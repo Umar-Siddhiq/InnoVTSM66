@@ -1,0 +1,17 @@
+# Ignore build directories
+build/
+Build/
+tools/
+docs/
+
+
+
+
+
+
+
+
+
+
+
+

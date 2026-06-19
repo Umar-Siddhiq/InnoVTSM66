@@ -1,0 +1,2205 @@
+This document is for Copilot or any AI though that works with this project. So before going through, before making any
+ changes or before studying this project, when you are studying thing regarding or server things or GPRS related things,
+  you have to go through this text document completely and learn it and keep in mind always.# COLORPLAST SIM PROFILE
+
+SWITCHING - COMPLETE PROGRAM FLOW EXPLANATION
+________________________________________________
+
+# OVERVIEW
+
+COLORPLAST SIM is a multi-profile SIM.
+
+The SIM internally contains multiple operator profiles:
+
+```
+Profile 1 -> Airtel
+Profile 2 -> BSNL
+Profile 3 -> Vi
+```
+
+Only one profile can be active at a time.
+
+The firmware uses STK (SIM Toolkit) commands to:
+1. Initialize STK session
+2. Navigate SIM internal menu state
+3. Select required profile
+4. Confirm selection
+5. Reset modem
+6. Verify IMSI changed
+
+---
+
+# COLORPLAST COMMAND DEFINITIONS
+
+#define STK_COLORPLAST_SETUP_COUNT        2
+#define STK_COLORPLAST_PROFILE_COUNT      3
+
+## STEP 1 COMMAND:
+
+#define STK_COLORPLAST_MENU
+"810301250082028281830100"
+
+## STEP 2 COMMAND:
+
+#define STK_COLORPLAST_ITEM
+"D30782020181900180"
+
+## PROFILE COMMANDS:
+
+#define STK_COLORPLAST_PRIMARY
+"810301240082028281830100900101"
+
+#define STK_COLORPLAST_SECONDARY
+"810301240082028281830100900102"
+
+#define STK_COLORPLAST_THIRD
+"810301240082028281830100900103"
+
+## CONFIRMATION COMMAND:
+
+#define STK_COLORPLAST_CONFIRM
+"810301010482028281830100"
+
+---
+
+# HOW DATA IS STORED INSIDE STKdata
+
+Earlier, this function executes:
+
+```
+LoadColorplastSTKData(&STKdata);
+```
+
+This fills the structure like below:
+
+```
+STKdata.setup_cmd_count = 2;
+
+STKdata.Setup[0].data =
+"810301250082028281830100";
+
+STKdata.Setup[0].type = 0;
+
+
+STKdata.Setup[1].data =
+"D30782020181900180";
+
+STKdata.Setup[1].type = 1;
+
+
+STKdata.Profile[0].data =
+"810301240082028281830100900101";
+
+STKdata.Profile[1].data =
+"810301240082028281830100900102";
+
+STKdata.Profile[2].data =
+"810301240082028281830100900103";
+```
+
+---
+
+# MEANING OF type FIELD
+
+type decides WHICH API should send the STK packet.
+
+There are TWO STK communication methods.
+
+---
+
+# TYPE = 0
+
+type = 0 means:
+
+```
+Use:
+RIL_QSTKTerminalResponse()
+```
+
+Meaning:
+This packet is treated as a TERMINAL RESPONSE.
+
+This is used when modem/phone is RESPONDING to SIM.
+
+Examples:
+- menu response
+- confirmation response
+- selection response
+
+---
+
+# TYPE = 1
+
+type = 1 means:
+
+```
+Use:
+RIL_QSTKEnvelopeCommand()
+```
+
+Meaning:
+This packet is treated as an ENVELOPE COMMAND.
+
+This is used when modem/phone is SENDING EVENT OR USER ACTION to SIM.
+
+Examples:
+- key press
+- menu navigation
+- event notification
+- selection event
+
+---
+
+# WHY type IS IMPORTANT
+
+SIM Toolkit protocol expects packets in proper format and direction.
+
+If wrong API is used:
+
+```
+- SIM ignores command
+- STK session breaks
+- menu state becomes invalid
+- profile switch fails
+```
+
+Therefore:
+
+```
+type = 0 -> TerminalResponse()
+type = 1 -> EnvelopeCommand()
+```
+
+is VERY IMPORTANT.
+
+---
+
+# ACTUAL EXECUTION FLOW
+
+Suppose firmware calls:
+
+```
+SwitchProfile(2);
+```
+
+Meaning:
+
+```
+Switch to Profile 2 = BSNL
+```
+
+---
+
+# STEP 1 - ENTER SETUP LOOP
+
+Code:
+
+```
+for(int i = 0; i < STKdata.setup_cmd_count; i++)
+```
+
+Value:
+
+```
+STKdata.setup_cmd_count = 2
+```
+
+Therefore loop runs:
+
+```
+Iteration 1 -> i = 0
+Iteration 2 -> i = 1
+```
+
+---
+
+# ITERATION 1
+
+## CURRENT INDEX:
+
+```
+i = 0
+```
+
+Firmware accesses:
+
+```
+STKdata.Setup[0]
+```
+
+Stored values:
+
+```
+data =
+"810301250082028281830100"
+
+type = 0
+```
+
+---
+
+# TYPE CHECK
+
+Code:
+
+```
+if(STKdata.Setup[i].type == 1)
+```
+
+Substituted value:
+
+```
+if(0 == 1)
+```
+
+Condition result:
+
+```
+FALSE
+```
+
+Therefore execution enters:
+
+```
+else block
+```
+
+---
+
+# API SELECTED
+
+Since type = 0:
+
+Firmware executes:
+
+```
+RIL_QSTKTerminalResponse(
+    "810301250082028281830100"
+);
+```
+
+---
+
+# WHAT THIS COMMAND DOES
+
+This is the FIRST STK initialization/menu command.
+
+This packet initializes STK interaction state.
+
+SIM internally interprets this as:
+
+```
+Terminal response for menu/session setup.
+```
+
+This packet is NOT treated as:
+- user event
+- key press
+
+Therefore:
+TerminalResponse() is correct API.
+
+---
+
+# RETURN CHECK
+
+Code:
+
+```
+if(ret != RIL_AT_SUCCESS)
+    return false;
+```
+
+If command fails:
+profile switching stops immediately.
+
+If success:
+
+```
+ThreadSleep(1500);
+```
+
+Firmware waits 1.5 seconds.
+
+Reason:
+SIM needs time to process STK packet and update internal menu/session state.
+
+---
+
+# ITERATION 2
+
+## CURRENT INDEX:
+
+```
+i = 1
+```
+
+Firmware accesses:
+
+```
+STKdata.Setup[1]
+```
+
+Stored values:
+
+```
+data =
+"D30782020181900180"
+
+type = 1
+```
+
+---
+
+# TYPE CHECK
+
+Code:
+
+```
+if(type == 1)
+```
+
+Substituted:
+
+```
+if(1 == 1)
+```
+
+Condition result:
+
+```
+TRUE
+```
+
+---
+
+# API SELECTED
+
+Firmware executes:
+
+```
+RIL_QSTKEnvelopeCommand(
+    "D30782020181900180"
+);
+```
+
+---
+
+# WHY EnvelopeCommand() HERE
+
+This packet is treated as:
+
+```
+User/menu event packet.
+```
+
+It represents STK event navigation.
+
+SIM interprets this as:
+- menu interaction
+- navigation action
+- internal event
+
+This is NOT treated as terminal reply.
+
+Therefore:
+EnvelopeCommand() is mandatory here.
+
+---
+
+# RETURN CHECK
+
+Again:
+
+```
+if(ret != SUCCESS)
+    return false;
+```
+
+If success:
+
+```
+ThreadSleep(1500);
+```
+
+Firmware again waits 1.5 seconds.
+
+---
+
+# IMPORTANT STATE AFTER SETUP LOOP
+
+At this point:
+
+```
+STK session initialized
+SIM internal menu state prepared
+Profile selection stage reached
+```
+
+Now firmware can send actual profile selection command.
+
+---
+
+# PROFILE COMMAND SECTION
+
+Firmware called:
+
+```
+SwitchProfile(2)
+```
+
+Meaning:
+
+```
+Select BSNL profile
+```
+
+---
+
+# PROFILE INDEX CALCULATION
+
+Code:
+
+```
+STKdata.Profile[num - 1]
+```
+
+Value:
+
+```
+num = 2
+```
+
+Therefore:
+
+```
+num - 1 = 1
+```
+
+Firmware accesses:
+
+```
+STKdata.Profile[1]
+```
+
+Value stored:
+
+```
+"810301240082028281830100900102"
+```
+
+---
+
+# MEANING OF THIS COMMAND
+
+This packet means:
+
+```
+Select profile/account ID 02
+```
+
+Which corresponds to:
+
+```
+BSNL profile
+```
+
+---
+
+# PROFILE TYPE CHECK
+
+For COLORPLAST:
+profile type defaults to 0
+
+Therefore:
+
+```
+TerminalResponse() API used.
+```
+
+---
+
+# API EXECUTION
+
+Firmware executes:
+
+```
+RIL_QSTKTerminalResponse(
+    "810301240082028281830100900102"
+);
+```
+
+---
+
+# WHY TerminalResponse() HERE
+
+SIM expects this packet as:
+
+```
+Response to current STK menu state.
+```
+
+This is interpreted as:
+menu selection response.
+
+NOT as:
+independent event notification.
+
+Therefore:
+TerminalResponse() is correct.
+
+---
+
+# RETURN CHECK
+
+If failed:
+
+```
+return false;
+```
+
+If success:
+
+```
+ThreadSleep(1500);
+```
+
+---
+
+# IMPORTANT STATE AFTER PROFILE COMMAND
+
+At this point:
+
+```
+SIM internally selected profile 02.
+```
+
+However:
+selection is NOT finalized yet.
+
+COLORPLAST requires additional confirmation command.
+
+---
+
+# CONFIRMATION PHASE
+
+Condition:
+
+```
+if(VTSData.SIMMake == COLORPLAST)
+```
+
+Result:
+TRUE
+
+---
+
+# CONFIRMATION COMMAND EXECUTION
+
+Firmware executes:
+
+```
+RIL_QSTKTerminalResponse(
+    "810301010482028281830100"
+);
+```
+
+---
+
+# MEANING OF CONFIRMATION COMMAND
+
+This packet means:
+
+```
+Confirm profile selection.
+```
+
+SIM internally interprets:
+
+```
+"YES, apply selected profile."
+```
+
+---
+
+# WHY TerminalResponse() AGAIN
+
+Because SIM expects confirmation as:
+
+```
+response to confirmation request.
+```
+
+Example internal STK flow:
+
+```
+SIM -> Confirm switch?
+MODEM -> Yes
+```
+
+Therefore:
+TerminalResponse() required.
+
+---
+
+# RETURN CHECK
+
+If failed:
+
+```
+return false;
+```
+
+If success:
+
+```
+ThreadSleep(1500);
+```
+
+---
+
+# IMPORTANT STATE AFTER CONFIRMATION
+
+Now SIM has:
+
+```
+committed new profile internally.
+```
+
+Meaning:
+- new IMSI selected
+- new operator profile activated internally
+
+However modem still running old session.
+
+---
+
+# MODEM RESET PHASE
+
+Code intention:
+
+```
+AT+CFUN=1,1
+```
+
+(Currently commented)
+
+Expected actual execution:
+
+```
+SendCFUNAT(1,1);
+```
+
+---
+
+# WHY RESET IS REQUIRED
+
+Even though SIM switched profile internally:
+
+```
+modem still using old IMSI/session/network state.
+```
+
+Reset forces modem to:
+
+```
+- reread SIM
+- reload IMSI
+- restart GSM stack
+- restart network registration
+```
+
+---
+
+# WAIT AFTER RESET
+
+Code:
+
+```
+ThreadSleep(3000);
+```
+
+Firmware waits 3 seconds for modem restart.
+
+---
+
+# IMSI VERIFICATION PHASE
+
+Later firmware executes:
+
+```
+RIL_SIM_GetIMSI(imsi);
+```
+
+Now modem reads SIM again.
+
+---
+
+# SUCCESS CONDITION
+
+If:
+
+```
+Old IMSI != New IMSI
+```
+
+Then:
+
+```
+Profile switching SUCCESS.
+```
+
+Else:
+
+```
+Profile switching FAILED.
+```
+
+---
+
+# COMPLETE EXECUTION SEQUENCE
+
+SwitchProfile(2)
+
+↓
+
+Setup Loop Starts
+
+↓
+
+Iteration 1
+
+↓
+
+Setup[0]
+data = "810301250082028281830100"
+type = 0
+
+↓
+
+TerminalResponse(
+"810301250082028281830100"
+)
+
+↓
+
+Sleep 1500ms
+
+↓
+
+Iteration 2
+
+↓
+
+Setup[1]
+data = "D30782020181900180"
+type = 1
+
+↓
+
+EnvelopeCommand(
+"D30782020181900180"
+)
+
+↓
+
+Sleep 1500ms
+
+↓
+
+Profile Selection
+
+↓
+
+Profile[1]
+data =
+"810301240082028281830100900102"
+
+↓
+
+TerminalResponse(
+"810301240082028281830100900102"
+)
+
+↓
+
+Sleep 1500ms
+
+↓
+
+Confirmation Phase
+
+↓
+
+TerminalResponse(
+"810301010482028281830100"
+)
+
+↓
+
+Sleep 1500ms
+
+↓
+
+AT+CFUN=1,1
+
+↓
+
+Sleep 3000ms
+
+↓
+
+Read IMSI
+
+↓
+
+If IMSI changed:
+SUCCESS
+
+Else:
+FAILURE
+
+
+
+
+Searched for text `GetNextValidProfile` (`**/custom/**/*.c`), 4 results
+
+Searched for text `GetNextValidProfile` (`**/custom/**/*.h`), 1 result
+
+Read [](file:///c%3A/Users/Admin/Desktop/InnoVTSM66/custom/GPRS.c#149-149), lines 149 to 178
+
+Read [](file:///c%3A/Users/Admin/Desktop/InnoVTSM66/custom/GPRS.c#160-160), lines 160 to 215
+
+Searched for text `ProfileFailCount` (`**/custom/**/*.c`), 9 results
+
+Searched for text `MAX_CONSECUTIVE_FAILS` (`**/custom/**/*.c`), 4 results
+
+Searched for text `MAX_CONSECUTIVE_FAILS` (`**/custom/**/*.h`), no results
+
+Read [](file:///c%3A/Users/Admin/Desktop/InnoVTSM66/custom/GPRS.c#350-350), lines 350 to 410
+
+Read [](file:///c%3A/Users/Admin/Desktop/InnoVTSM66/custom/inc/VTS.h#609-609), lines 609 to 609
+
+Searched for text `ProfileFailCount` (`**/custom/inc/VTS.h`), 1 result
+
+Now I'll provide a comprehensive explanation of how `GetNextValidProfile()` works with failure history tracking:
+
+## **`GetNextValidProfile()` - Intelligent Profile Selection System**
+
+### **Overview:**
+This function intelligently rotates between available profiles, **automatically skipping broken ones** based on failure history. It ensures the device keeps trying different carriers until it finds one that works.
+
+---
+
+### **Key Data Structure: Failure Tracking**
+
+```c
+// In VTS.h (line 556):
+typedef struct {
+    uint8_t CurrentProfile;        // Currently active profile (1-3 for IDEMIA_3P)
+    uint8_t ProfileFailCount[5];   // Tracks consecutive failures per profile
+                                   // Index 0: unused
+                                   // Index 1-3: AIRTEL, BSNL, VIL (for IDEMIA_3P)
+                                   // Index 4: reserved
+} VTSStateTypedef;
+```
+
+**Failure Threshold:** `MAX_CONSECUTIVE_FAILS = 3`
+- Once a profile fails 3 consecutive times, it's **skipped** automatically
+- Only profiles with `ProfileFailCount < 3` are tried
+
+---
+
+### **How Failures Are Tracked:**
+
+#### **Failure Case 1: IMSI Read Failed**
+```c
+// When profile switch command sent but IMSI check fails
+if (ret != RIL_AT_SUCCESS)  // Failed to read new IMSI
+{
+    VTSState.ProfileFailCount[num]++;  // Increment failure count
+    LOGData(..., "Profile %d switch failed (IMSI read error), fail count: %d", 
+            num, VTSState.ProfileFailCount[num]);
+}
+```
+Example:
+- Try Profile 1 → IMSI read fails → `ProfileFailCount[1] = 1`
+- Try Profile 1 again → IMSI read fails → `ProfileFailCount[1] = 2`
+- Try Profile 1 again → IMSI read fails → `ProfileFailCount[1] = 3` ❌ **BLACKLISTED**
+
+#### **Failure Case 2: Profile Doesn't Exist on SIM**
+```c
+// When IMSI didn't change (profile doesn't exist on this SIM)
+if(Ql_strstr(imsi, NetWork.IMSI))  // Same IMSI = profile not found
+{
+    VTSState.ProfileFailCount[num]++;
+    LOGData(..., "Profile %d switch failed (non-existent profile), fail count: %d");
+}
+```
+Example: SIM only has profiles 1 & 3, but no profile 2
+- Try Profile 2 → IMSI unchanged → `ProfileFailCount[2] = 1`
+- Try Profile 2 → IMSI unchanged → `ProfileFailCount[2] = 2`
+- Try Profile 2 → IMSI unchanged → `ProfileFailCount[2] = 3` ❌ **BLACKLISTED**
+
+#### **Success: Reset Failure Count**
+```c
+// When profile successfully switches (IMSI changed)
+LOGData(TAG_GPRS, "Profile Successfully Changed");
+VTSState.ProfileFailCount[num] = 0;  // Reset to 0
+LOGData(..., "Profile %d switch successful, resetting fail count", num);
+```
+
+---
+
+### **Algorithm: GetNextValidProfile()**
+
+```
+START with nextProfile = (currentProfile % profiles_supported) + 1
+
+LOOP through all available profiles:
+    IF ProfileFailCount[nextProfile] < 3:
+        ✅ Found valid profile! Return it
+    ELSE:
+        ⏭️ Try next profile (wrap around if needed)
+
+IF ALL profiles have ≥ 3 failures:
+    🔄 RESET all ProfileFailCount[i] = 0
+    ↩️  Return profile 1 (fresh start)
+```
+
+---
+
+### **Practical Example with IDEMIA_3P (3 Profiles)**
+
+#### **Scenario: Airel (P1) is broken, BSNL (P2) works, VIL (P3) is broken**
+
+**Initial State:**
+```
+CurrentProfile = 3 (VIL)
+ProfileFailCount[1] = 0 (AIRTEL - not tried yet)
+ProfileFailCount[2] = 0 (BSNL - not tried yet)
+ProfileFailCount[3] = 0 (VIL - not tried yet)
+```
+
+**Timeout triggers at 2 minutes:**
+1. `GetNextValidProfile(3)` called
+2. Next = (3 % 3) + 1 = **1 (AIRTEL)**
+3. Check: `ProfileFailCount[1]` (0) < 3? ✅ YES
+4. **Return 1** → Try AIRTEL
+
+**AIRTEL fails (network error):**
+```
+ProfileFailCount[1] = 1
+```
+
+**Timeout triggers at 4 minutes:**
+1. `GetNextValidProfile(1)` called
+2. Next = (1 % 3) + 1 = **2 (BSNL)**
+3. Check: `ProfileFailCount[2]` (0) < 3? ✅ YES
+4. **Return 2** → Try BSNL
+
+**BSNL succeeds (IMSI changes):**
+```
+ProfileFailCount[2] = 0  (reset to 0)
+CurrentProfile = 2      (now using BSNL)
+```
+
+**Later, BSNL loses signal (timeout 2 min):**
+1. `GetNextValidProfile(2)` called
+2. Next = (2 % 3) + 1 = **3 (VIL)**
+3. Check: `ProfileFailCount[3]` (0) < 3? ✅ YES
+4. **Return 3** → Try VIL
+
+**VIL fails 3 times:**
+```
+ProfileFailCount[3] = 1, 2, 3 ❌ BLACKLISTED
+```
+
+**Next timeout at 8 minutes:**
+1. `GetNextValidProfile(3)` called
+2. Try profile 1: `ProfileFailCount[1]` (1) < 3? ✅ YES
+3. **Return 1** → Try AIRTEL again
+
+---
+
+### **Smart Behavior Summary:**
+
+| Situation | Behavior |
+|-----------|----------|
+| Profile works perfectly | Keep using it (fails = 0) |
+| Profile fails once or twice | Try it again next rotation |
+| Profile fails 3 times | **Skip it completely** |
+| All profiles fail 3+ times | **Reset everything and start fresh** |
+| Found good profile | Stay on it until it disconnects |
+
+---
+
+### **For Your IDEMIA_3P Setup:**
+- ✅ **Profile 3 (AIRTEL):** Set as default - if it works, stays active
+- ✅ **Profile 2 (BSNL):** Tried if Profile 3 fails 3 times
+- ✅ **Profile 1 (VIL):** Tried if Profile 2 fails 3 times
+- 🔄 **Auto-reset:** If all fail, counters reset and cycle restarts
+
+This ensures **maximum uptime** by automatically avoiding bad profiles while regularly retrying them in case the network recovers.
+
+
+
+
+++++++++++++++++      ISSUE BLACKLISTING       +++++++++++++++++++++++++++++++++++++++
+------------------------------------------------------------------------------------------------------------------
+10:46:02 RX bytes: 3
+10:46:02 RX bytes: 8
+10:46:02 RX bytes: 7
+10:46:02 RX bytes: 5
+10:46:02 RX bytes: 7
+10:46:02 RX bytes: 4
+10:46:02 RX bytes: 4
+10:46:02 RX bytes: 29
+10:46:02 INFO: RX: $GPD,868329080224359,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:46:02 INFO: Branch: $GPD
+10:46:02 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=2, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:46:03 RX bytes: 41
+10:46:03 RX bytes: 3
+10:46:03 RX bytes: 14
+10:46:03 RX bytes: 13
+10:46:03 RX bytes: 10
+10:46:03 RX bytes: 11
+10:46:03 RX bytes: 12
+10:46:03 RX bytes: 24
+10:46:03 RX bytes: 6
+10:46:03 RX bytes: 5
+10:46:03 RX bytes: 11
+10:46:03 RX bytes: 17
+10:46:03 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,3,3,3,,8991430008112790394F,404940946777138,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:03 INFO: Branch: $INF
+10:46:03 Update check scheduled
+10:46:03 Update check scheduled
+10:46:03 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=3/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:04 RX bytes: 1
+10:46:04 RX bytes: 3
+10:46:04 RX bytes: 10
+10:46:04 RX bytes: 6
+10:46:04 RX bytes: 5
+10:46:04 RX bytes: 5
+10:46:04 RX bytes: 5
+10:46:04 RX bytes: 7
+10:46:04 RX bytes: 20
+10:46:04 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:46:04 INFO: Branch: $CEL
+10:46:04 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:46:04 Update check starting
+10:46:05 RX bytes: 1
+10:46:05 RX bytes: 1
+10:46:05 RX bytes: 3
+10:46:05 RX bytes: 11
+10:46:05 RX bytes: 2
+10:46:05 RX bytes: 5
+10:46:05 RX bytes: 3
+10:46:05 RX bytes: 2
+10:46:05 RX bytes: 4
+10:46:05 RX bytes: 5
+10:46:05 RX bytes: 4
+10:46:05 RX bytes: 4
+10:46:05 RX bytes: 16
+10:46:05 RX bytes: 1
+10:46:05 INFO: RX: $PER,868329080224359,1,0,051605,150526,1,1,0,0,0,0,1,11.2,4.1
+10:46:05 INFO: Branch: $PER
+10:46:05 INFO: Parsed $PER: GPS=1/0, Time=05:16:05, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.2, BattVolt=4.1
+10:46:06 RX bytes: 1
+10:46:06 RX bytes: 1
+10:46:06 RX bytes: 2
+10:46:06 RX bytes: 10
+10:46:06 RX bytes: 5
+10:46:06 RX bytes: 7
+10:46:06 RX bytes: 9
+10:46:06 RX bytes: 4
+10:46:06 RX bytes: 14
+10:46:06 RX bytes: 5
+10:46:06 RX bytes: 1
+10:46:06 RX bytes: 2
+10:46:06 RX bytes: 1
+10:46:06 RX bytes: 6
+10:46:06 INFO: RX: $GPD,868329080224359,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:46:06 INFO: Branch: $GPD
+10:46:06 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=2, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:46:08 RX bytes: 1
+10:46:08 RX bytes: 2
+10:46:08 RX bytes: 2
+10:46:08 RX bytes: 10
+10:46:08 RX bytes: 2
+10:46:08 RX bytes: 2
+10:46:08 RX bytes: 8
+10:46:08 RX bytes: 9
+10:46:08 RX bytes: 5
+10:46:08 RX bytes: 8
+10:46:08 RX bytes: 9
+10:46:08 RX bytes: 7
+10:46:08 RX bytes: 6
+10:46:08 RX bytes: 7
+10:46:08 RX bytes: 4
+10:46:08 RX bytes: 4
+10:46:08 RX bytes: 2
+10:46:08 RX bytes: 2
+10:46:08 RX bytes: 5
+10:46:08 RX bytes: 4
+10:46:08 RX bytes: 8
+10:46:08 RX bytes: 4
+10:46:08 RX bytes: 8
+10:46:08 RX bytes: 6
+10:46:08 RX bytes: 7
+10:46:08 RX bytes: 3
+10:46:08 RX bytes: 6
+10:46:08 RX bytes: 1
+10:46:08 RX bytes: 1
+10:46:08 RX bytes: 1
+10:46:08 RX bytes: 12
+10:46:08 RX bytes: 11
+10:46:08 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,3,3,3,,8991430008112790394F,404940946777138,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:08 INFO: Branch: $INF
+10:46:08 Update check scheduled
+10:46:08 Update check scheduled
+10:46:08 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=3/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:09 RX bytes: 1
+10:46:09 RX bytes: 2
+10:46:09 RX bytes: 2
+10:46:09 RX bytes: 9
+10:46:09 RX bytes: 5
+10:46:09 RX bytes: 6
+10:46:09 RX bytes: 6
+10:46:09 RX bytes: 5
+10:46:09 RX bytes: 7
+10:46:09 RX bytes: 11
+10:46:09 RX bytes: 5
+10:46:09 RX bytes: 3
+10:46:09 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:46:09 INFO: Branch: $CEL
+10:46:09 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:46:09 Update check starting
+10:46:10 RX bytes: 1
+10:46:10 RX bytes: 3
+10:46:10 RX bytes: 8
+10:46:10 RX bytes: 2
+10:46:10 RX bytes: 4
+10:46:10 RX bytes: 4
+10:46:10 RX bytes: 4
+10:46:10 RX bytes: 7
+10:46:10 RX bytes: 9
+10:46:10 RX bytes: 14
+10:46:10 RX bytes: 6
+10:46:10 INFO: RX: $PER,868329080224359,1,0,051610,150526,1,1,0,0,0,0,1,11.1,4.2
+10:46:10 INFO: Branch: $PER
+10:46:10 INFO: Parsed $PER: GPS=1/0, Time=05:16:10, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.1, BattVolt=4.2
+10:46:11 RX bytes: 1
+10:46:11 RX bytes: 1
+10:46:11 RX bytes: 2
+10:46:11 RX bytes: 1
+10:46:11 RX bytes: 13
+10:46:11 RX bytes: 9
+10:46:11 RX bytes: 9
+10:46:11 RX bytes: 8
+10:46:11 RX bytes: 7
+10:46:11 RX bytes: 6
+10:46:11 RX bytes: 7
+10:46:11 RX bytes: 4
+10:46:11 INFO: RX: $GPD,868329080224359,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:46:11 INFO: Branch: $GPD
+10:46:11 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=2, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:46:12 RX bytes: 1
+10:46:12 RX bytes: 1
+10:46:12 RX bytes: 4
+10:46:12 RX bytes: 10
+10:46:12 RX bytes: 7
+10:46:12 RX bytes: 15
+10:46:12 RX bytes: 8
+10:46:12 RX bytes: 12
+10:46:12 RX bytes: 16
+10:46:12 RX bytes: 27
+10:46:12 RX bytes: 8
+10:46:12 RX bytes: 4
+10:46:12 RX bytes: 8
+10:46:12 RX bytes: 6
+10:46:12 RX bytes: 9
+10:46:12 RX bytes: 8
+10:46:12 RX bytes: 3
+10:46:12 RX bytes: 19
+10:46:12 RX bytes: 1
+10:46:13 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,3,3,3,,8991430008112790394F,404940946777138,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:13 INFO: Branch: $INF
+10:46:13 Update check scheduled
+10:46:13 Update check scheduled
+10:46:13 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=3/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:14 RX bytes: 1
+10:46:14 RX bytes: 2
+10:46:14 RX bytes: 9
+10:46:14 RX bytes: 11
+10:46:14 RX bytes: 8
+10:46:14 RX bytes: 11
+10:46:14 RX bytes: 20
+10:46:14 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:46:14 INFO: Branch: $CEL
+10:46:14 Update check starting
+10:46:14 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:46:15 RX bytes: 1
+10:46:15 RX bytes: 2
+10:46:15 RX bytes: 2
+10:46:15 RX bytes: 18
+10:46:15 RX bytes: 7
+10:46:15 RX bytes: 13
+10:46:15 RX bytes: 17
+10:46:15 RX bytes: 2
+10:46:15 INFO: RX: $PER,868329080224359,1,0,051615,150526,1,1,0,0,0,0,1,11.1,4.1
+10:46:15 INFO: Branch: $PER
+10:46:15 INFO: Parsed $PER: GPS=1/0, Time=05:16:15, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.1, BattVolt=4.1
+10:46:16 RX bytes: 1
+10:46:16 RX bytes: 4
+10:46:16 RX bytes: 9
+10:46:16 RX bytes: 6
+10:46:16 RX bytes: 7
+10:46:16 RX bytes: 10
+10:46:16 RX bytes: 6
+10:46:16 RX bytes: 18
+10:46:16 RX bytes: 6
+10:46:16 RX bytes: 1
+10:46:16 INFO: RX: $GPD,868329080224359,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:46:16 INFO: Branch: $GPD
+10:46:16 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=2, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:46:17 RX bytes: 1
+10:46:17 RX bytes: 2
+10:46:17 RX bytes: 2
+10:46:17 RX bytes: 10
+10:46:17 RX bytes: 2
+10:46:17 RX bytes: 7
+10:46:17 RX bytes: 8
+10:46:17 RX bytes: 4
+10:46:17 RX bytes: 5
+10:46:17 RX bytes: 14
+10:46:17 RX bytes: 2
+10:46:17 RX bytes: 4
+10:46:17 RX bytes: 5
+10:46:17 RX bytes: 7
+10:46:17 RX bytes: 2
+10:46:17 RX bytes: 8
+10:46:17 RX bytes: 25
+10:46:17 RX bytes: 2
+10:46:17 RX bytes: 2
+10:46:17 RX bytes: 1
+10:46:17 RX bytes: 1
+10:46:17 RX bytes: 1
+10:46:17 RX bytes: 3
+10:46:17 RX bytes: 3
+10:46:17 RX bytes: 2
+10:46:17 RX bytes: 2
+10:46:17 RX bytes: 15
+10:46:17 RX bytes: 4
+10:46:17 RX bytes: 4
+10:46:17 RX bytes: 19
+10:46:17 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,3,3,3,,8991430008112790394F,404940946777138,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:17 INFO: Branch: $INF
+10:46:17 Update check scheduled
+10:46:17 Update check scheduled
+10:46:17 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=3/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:18 RX bytes: 1
+10:46:18 RX bytes: 3
+10:46:18 RX bytes: 10
+10:46:18 RX bytes: 9
+10:46:18 RX bytes: 6
+10:46:18 RX bytes: 12
+10:46:18 RX bytes: 21
+10:46:19 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:46:19 INFO: Branch: $CEL
+10:46:19 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:46:19 Update check starting
+10:46:20 RX bytes: 1
+10:46:20 RX bytes: 1
+10:46:20 RX bytes: 2
+10:46:20 RX bytes: 1
+10:46:20 RX bytes: 9
+10:46:20 RX bytes: 6
+10:46:20 RX bytes: 3
+10:46:20 RX bytes: 7
+10:46:20 RX bytes: 11
+10:46:20 RX bytes: 13
+10:46:20 RX bytes: 8
+10:46:20 INFO: RX: $PER,868329080224359,1,0,051619,150526,1,1,0,0,0,0,1,11.2,4.0
+10:46:20 INFO: Branch: $PER
+10:46:20 INFO: Parsed $PER: GPS=1/0, Time=05:16:19, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.2, BattVolt=4
+10:46:21 RX bytes: 1
+10:46:21 RX bytes: 2
+10:46:21 RX bytes: 32
+10:46:21 RX bytes: 9
+10:46:21 RX bytes: 22
+10:46:21 RX bytes: 2
+10:46:21 INFO: RX: $GPD,868329080224359,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:46:21 INFO: Branch: $GPD
+10:46:21 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=2, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:46:22 RX bytes: 1
+10:46:22 RX bytes: 4
+10:46:22 RX bytes: 9
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 1
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 1
+10:46:22 RX bytes: 3
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 1
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 4
+10:46:22 RX bytes: 8
+10:46:22 RX bytes: 8
+10:46:22 RX bytes: 5
+10:46:22 RX bytes: 6
+10:46:22 RX bytes: 7
+10:46:22 RX bytes: 3
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 5
+10:46:22 RX bytes: 3
+10:46:22 RX bytes: 10
+10:46:22 RX bytes: 4
+10:46:22 RX bytes: 3
+10:46:22 RX bytes: 3
+10:46:22 RX bytes: 5
+10:46:22 RX bytes: 6
+10:46:22 RX bytes: 15
+10:46:22 RX bytes: 3
+10:46:22 RX bytes: 1
+10:46:22 RX bytes: 9
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 1
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 3
+10:46:22 RX bytes: 1
+10:46:22 RX bytes: 3
+10:46:22 RX bytes: 1
+10:46:22 RX bytes: 1
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 2
+10:46:22 RX bytes: 1
+10:46:22 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,15,ID3P,3,3,3,,8991430008112790394F,404940946777138,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:22 INFO: Branch: $INF
+10:46:22 Update check scheduled
+10:46:22 Update check scheduled
+10:46:22 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=15, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=3/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:23 RX bytes: 1
+10:46:23 RX bytes: 2
+10:46:23 RX bytes: 2
+10:46:23 RX bytes: 9
+10:46:23 RX bytes: 1
+10:46:23 RX bytes: 23
+10:46:23 RX bytes: 24
+10:46:23 INFO: RX: $CEL,868329080224359,0,0,,,15,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:46:23 INFO: Branch: $CEL
+10:46:24 Update check starting
+10:46:24 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=15, Neighbors=4
+10:46:25 RX bytes: 1
+10:46:25 RX bytes: 1
+10:46:25 RX bytes: 2
+10:46:25 RX bytes: 11
+10:46:25 RX bytes: 3
+10:46:25 RX bytes: 2
+10:46:25 RX bytes: 2
+10:46:25 RX bytes: 11
+10:46:25 RX bytes: 10
+10:46:25 RX bytes: 16
+10:46:25 RX bytes: 3
+10:46:25 INFO: RX: $PER,868329080224359,1,0,051625,150526,1,1,0,0,0,0,1,11.1,4.1
+10:46:25 INFO: Branch: $PER
+10:46:25 INFO: Parsed $PER: GPS=1/0, Time=05:16:25, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.1, BattVolt=4.1
+10:46:26 RX bytes: 4
+10:46:26 RX bytes: 3
+10:46:26 RX bytes: 9
+10:46:26 RX bytes: 16
+10:46:26 RX bytes: 6
+10:46:26 RX bytes: 7
+10:46:26 RX bytes: 16
+10:46:26 RX bytes: 7
+10:46:26 INFO: RX: $GPD,868329080224359,0,3,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:46:26 INFO: Branch: $GPD
+10:46:26 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=3, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:46:27 RX bytes: 1
+10:46:27 RX bytes: 3
+10:46:27 RX bytes: 9
+10:46:27 RX bytes: 2
+10:46:27 RX bytes: 4
+10:46:27 RX bytes: 12
+10:46:27 RX bytes: 5
+10:46:27 RX bytes: 7
+10:46:27 RX bytes: 21
+10:46:27 RX bytes: 3
+10:46:27 RX bytes: 7
+10:46:27 RX bytes: 16
+10:46:27 RX bytes: 11
+10:46:27 RX bytes: 7
+10:46:27 RX bytes: 4
+10:46:27 RX bytes: 47
+10:46:27 RX bytes: 1
+10:46:27 RX bytes: 7
+10:46:27 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,18,ID3P,3,3,3,,8991430008112790394F,404940946777138,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:27 INFO: Branch: $INF
+10:46:27 Update check scheduled
+10:46:27 Update check scheduled
+10:46:27 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=18, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=3/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:29 Update check starting
+10:46:38 RX bytes: 1
+10:46:38 RX bytes: 2
+10:46:38 RX bytes: 10
+10:46:38 RX bytes: 6
+10:46:38 RX bytes: 6
+10:46:38 RX bytes: 14
+10:46:38 RX bytes: 15
+10:46:39 INFO: RX: $RES,****REGISTRATION DENIED, Switching Profile ****
+10:46:39 INFO: Branch: $RES
+10:46:48 RX bytes: 1
+10:46:48 RX bytes: 2
+10:46:48 RX bytes: 2
+10:46:48 RX bytes: 11
+10:46:48 RX bytes: 4
+10:46:48 RX bytes: 9
+10:46:48 RX bytes: 6
+10:46:48 RX bytes: 24
+10:46:48 RX bytes: 17
+10:46:48 RX bytes: 23
+10:46:48 RX bytes: 17
+10:46:48 RX bytes: 9
+10:46:48 RX bytes: 42
+10:46:48 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,2,3,3,,8991430008112790394F,404720210350322,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:48 INFO: Parsed $RES: $RES,****REGISTRATION DENIED, Switching Profile ****
+10:46:48 INFO: Branch: $INF
+10:46:48 Update check scheduled
+10:46:48 INFO: Fetched SPN from server for IMSI: 404720210350322 (operator=BSNL)
+10:46:48 INFO: Fetched MSISDN/profiles from server for IMSI: 404720210350322 (msisdn=5752090706302, profiles=3, count=3)
+10:46:48 Update check scheduled
+10:46:48 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=2/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:49 RX bytes: 5
+10:46:49 RX bytes: 2
+10:46:49 RX bytes: 20
+10:46:49 RX bytes: 16
+10:46:49 RX bytes: 10
+10:46:49 RX bytes: 9
+10:46:49 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:46:49 INFO: Branch: $CEL
+10:46:49 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:46:50 Update check starting
+10:46:50 Update check request: api/update/command?state=FQ_TN1&simMake=ID3P&fwVersion=1&mcuVersion=V0.1.0&make=QUICKTEL
+10:46:50 RX bytes: 1
+10:46:50 RX bytes: 2
+10:46:50 RX bytes: 2
+10:46:50 RX bytes: 4
+10:46:50 RX bytes: 6
+10:46:50 RX bytes: 4
+10:46:50 RX bytes: 5
+10:46:50 RX bytes: 12
+10:46:50 RX bytes: 6
+10:46:50 RX bytes: 14
+10:46:50 RX bytes: 6
+10:46:50 INFO: RX: $PER,868329080224359,1,0,051650,150526,1,1,0,0,0,0,1,11.0,4.0
+10:46:50 INFO: Branch: $PER
+10:46:50 INFO: Parsed $PER: GPS=1/0, Time=05:16:50, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11, BattVolt=4
+10:46:51 RX bytes: 1
+10:46:51 RX bytes: 2
+10:46:51 RX bytes: 2
+10:46:51 RX bytes: 10
+10:46:51 RX bytes: 2
+10:46:51 RX bytes: 1
+10:46:51 RX bytes: 1
+10:46:51 RX bytes: 2
+10:46:51 RX bytes: 5
+10:46:51 RX bytes: 6
+10:46:51 RX bytes: 5
+10:46:51 RX bytes: 3
+10:46:51 RX bytes: 13
+10:46:51 RX bytes: 3
+10:46:51 RX bytes: 7
+10:46:51 RX bytes: 5
+10:46:51 INFO: RX: $GPD,868329080224359,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:46:51 INFO: Branch: $GPD
+10:46:51 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=1, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:46:53 RX bytes: 1
+10:46:53 RX bytes: 2
+10:46:53 RX bytes: 2
+10:46:53 RX bytes: 11
+10:46:53 RX bytes: 9
+10:46:53 RX bytes: 8
+10:46:53 RX bytes: 6
+10:46:53 RX bytes: 6
+10:46:53 RX bytes: 12
+10:46:53 RX bytes: 4
+10:46:53 RX bytes: 4
+10:46:53 RX bytes: 3
+10:46:53 RX bytes: 3
+10:46:53 RX bytes: 4
+10:46:53 RX bytes: 9
+10:46:53 RX bytes: 3
+10:46:53 RX bytes: 2
+10:46:53 RX bytes: 6
+10:46:53 RX bytes: 3
+10:46:53 RX bytes: 5
+10:46:53 RX bytes: 6
+10:46:53 RX bytes: 5
+10:46:53 RX bytes: 7
+10:46:53 RX bytes: 9
+10:46:53 RX bytes: 10
+10:46:53 RX bytes: 5
+10:46:53 RX bytes: 4
+10:46:53 RX bytes: 6
+10:46:53 RX bytes: 5
+10:46:53 RX bytes: 5
+10:46:53 RX bytes: 1
+10:46:53 RX bytes: 1
+10:46:53 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,2,3,3,,8991430008112790394F,404720210350322,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:53 INFO: Branch: $INF
+10:46:53 Update check scheduled
+10:46:53 Update check scheduled
+10:46:53 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=2/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:54 RX bytes: 1
+10:46:54 RX bytes: 3
+10:46:54 RX bytes: 10
+10:46:54 RX bytes: 11
+10:46:54 RX bytes: 3
+10:46:54 RX bytes: 12
+10:46:54 RX bytes: 11
+10:46:54 RX bytes: 3
+10:46:54 RX bytes: 1
+10:46:54 RX bytes: 7
+10:46:54 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:46:54 INFO: Branch: $CEL
+10:46:54 Update check starting
+10:46:54 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:46:55 RX bytes: 1
+10:46:55 RX bytes: 2
+10:46:55 RX bytes: 2
+10:46:55 RX bytes: 10
+10:46:55 RX bytes: 4
+10:46:55 RX bytes: 24
+10:46:55 RX bytes: 17
+10:46:55 RX bytes: 2
+10:46:55 INFO: RX: $PER,868329080224359,1,0,051655,150526,1,1,0,0,0,0,1,11.1,4.2
+10:46:55 INFO: Branch: $PER
+10:46:55 INFO: Parsed $PER: GPS=1/0, Time=05:16:55, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.1, BattVolt=4.2
+10:46:56 RX bytes: 1
+10:46:56 RX bytes: 4
+10:46:56 RX bytes: 8
+10:46:56 RX bytes: 2
+10:46:56 RX bytes: 3
+10:46:56 RX bytes: 9
+10:46:56 RX bytes: 16
+10:46:56 RX bytes: 16
+10:46:56 RX bytes: 9
+10:46:56 INFO: RX: $GPD,868329080224359,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:46:56 INFO: Branch: $GPD
+10:46:56 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=1, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:46:57 RX bytes: 1
+10:46:57 RX bytes: 2
+10:46:57 RX bytes: 2
+10:46:57 RX bytes: 12
+10:46:57 RX bytes: 2
+10:46:57 RX bytes: 7
+10:46:57 RX bytes: 10
+10:46:57 RX bytes: 9
+10:46:57 RX bytes: 20
+10:46:57 RX bytes: 7
+10:46:57 RX bytes: 20
+10:46:57 RX bytes: 5
+10:46:57 RX bytes: 4
+10:46:58 RX bytes: 2
+10:46:58 RX bytes: 9
+10:46:58 RX bytes: 4
+10:46:58 RX bytes: 14
+10:46:58 RX bytes: 8
+10:46:58 RX bytes: 15
+10:46:58 RX bytes: 7
+10:46:58 RX bytes: 7
+10:46:58 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,2,3,3,,8991430008112790394F,404720210350322,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:58 INFO: Branch: $INF
+10:46:58 Update check scheduled
+10:46:58 Update check scheduled
+10:46:58 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=2/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:46:59 RX bytes: 1
+10:46:59 RX bytes: 2
+10:46:59 RX bytes: 2
+10:46:59 RX bytes: 12
+10:46:59 RX bytes: 5
+10:46:59 RX bytes: 7
+10:46:59 RX bytes: 12
+10:46:59 RX bytes: 21
+10:46:59 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:46:59 INFO: Branch: $CEL
+10:46:59 Update check starting
+10:46:59 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:47:00 RX bytes: 13
+10:47:00 RX bytes: 3
+10:47:00 RX bytes: 11
+10:47:00 RX bytes: 9
+10:47:00 RX bytes: 6
+10:47:00 RX bytes: 5
+10:47:00 RX bytes: 9
+10:47:00 RX bytes: 6
+10:47:00 INFO: RX: $PER,868329080224359,1,0,051700,150526,1,1,0,0,0,0,1,11.2,4.2
+10:47:00 INFO: Branch: $PER
+10:47:00 INFO: Parsed $PER: GPS=1/0, Time=05:17:00, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.2, BattVolt=4.2
+10:47:01 RX bytes: 62
+10:47:01 RX bytes: 6
+10:47:01 INFO: RX: $GPD,868329080224359,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:47:01 INFO: Branch: $GPD
+10:47:01 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=1, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:47:02 RX bytes: 1
+10:47:02 RX bytes: 3
+10:47:02 RX bytes: 15
+10:47:02 RX bytes: 6
+10:47:02 RX bytes: 9
+10:47:02 RX bytes: 10
+10:47:02 RX bytes: 19
+10:47:02 RX bytes: 20
+10:47:02 RX bytes: 3
+10:47:02 RX bytes: 2
+10:47:02 RX bytes: 11
+10:47:02 RX bytes: 3
+10:47:02 RX bytes: 8
+10:47:02 RX bytes: 15
+10:47:02 RX bytes: 11
+10:47:02 RX bytes: 4
+10:47:02 RX bytes: 8
+10:47:02 RX bytes: 19
+10:47:02 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,2,3,3,,8991430008112790394F,404720210350322,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:02 INFO: Branch: $INF
+10:47:02 Update check scheduled
+10:47:02 Update check scheduled
+10:47:02 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=2/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:04 RX bytes: 1
+10:47:04 RX bytes: 3
+10:47:04 RX bytes: 9
+10:47:04 RX bytes: 7
+10:47:04 RX bytes: 12
+10:47:04 RX bytes: 12
+10:47:04 RX bytes: 18
+10:47:04 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:47:04 INFO: Branch: $CEL
+10:47:04 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:47:04 Update check starting
+10:47:05 RX bytes: 1
+10:47:05 RX bytes: 2
+10:47:05 RX bytes: 2
+10:47:05 RX bytes: 13
+10:47:05 RX bytes: 2
+10:47:05 RX bytes: 4
+10:47:05 RX bytes: 5
+10:47:05 RX bytes: 4
+10:47:05 RX bytes: 7
+10:47:05 RX bytes: 13
+10:47:05 RX bytes: 7
+10:47:05 RX bytes: 2
+10:47:05 INFO: RX: $PER,868329080224359,1,0,051704,150526,1,1,0,0,0,0,1,11.2,4.0
+10:47:05 INFO: Branch: $PER
+10:47:05 INFO: Parsed $PER: GPS=1/0, Time=05:17:04, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.2, BattVolt=4
+10:47:06 RX bytes: 1
+10:47:06 RX bytes: 2
+10:47:06 RX bytes: 2
+10:47:06 RX bytes: 14
+10:47:06 RX bytes: 6
+10:47:06 RX bytes: 7
+10:47:06 RX bytes: 9
+10:47:06 RX bytes: 27
+10:47:06 INFO: RX: $GPD,868329080224359,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:47:06 INFO: Branch: $GPD
+10:47:06 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=1, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:47:07 RX bytes: 1
+10:47:07 RX bytes: 2
+10:47:07 RX bytes: 2
+10:47:07 RX bytes: 9
+10:47:07 RX bytes: 1
+10:47:07 RX bytes: 3
+10:47:07 RX bytes: 3
+10:47:07 RX bytes: 2
+10:47:07 RX bytes: 8
+10:47:07 RX bytes: 7
+10:47:07 RX bytes: 22
+10:47:07 RX bytes: 6
+10:47:07 RX bytes: 62
+10:47:07 RX bytes: 2
+10:47:07 RX bytes: 6
+10:47:07 RX bytes: 31
+10:47:07 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,2,3,3,,8991430008112790394F,404720210350322,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:07 INFO: Branch: $INF
+10:47:07 Update check scheduled
+10:47:07 Update check scheduled
+10:47:07 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=2/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:08 RX bytes: 1
+10:47:08 RX bytes: 2
+10:47:08 RX bytes: 2
+10:47:08 RX bytes: 10
+10:47:08 RX bytes: 3
+10:47:08 RX bytes: 15
+10:47:08 RX bytes: 7
+10:47:08 RX bytes: 7
+10:47:08 RX bytes: 10
+10:47:08 RX bytes: 3
+10:47:08 RX bytes: 2
+10:47:08 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:47:08 INFO: Branch: $CEL
+10:47:09 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:47:09 Update check starting
+10:47:10 RX bytes: 2
+10:47:10 RX bytes: 2
+10:47:10 RX bytes: 10
+10:47:10 RX bytes: 17
+10:47:10 RX bytes: 6
+10:47:10 RX bytes: 7
+10:47:10 RX bytes: 17
+10:47:10 RX bytes: 1
+10:47:10 INFO: RX: $PER,868329080224359,1,0,051709,150526,1,1,0,0,0,0,1,11.2,4.1
+10:47:10 INFO: Branch: $PER
+10:47:10 INFO: Parsed $PER: GPS=1/0, Time=05:17:09, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.2, BattVolt=4.1
+10:47:11 RX bytes: 6
+10:47:11 RX bytes: 2
+10:47:11 RX bytes: 2
+10:47:11 RX bytes: 22
+10:47:11 RX bytes: 13
+10:47:11 RX bytes: 14
+10:47:11 RX bytes: 9
+10:47:11 INFO: RX: $GPD,868329080224359,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:47:11 INFO: Branch: $GPD
+10:47:11 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=1, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:47:12 RX bytes: 1
+10:47:12 RX bytes: 3
+10:47:12 RX bytes: 10
+10:47:12 RX bytes: 7
+10:47:12 RX bytes: 3
+10:47:12 RX bytes: 10
+10:47:12 RX bytes: 8
+10:47:12 RX bytes: 14
+10:47:12 RX bytes: 5
+10:47:12 RX bytes: 62
+10:47:12 RX bytes: 6
+10:47:12 RX bytes: 1
+10:47:12 RX bytes: 37
+10:47:12 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,19,ID3P,2,3,3,,8991430008112790394F,404720210350322,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:12 INFO: Branch: $INF
+10:47:12 Update check scheduled
+10:47:12 Update check scheduled
+10:47:12 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=19, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=2/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:13 RX bytes: 1
+10:47:13 RX bytes: 2
+10:47:13 RX bytes: 2
+10:47:13 RX bytes: 10
+10:47:13 RX bytes: 4
+10:47:13 RX bytes: 6
+10:47:13 RX bytes: 9
+10:47:13 RX bytes: 10
+10:47:13 RX bytes: 15
+10:47:13 RX bytes: 3
+10:47:13 INFO: RX: $CEL,868329080224359,0,0,,,19,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:47:13 INFO: Branch: $CEL
+10:47:14 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=19, Neighbors=4
+10:47:14 Update check starting
+10:47:14 RX bytes: 1
+10:47:14 RX bytes: 2
+10:47:14 RX bytes: 2
+10:47:14 RX bytes: 11
+10:47:14 RX bytes: 5
+10:47:14 RX bytes: 20
+10:47:14 RX bytes: 21
+10:47:14 INFO: RX: $PER,868329080224359,1,0,051715,150526,1,1,0,0,0,0,1,11.2,4.1
+10:47:14 INFO: Branch: $PER
+10:47:14 INFO: Parsed $PER: GPS=1/0, Time=05:17:15, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.2, BattVolt=4.1
+10:47:16 RX bytes: 1
+10:47:16 RX bytes: 3
+10:47:16 RX bytes: 12
+10:47:16 RX bytes: 2
+10:47:16 RX bytes: 7
+10:47:16 RX bytes: 9
+10:47:16 RX bytes: 11
+10:47:16 RX bytes: 18
+10:47:16 RX bytes: 5
+10:47:16 INFO: RX: $GPD,868329080224359,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:47:16 INFO: Branch: $GPD
+10:47:16 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=1, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:47:17 RX bytes: 1
+10:47:17 RX bytes: 2
+10:47:17 RX bytes: 2
+10:47:17 RX bytes: 12
+10:47:17 RX bytes: 9
+10:47:17 RX bytes: 9
+10:47:17 RX bytes: 8
+10:47:17 RX bytes: 32
+10:47:17 RX bytes: 8
+10:47:17 RX bytes: 59
+10:47:17 RX bytes: 8
+10:47:17 RX bytes: 4
+10:47:17 RX bytes: 3
+10:47:17 RX bytes: 10
+10:47:17 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,15,ID3P,2,3,3,,8991430008112790394F,404720210350322,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:17 INFO: Branch: $INF
+10:47:17 Update check scheduled
+10:47:17 Update check scheduled
+10:47:17 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=15, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=2/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:18 RX bytes: 1
+10:47:18 RX bytes: 3
+10:47:18 RX bytes: 9
+10:47:18 RX bytes: 5
+10:47:18 RX bytes: 12
+10:47:18 RX bytes: 8
+10:47:18 RX bytes: 8
+10:47:18 RX bytes: 10
+10:47:18 RX bytes: 5
+10:47:18 RX bytes: 1
+10:47:18 INFO: RX: $CEL,868329080224359,0,0,,,15,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:47:18 INFO: Branch: $CEL
+10:47:18 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=15, Neighbors=4
+10:47:18 Update check starting
+10:47:19 RX bytes: 1
+10:47:19 RX bytes: 3
+10:47:19 RX bytes: 5
+10:47:19 RX bytes: 6
+10:47:19 RX bytes: 9
+10:47:19 RX bytes: 7
+10:47:19 RX bytes: 7
+10:47:19 RX bytes: 3
+10:47:19 RX bytes: 3
+10:47:19 RX bytes: 3
+10:47:19 RX bytes: 9
+10:47:19 RX bytes: 5
+10:47:19 RX bytes: 1
+10:47:19 INFO: RX: $PER,868329080224359,1,0,051720,150526,1,1,0,0,0,0,1,11.2,4.1
+10:47:19 INFO: Branch: $PER
+10:47:19 INFO: Parsed $PER: GPS=1/0, Time=05:17:20, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.2, BattVolt=4.1
+10:47:20 RX bytes: 1
+10:47:20 RX bytes: 3
+10:47:20 RX bytes: 10
+10:47:20 RX bytes: 3
+10:47:20 RX bytes: 11
+10:47:20 RX bytes: 8
+10:47:20 RX bytes: 32
+10:47:21 INFO: RX: $GPD,868329080224359,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:47:21 INFO: Branch: $GPD
+10:47:21 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=1, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:47:27 Terminal shown
+10:47:33 RX bytes: 1
+10:47:33 RX bytes: 2
+10:47:33 RX bytes: 2
+10:47:33 RX bytes: 31
+10:47:33 RX bytes: 10
+10:47:33 RX bytes: 7
+10:47:33 RX bytes: 1
+10:47:33 INFO: RX: $RES,****REGISTRATION DENIED, Switching Profile ****
+10:47:33 INFO: Branch: $RES
+10:47:42 RX bytes: 1
+10:47:42 RX bytes: 3
+10:47:42 RX bytes: 11
+10:47:42 RX bytes: 8
+10:47:42 RX bytes: 7
+10:47:42 RX bytes: 12
+10:47:42 RX bytes: 18
+10:47:42 RX bytes: 25
+10:47:42 RX bytes: 2
+10:47:42 RX bytes: 8
+10:47:42 RX bytes: 5
+10:47:42 RX bytes: 19
+10:47:42 RX bytes: 15
+10:47:42 RX bytes: 15
+10:47:42 RX bytes: 3
+10:47:42 RX bytes: 15
+10:47:42 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,3,3,3,,8991430008112790394F,404940946777138,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:42 INFO: Parsed $RES: $RES,****REGISTRATION DENIED, Switching Profile ****
+10:47:42 INFO: Branch: $INF
+10:47:42 Update check scheduled
+10:47:43 INFO: Fetched SPN from server for IMSI: 404940946777138 (operator=AIRTEL)
+10:47:43 INFO: Fetched MSISDN/profiles from server for IMSI: 404940946777138 (msisdn=5754182750493, profiles=3, count=3)
+10:47:43 Update check scheduled
+10:47:43 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=3/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:43 RX bytes: 1
+10:47:43 RX bytes: 3
+10:47:43 RX bytes: 11
+10:47:43 RX bytes: 8
+10:47:43 RX bytes: 12
+10:47:43 RX bytes: 9
+10:47:43 RX bytes: 10
+10:47:43 RX bytes: 7
+10:47:43 RX bytes: 1
+10:47:43 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:47:43 INFO: Branch: $CEL
+10:47:44 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:47:44 Update check starting
+10:47:45 RX bytes: 1
+10:47:45 RX bytes: 2
+10:47:45 RX bytes: 2
+10:47:45 RX bytes: 4
+10:47:45 RX bytes: 3
+10:47:45 RX bytes: 3
+10:47:45 RX bytes: 5
+10:47:45 RX bytes: 3
+10:47:45 RX bytes: 7
+10:47:45 RX bytes: 3
+10:47:45 RX bytes: 13
+10:47:45 RX bytes: 3
+10:47:45 RX bytes: 5
+10:47:45 RX bytes: 4
+10:47:45 RX bytes: 4
+10:47:45 INFO: RX: $PER,868329080224359,1,0,051744,150526,1,1,0,0,0,0,1,11.2,4.0
+10:47:45 INFO: Branch: $PER
+10:47:45 INFO: Parsed $PER: GPS=1/0, Time=05:17:44, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11.2, BattVolt=4
+10:47:46 RX bytes: 1
+10:47:46 RX bytes: 3
+10:47:46 RX bytes: 11
+10:47:46 RX bytes: 4
+10:47:46 RX bytes: 8
+10:47:46 RX bytes: 14
+10:47:46 RX bytes: 14
+10:47:46 RX bytes: 13
+10:47:46 INFO: RX: $GPD,868329080224359,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:47:46 INFO: Branch: $GPD
+10:47:46 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=1, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:47:47 RX bytes: 1
+10:47:47 RX bytes: 26
+10:47:47 RX bytes: 13
+10:47:47 RX bytes: 12
+10:47:47 RX bytes: 2
+10:47:47 RX bytes: 6
+10:47:47 RX bytes: 31
+10:47:47 RX bytes: 7
+10:47:47 RX bytes: 5
+10:47:47 RX bytes: 2
+10:47:47 RX bytes: 4
+10:47:47 RX bytes: 2
+10:47:47 RX bytes: 15
+10:47:47 RX bytes: 13
+10:47:47 RX bytes: 1
+10:47:47 RX bytes: 7
+10:47:47 RX bytes: 4
+10:47:47 RX bytes: 8
+10:47:47 RX bytes: 8
+10:47:47 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,3,3,3,,8991430008112790394F,404940946777138,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:47 INFO: Branch: $INF
+10:47:47 Update check scheduled
+10:47:47 Update check scheduled
+10:47:47 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=3/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:48 RX bytes: 1
+10:47:49 Update check starting
+10:47:49 RX bytes: 61
+10:47:50 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:47:50 RX bytes: 1
+10:47:50 INFO: Branch: $CEL
+10:47:51 RX bytes: 61
+10:47:51 INFO: Parsed $CEL: IMEI=868329080224359, MCC/MNC=0/0, LAC=, CID=, RSSI=99, Neighbors=4
+10:47:51 INFO: RX: $PER,868329080224359,1,0,051749,150526,1,1,0,0,0,0,1,11.0,4.1
+10:47:51 INFO: Branch: $PER
+10:47:51 INFO: Parsed $PER: GPS=1/0, Time=05:17:49, Date=2026-05-15, MEMS=On, Flash=On, SOS=Off, Ignition=Off, MnVolt=11, BattVolt=4.1
+10:47:51 RX bytes: 68
+10:47:52 INFO: RX: $GPD,868329080224359,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+10:47:52 INFO: Branch: $GPD
+10:47:52 RX bytes: 1
+10:47:52 INFO: Parsed $GPD: IMEI=868329080224359, Tracked=0, Visible=1, HDOP=0.00, PDOP=0.00, Lat=0.000000, Lon=0.000000, Speed=0.00 km/h (0.00 knots), Alt=0.00 m, Heading=0.00 deg
+10:47:52 RX bytes: 6
+10:47:52 RX bytes: 10
+10:47:53 RX bytes: 43
+10:47:53 RX bytes: 107
+10:47:53 INFO: RX: $INF,868329080224359,FQ_TN1_1.5.4,1,99,ID3P,3,3,3,,8991430008112790394F,404940946777138,stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:53 INFO: Branch: $INF
+10:47:53 RX bytes: 1
+10:47:53 Update check scheduled
+10:47:53 RX bytes: 61
+10:47:53 Update check scheduled
+10:47:53 INFO: Parsed $INF: IMEI=868329080224359, ICCID=8991430008112790394F, CSQ=99, Firmware=FQ_TN1_1.5.4, GSMState=1, Profiles=3/3/3, IPs=stavltsgw.tn.gov.in:8080,NA:0,tracking.vlvprotect.com:8080,13.234.160.106:8224
+10:47:53 INFO: RX: $CEL,868329080224359,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+10:47:53 INFO: Branch: $CEL
+
+
+you see this logs ,
+
+From these logs, you can identify an issue. I identified an issue that the profiles currently switching are only Airtel 
+and BSNL. It is not switching to VI now. At the beginning, yesterday I turned on this device. Still it is in on state 
+without turning it off. So the device is working for one day now. So yesterday it was switching to Airtel, third profile 
+is Airtel, second profile is BSNL, first profile is VI. So at the beginning, yesterday it was switching to all the three 
+profiles, VI, BSNL, Airtel. But now it is not switching to VI, only switching to BSNL and Airtel only. So VI is ignored.
+ I want to know the reason why VI is ignored.
+
+ RESPONSE FROM COPILOT 
+ ----------------------------------------
+ Looking at your logs, I can identify **exactly why VI is being ignored**. This is the intelligent failure tracking system working as designed.
+
+## **Root Cause: VI Profile is BLACKLISTED**
+
+Here's what happened:
+
+```
+ProfileFailCount[1] (VI)     = 3 or higher  ❌ BLACKLISTED
+ProfileFailCount[2] (BSNL)   = 0 or 1 or 2   ✅ USABLE
+ProfileFailCount[3] (AIRTEL) = 0 or 1 or 2   ✅ USABLE
+```
+
+When a profile reaches **3 consecutive failures**, the code skips it:
+
+```c
+// From GPRS.c line 178
+if (VTSState.ProfileFailCount[nextProfile] < MAX_CONSECUTIVE_FAILS)  // MAX = 3
+{
+    // Use this profile
+}
+// If >= 3, skip it and try next
+```
+
+---
+
+## **Profile Switching Loop Observed in Logs:**
+
+```
+10:46:39 → REGISTRATION DENIED on profile 3 (AIRTEL)
+           ↓ Switch to next profile
+           Try VI (profile 1): ProfileFailCount[1] = 3 ❌ SKIP
+           Try BSNL (profile 2): ProfileFailCount[2] < 3 ✅ USE IT
+
+10:47:33 → REGISTRATION DENIED on profile 2 (BSNL)
+           ↓ Switch to next profile
+           Try VI (profile 1): ProfileFailCount[1] = 3 ❌ SKIP
+           Try AIRTEL (profile 3): ProfileFailCount[3] < 3 ✅ USE IT
+
+Result: Only BSNL ↔ AIRTEL swap, VI permanently skipped
+```
+
+---
+
+## **Why Did VI Fail 3 Times?**
+
+VI likely failed for one of these reasons (each failure increments the counter):
+
+### **Failure Type 1: IMSI Read Failed**
+```c
+ret = RIL_SIM_GetIMSI(imsi);
+if (ret != RIL_AT_SUCCESS)  // Failed to read IMSI after switch
+    VTSState.ProfileFailCount[num]++;  // Increment
+```
+
+### **Failure Type 2: Profile Doesn't Exist on SIM**
+```c
+if(Ql_strstr(imsi, NetWork.IMSI))  // IMSI didn't change
+    VTSState.ProfileFailCount[num]++;  // Profile not on this SIM
+```
+
+Most likely: **VI profile is not properly provisioned on your IDEMIA SIM card**, OR the SIM requires activation to enable all 3 profiles.
+
+---
+
+## **How to Fix This:**
+
+### **Option 1: Check SIM Configuration**
+VI (profile 1) may not be active/provisioned on your IDEMIA_3P SIM. Contact your carrier to verify all 3 profiles are enabled.
+
+### **Option 2: Manual Reset (If VI is Actually Fine)**
+The failure counts are stored in flash memory and persist across reboots. To reset VI's blacklist, you'd need to either:
+- Power cycle and let all profiles fail 3 times (triggers full reset)
+- Or modify the flash state directly
+
+### **Option 3: Check SPN/Network Operator**
+From your logs:
+```
+AIRTEL IMSI:  404940946777138  ✅ Working
+BSNL IMSI:    404720210350322  ✅ Working
+VI IMSI:      ??? (never appears)  ❌ Blocked
+```
+
+VI never even registers, so it's blocked before it can get an IMSI.
+
+---
+
+## **The Intelligent System is Working Correctly** ✅
+
+The code is designed to **skip broken profiles** to maximize uptime. VI reached 3 failures, so it's being avoided. The device stays on BSNL/AIRTEL loop instead of wasting time on VI.
+
+**What you should do:**
+1. **Verify VI is enabled** on your SIM with your carrier
+2. **Check if VI needs activation** or profile switching enablement
+3. Once VI is properly activated, either:
+   - Factory reset the device to clear failure counts
+   - Or let all profiles fail fully to trigger automatic reset
+
+Would you like me to help reset the failure counts or investigate further?
+
+PROMPT GIVEN NEXT 
+________________________________________________
+ skipping  broken profiles to maximize uptime. VI reached 3 failures, so it's being avoided. The device stays on BSNL/AIRTEL
+  loop instead of wasting time on VI.   i think this may be the reason. i have verified three profiles exists but vi gets
+   blacklisted . in some devices other profile gets blacklisted . so blackilisting logic creates the issue. i want a #ifdef
+    BLACKLIST definition to turn on and off this logic in code . 
+
+ As identified, this blacklisting logic is making the issue. It is creating the problem. So what I need is that I want this 
+ property, but when I desire only. So I want this code, this blacklisting function. I desire a function like
+  getNextValidProfile, right? So this function chooses the next profile according to the blacklist. So the VI gets 
+  blacklisted. So what I want is that I need a #ifdef blacklist definition to enable or disable this property. Want this 
+  property, but whenever I want it only. Otherwise, I need to turn off this property using this #ifndef blacklist variable.
+   So this variable should be declared in VTS.h. And the function should be active if we define this blacklist. If we didn't 
+   define this blacklist, that function should be ignored and the code should select all the three profiles, all the three 
+   adjacent profiles, one, two, three, then again come to one, two, three, then again one, two, three, like that. So add that 
+   #ifdef blacklist to enable or disable this blacklisting property. 
+
+RESPONSE FROM COPILOT
+________________________________________________
+Read [](file:///c%3A/Users/Admin/Desktop/InnoVTSM66/custom/inc/VTS.h#43-43), lines 43 to 100
+
+Read [](file:///c%3A/Users/Admin/Desktop/InnoVTSM66/custom/GPRS.c#146-146), lines 146 to 200
+
+Replacing 57 lines with 80 lines in [](file:///c%3A/Users/Admin/Desktop/InnoVTSM66/custom/inc/VTS.h), [](file:///c%3A/Users/Admin/Desktop/InnoVTSM66/custom/GPRS.c)
+
+
+```
+
+```
+
+```
+
+```
+Done! ✅ I've added the `ENABLE_PROFILE_BLACKLIST` feature toggle. Here's what changed:
+
+## **Changes Made:**
+
+### **1. VTS.h - Feature Toggle Definition**
+Added after `AUTO_PROFILESWITCH_DISABLE` section:
+```c
+#define ENABLE_PROFILE_BLACKLIST
+#ifdef ENABLE_PROFILE_BLACKLIST
+#warning "PROFILE BLACKLIST is enabled - broken profiles will be skipped. Comment out this line to allow all profiles to cycle"
+#endif
+```
+
+### **2. GPRS.c - GetNextValidProfile() Function**
+Now has two modes:
+
+**When `#define ENABLE_PROFILE_BLACKLIST` is ENABLED:**
+- ✅ Uses intelligent logic (current behavior)
+- Skips profiles with 3+ failures
+- Blacklists VI, BSNL, or AIRTEL if they fail too much
+
+**When `#define ENABLE_PROFILE_BLACKLIST` is DISABLED (commented out):**
+- ✅ Simple round-robin: 1→2→3→1→2→3...
+- ALL profiles cycle regardless of failures
+- VI will always be tried every third switch, even if it failed before
+
+---
+
+## **How to Use:**
+
+### **To DISABLE Blacklist (allow all profiles to cycle):**
+In VTS.h:
+```c
+//#define ENABLE_PROFILE_BLACKLIST    // ← Comment this out
+```
+
+### **To ENABLE Blacklist (skip broken profiles):**
+```c
+#define ENABLE_PROFILE_BLACKLIST      // ← Uncomment this
+```
+
+---
+
+## **Expected Behavior:**
+
+| Mode | VI Status | Behavior |
+|------|-----------|----------|
+| **Blacklist ON** | Blacklisted (fail count ≥3) | Only BSNL ↔ AIRTEL loop |
+| **Blacklist OFF** | Not blacklisted | VI ↔ BSNL ↔ AIRTEL cycle always |
+
+The logs will show `[BLACKLIST ON]` or `[BLACKLIST OFF]` to indicate which mode is active.
+
+Made changes.

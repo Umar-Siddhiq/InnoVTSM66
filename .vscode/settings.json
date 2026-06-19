@@ -1,0 +1,21 @@
+{
+    "files.associations": {
+        "gprs.h": "c",
+        "ril_network.h": "c",
+        "systic.h": "c",
+        "server.h": "c",
+        "smslib.h": "c",
+        "ril_ftp.h": "c",
+        "ril.h": "c",
+        "compare": "c",
+        "math.h": "c",
+        "cmath": "c",
+        "ql_socket.h": "c",
+        "ftp.h": "c",
+        "file.h": "c",
+        "epo.h": "c"
+        "mcu.h": "c",
+        "ctype.h": "c",
+        "mota.h": "c"
+    }
+}
