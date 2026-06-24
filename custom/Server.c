@@ -64,7 +64,7 @@ uint8_t IsStored = 0;
 #endif
 
 double prevLat=0,prevLong=0;
-double fGPSLat=0,fGPSLong=0,fGPSAlt=0,fGPSpdop=0,fGPShdop=0,fGPSSats=0, fGPSSpeed=0, fGPSHeading=0;
+double fGPSLat=0,fGPSLong=0,fGPSAlt=0,fGPSpdop=0,fGPShdop=0,fGPSSats=0, fGPSSpeed=0, fGPSHeading=0, fGPSForce=0;
 
 
 uint8_t IsServerRes=0;
@@ -834,7 +834,7 @@ void PrepareFTKBuffer(FTKConfigtypedef *ftk)
 	Ql_sprintf(sSPD, "%3.2f", ftk->Speed);
 	Ql_sprintf(sHD, "%3.2f", ftk->HDOP);
 	Ql_sprintf(sPD, "%3.2f", ftk->PDOP);
-	Ql_sprintf(sHead, "%3.2f", ftk->Heading);
+	Ql_sprintf(sHead, "%3.1f", ftk->Heading);
 
 	//uint16_t dLen=23;
 	//GPS.sLngDir='E';
@@ -4524,7 +4524,7 @@ void ChangeToHistoryPacket(char *buf)
 	if(!fn)
 		return;
 	fn[1] = 'H';
-	LOGData(TAG_SERVER,"Changed to History Packet, Len :%d",Ql_strlen(buf));
+	//LOGData(TAG_SERVER,"Changed to History Packet, Len :%d",Ql_strlen(buf));
 	return;
 }
 

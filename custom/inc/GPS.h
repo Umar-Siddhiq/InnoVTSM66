@@ -102,5 +102,7 @@ bool GPS_WaitBinaryAck(uint16_t ackForMsgId, uint32_t timeoutMs);
 void gps_thread_entry(s32 taskId);
 void SendNMEAToRS232(void);
 void gps_overspeed_check(void);
+void ApplyFGPS(void);
+bool GPS_IsSimulationActive(void);
 
 #endif // GPS_H

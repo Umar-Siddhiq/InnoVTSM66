@@ -13,6 +13,7 @@
 
 extern uint16_t mota_rcv_chunk_num;
 extern uint8_t IsMotaProcessing;
+extern uint8_t IsFotaProcessing;
 
 // Function declarations
 uint8_t ProcessMCUOTA(char* binFilePath);

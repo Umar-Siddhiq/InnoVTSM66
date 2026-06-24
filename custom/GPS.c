@@ -17,6 +17,8 @@ GSATypedef GSAData = {0};
 VTGTypedef VTGData = {{0}};
 ZDATypedef ZDAData = {{0}};
 GSTTypedef GSTData = {{0}};
+extern uint8_t IsFotaProcessing;
+extern uint8_t IsMotaProcessing;
 
 // Global command status
 GPS_CmdStatus gps_cmd = {
@@ -460,7 +462,7 @@ void gps_parameter_init(void)
     Ql_sprintf(sSpeed,"%3.2f", GPS.Speed);
     Ql_sprintf(sHDOP,"%3.2f", GPS.HDOP);
     Ql_sprintf(sPDOP,"%3.2f", GPS.PDOP);
-    Ql_sprintf(sHeading,"%3.2f", GPS.Heading);
+    Ql_sprintf(sHeading,"%3.1f", GPS.Heading);
     
 }
 
@@ -789,7 +791,7 @@ void gps_gga_update(GGATypedef *GGA)
     Ql_sprintf(sLongitude,"%3.6f",GPS.Longitude);
     Ql_sprintf(sAltitude,"%4.2f",GPS.Altitude);
     Ql_sprintf(sSpeed,"%3.2f",GPS.Speed);
-    Ql_sprintf(sHeading,"%3.2f",GPS.Heading);
+    Ql_sprintf(sHeading,"%3.1f",GPS.Heading);
     
 
 }
@@ -1001,8 +1003,93 @@ void gps_overspeed_check(void)
     }
 }
 
+#define EARTH_RADIUS_METERS 6371000.0
+#define PI 3.14159265358979323846
+
+static double toRadians(double degrees) {
+    return degrees * PI / 180.0;
+}
+
+static double cosTaylor(double x) {
+    double term = 1.0;
+    double sum = 1.0;
+    double x2 = x * x;
+    int n = 1;
+    double factorial = 1.0;
+    const int MAX_ITERATIONS = 20;
+
+    while (n <= MAX_ITERATIONS) {
+        factorial *= (2 * n - 1) * (2 * n);
+        term *= -x2 / factorial;
+        if (term > -1e-15 && term < 1e-15) break;
+        sum += term;
+        n++;
+    }
+    return sum;
+}
+
+extern double fGPSLat, fGPSLong, fGPSAlt, fGPSpdop, fGPShdop, fGPSSats, fGPSSpeed, fGPSHeading, fGPSForce;
+
+bool GPS_IsSimulationActive(void)
+{
+    return (fGPSLat != 0 && fGPSLong != 0);
+}
+
+void ApplyFGPS(void)
+{
+    GPS.GPSFix = 1;
+
+    // Apply random fluctuation to latitude and longitude (up to 25 meters)
+    double latFluctuation = ((Ql_rand() % 25) + 1) / EARTH_RADIUS_METERS * (180.0 / PI);
+    double longFluctuation = ((Ql_rand() % 25) + 1) / (EARTH_RADIUS_METERS * cosTaylor(toRadians(fGPSLat))) * (180.0 / PI);
+
+    GPS.Latitude = fGPSLat + ((Ql_rand() % 2 == 0) ? latFluctuation : -latFluctuation);
+    GPS.Longitude = fGPSLong + ((Ql_rand() % 2 == 0) ? longFluctuation : -longFluctuation);
+
+    // Apply random fluctuation to altitude, HDOP, PDOP, and number of satellites
+    GPS.Altitude = fGPSAlt + ((Ql_rand() % 2 == 0) ? (Ql_rand() % 5 + 1) : -(Ql_rand() % 5 + 1));
+    GPS.HDOP = fGPShdop + ((Ql_rand() % 2 == 0) ? ((Ql_rand() % 10 + 1) / 10.0) : -((Ql_rand() % 10 + 1) / 10.0));
+    GPS.PDOP = fGPSpdop + ((Ql_rand() % 2 == 0) ? ((Ql_rand() % 10 + 1) / 10.0) : -((Ql_rand() % 10 + 1) / 10.0));
+    GPS.NoOfSatalite = fGPSSats + ((Ql_rand() % 2 == 0) ? (Ql_rand() % 2) : -(Ql_rand() % 2));
+
+    GPS.LatDir = 'N';
+    GPS.LngDir = 'E';
+    GPS.Heading = 0;
+
+    // Fixed stationary speed fluctuation issue (speed stays strictly as input)
+    GPS.Speed = fGPSSpeed;
+    if(GPS.Speed < 0)
+        GPS.Speed = 0;
+
+    Ql_sprintf(sLatitude, "%03.7f", GPS.Latitude);
+    Ql_sprintf(sLongitude, "%03.7f", GPS.Longitude);
+    #ifdef BSNL_PROTO
+    Ql_sprintf(sAltitude, "%05.2f", GPS.Altitude);
+    #else
+    Ql_sprintf(sAltitude, "%3.2f", GPS.Altitude);
+    #endif
+    Ql_sprintf(sPDOP, "%2.2f", GPS.PDOP);
+    Ql_sprintf(sHDOP, "%2.2f", GPS.HDOP);
+    #ifdef BSNL_PROTO
+    Ql_sprintf(sSpeed,"%04.1f", GPS.Speed);
+    #else
+    Ql_sprintf(sSpeed,"%02.1f", GPS.Speed);
+    #endif
+    Ql_sprintf(sHeading,"%03.1f", GPS.Heading);
+}
+
 void gps_reset_routine(void)
 {
+    if (GPS_IsSimulationActive())
+    {
+        LOGData(TAG_GPS, "GPS Reset Routine bypassed because GPS simulation is active\r\n");
+        return;
+    }
+    if (IsMotaProcessing || IsFotaProcessing)
+    {
+        LOGData(TAG_GPS, "GPS Reset Routine bypassed because FOTA/MOTA is in progress\r\n");
+        return;
+    }
     LOGData(TAG_GPS,"GPS Reset Routine Triggered - Hardware Fault Detected\r\n");
     ThreadSleep(1000);
     if(GPSTimeout>0)
@@ -1016,6 +1103,7 @@ void gps_reset_routine(void)
 
 void gps_thread_entry(s32 taskId)
 {
+    static uint8_t s_realGpsFix = 0;
     gps_thread_init(taskId);
     GPS_RESET_INIT;
     GPS_RESET_OFF;
@@ -1056,9 +1144,35 @@ void gps_thread_entry(s32 taskId)
         if (gps_data_available)
         {
             gps_data_available = 0;
-            gps_data_process((char*)gps_uart_buffer);
+            if (!(fGPSLat != 0 && fGPSLong != 0 && fGPSForce)) // CGPS bypasses parsing
+            {
+                gps_data_process((char*)gps_uart_buffer);
+                s_realGpsFix = GPS.GPSFix; // Save real fix status
+                if (fGPSLat != 0 && fGPSLong != 0 && !fGPSForce && !s_realGpsFix)
+                {
+                    ApplyFGPS(); // FGPS fallback applied
+                }
+            }
             // Check overspeed after processing GPS data
             gps_overspeed_check();
+        }
+
+        static uint32_t last_sim_ms = 0;
+        uint32_t now_ms = Ql_GetMsSincePwrOn();
+        if (now_ms - last_sim_ms >= 1000)
+        {
+            last_sim_ms = now_ms;
+            if (fGPSLat != 0 && fGPSLong != 0)
+            {
+                if (fGPSForce)
+                {
+                    ApplyFGPS(); // Continuous forced simulation (CGPS)
+                }
+                else if (!s_realGpsFix || GPSTimeout == 0)
+                {
+                    ApplyFGPS(); // Fallback simulation (FGPS)
+                }
+            }
         }
       
         ThreadSleep(30);

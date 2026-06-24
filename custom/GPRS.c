@@ -14,6 +14,8 @@ _RTC CurrentDateTime = {0};
 uint8_t IsQNITZSet=0;
 Providertypedef prfReq=0;
  uint8_t PrfChanged;
+extern uint8_t IsFotaProcessing;
+extern uint8_t IsMotaProcessing;
 #define STK_ENB
 
 STKDatatypedef STKdata = {0};
@@ -535,6 +537,11 @@ static void CheckprfReq(void)
         return;
     }
 
+    if(IsMotaProcessing || IsFotaProcessing)
+    {
+        return;
+    }
+
     // Set default profile if none is set
     if(VTSState.CurrentProfile == NONE)
     {
@@ -647,9 +654,9 @@ void ProcessREGISTER(void)
             goto REGISTER_FAIL;
         }
          // Get next valid profile intelligently
-        if(ZigTestMode)
+        if(ZigTestMode || IsMotaProcessing || IsFotaProcessing)
         {
-            LOGData(TAG_GPRS, "ZigTestMode enabled, Skipping reset & profile switch on registration denied");
+            LOGData(TAG_GPRS, "ZigTestMode or FOTA/MOTA active, Skipping reset & profile switch on registration denied");
             goto REGISTER_FAIL;
         }
         #ifdef AUTO_PROFILESWITCH_DISABLE

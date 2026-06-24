@@ -12,6 +12,9 @@
 #include "Systic.h"
 #include "File.h"
 #include "MOTA.h"
+#include "ql_common.h"
+
+extern ST_ExtWatchdogCfg* Ql_WTD_GetWDIPinCfg(void);
 
 
 
@@ -19,6 +22,7 @@
 download_req_info_s  DownloadReq= {0};
 FTPStateTypedef FTPState= FTP_STATE_CLOSED;
 FTPDownloadTypedef FTPDownloadState= FTP_TRANSFER_CLOSED;
+uint8_t IsFotaProcessing = 0;
 
 
 uint8_t FTPFileBuffer[FOTA_MAX_BUFF_SIZE]={0};
@@ -445,14 +449,19 @@ uint8_t FOTAUpdate(char *firmwareFileName)
         LOGData(TAG_FTP, "Detected RAM file for FOTA");
     }
 
-    ST_FotaConfig fotaCfg = {
-        .Q_gpio_pin1 = LED_GPS_GPIO,   // Use LED GPIO for watchdog
-        .Q_feed_interval1 = 100,       // 100 ms feed interval (blinks fast)
-        .Q_gpio_pin2 = -1,             // Disable second watchdog
-        .Q_feed_interval2 = 0,
-        .reserved1 = 0,
-        .reserved2 = 0
-    };
+    ST_FotaConfig fotaCfg = {0};
+    fotaCfg.Q_gpio_pin1 = Ql_WTD_GetWDIPinCfg()->pinWtd1;
+    fotaCfg.Q_feed_interval1 = 100;
+    if (Ql_WTD_GetWDIPinCfg()->pinWtd2 != PINNAME_END)
+    {
+        fotaCfg.Q_gpio_pin2 = Ql_WTD_GetWDIPinCfg()->pinWtd2;
+        fotaCfg.Q_feed_interval2 = 100;
+    }
+    else
+    {
+        fotaCfg.Q_gpio_pin2 = -1;
+        fotaCfg.Q_feed_interval2 = 0;
+    }
     
     if (Ql_FOTA_Init(&fotaCfg) != QL_RET_OK) {
         LOGData(TAG_FTP,"FOTA init failed");
@@ -665,12 +674,13 @@ uint8_t SendFTPAttemptMsg(download_req_info_s* hdl)
 
 void AbortFTPRoutine(download_req_info_s* hdl)
 {
+    IsFotaProcessing = 0;
+    IsMotaProcessing = 0;
     FTPState=FTP_STATE_CLOSED;
     SendFTPAttemptMsg(hdl);
     //nwy_power_off(2);
     //ThreadSleep(5000);
 }
-
 
 // void FotaRoutine(void)
 // {
@@ -754,6 +764,14 @@ uint8_t FTPStart(download_req_info_s* downloadHandle)
 {
     if(downloadHandle->IsValid == FOTA_REQ_VALID_CODE)
     {
+        if(downloadHandle->RequestType == FTP_REQ_TYPE_FOTA)
+        {
+            IsFotaProcessing = 1;
+        }
+        else if(downloadHandle->RequestType == FTP_REQ_TYPE_CONFIG)
+        {
+            IsMotaProcessing = 1;
+        }
         PreFTPRoutine(downloadHandle);
         if(!FTP_Login(downloadHandle->IP,downloadHandle->Port,0,downloadHandle->User,downloadHandle->Pass))
         {
@@ -782,6 +800,8 @@ uint8_t FTPStart(download_req_info_s* downloadHandle)
         else
             downloadHandle->Status=2;
 
+        IsFotaProcessing = 0;
+        IsMotaProcessing = 0;
     }
     return 1;
 }

@@ -55,7 +55,7 @@ extern char FirmVer[];
 #warning "PROFILE BLACKLIST is enabled - broken profiles will be skipped. Comment out this line to allow all profiles to cycle"
 #endif
 
-#define			FIRMWAREVERSION			"1.5.5"
+#define			FIRMWAREVERSION			"1.5.7"
 #define 		DevModel				"02"
 #define			SDKFirm					"01/V1.0"
 #define 		PROTOVER				"AIS140"

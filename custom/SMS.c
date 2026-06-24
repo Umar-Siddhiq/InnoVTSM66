@@ -430,9 +430,12 @@ void MakeACTMessage(uint8_t mode, char* code)
 	Ql_strcat(SimData,VTSData.VendorID);
 	InsertChar(SimData,',');
 	if(FirmVer[0] == 'V')
-		Ql_strcat(SimData,FirmVer+1);
-	else
 		Ql_strcat(SimData,FirmVer);
+	else
+	{
+		Ql_strcat(SimData,"V");
+		Ql_strcat(SimData,FirmVer);
+	}
 	InsertChar(SimData,',');
 	Ql_strncat(SimData,NetWork.IMEI,15);
 	
@@ -441,10 +444,10 @@ void MakeACTMessage(uint8_t mode, char* code)
 	Ql_strcat(SimData, alert_id_str);
 	
 	//Ql_strcat(SimData,sLatitude);
-	StringAdd(SimData,"%011.8f",GPS.Latitude); //011.12345678
+	StringAdd(SimData,"%.6f",GPS.Latitude);
 	Ql_strcat(SimData,",N,");
 	//Ql_strcat(SimData,sLongitude);
-	StringAdd(SimData,"%011.8f",GPS.Longitude);
+	StringAdd(SimData,"%.6f",GPS.Longitude);
 	Ql_strcat(SimData,",E,");
 	InsertChar(SimData,GPS.GPSFix + '0');
 	InsertChar(SimData,',');
@@ -458,7 +461,7 @@ void MakeACTMessage(uint8_t mode, char* code)
 	InsertChar(SimData,',');
 
 	//Ql_strcat(SimData,sSpeed);
-	StringAdd(SimData,"%04.1f",GPS.Speed);
+	StringAdd(SimData,"%03.1f",GPS.Speed);
 	InsertChar(SimData,',');
 	#ifdef PROTO_CDAC
 	InsertIntValue_OLD(SimData,GSM.SignalStrength,"%02d");
@@ -480,7 +483,7 @@ void MakeACTMessage(uint8_t mode, char* code)
 	InsertChar(SimData,',');
 	InsertChar(SimData,PeriPheralVal.IGN + '0');
 	InsertChar(SimData,',');
-	Ql_sprintf(ss,"%04.1f",(PeriPheralVal.BattVolt));
+	Ql_sprintf(ss,"%04.1f",(PeriPheralVal.MainsVolt));
 	Ql_strcat(SimData,ss);
 	InsertChar(SimData,',');
 	Ql_sprintf(ss,"%06lu",FrameNumber);
@@ -1598,6 +1601,8 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 		{
 			memset(SimData,0x00,MSGSIZE);
 			Ql_strcpy(SimData,"FirVer = ");
+			Ql_strcat(SimData,PROTO_TAG);
+			Ql_strcat(SimData,"_");
 			Ql_strcat(SimData,FirmVer);
 			Ql_strcat(SimData,"\r\nBuild Date - ");
 			Ql_strcat(SimData,__DATE__);  // Adds compile date
@@ -1977,57 +1982,64 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			Ql_memset(pass, 0, sizeof(pass));
 			return 1;
 		}
+		uint8_t is_cgps = 0;
 		ls = Ql_strstr(fn,"FGPS");
+		if(!ls)
+		{
+			ls = Ql_strstr(fn,"CGPS");
+			if(ls) is_cgps = 1;
+		}
 		if(ls)
 		{
-			LOGData(TAG_OTA,"FGPS cmd");
-			double flat=0, flng=0, pdop=0, hdop=0; // SET FGPS 28234345,76123123,180,120,8,200,25,180     // SET FGPS lat,long,hdop,pdop,noofsat,altitude,Speed,Heading
+			char* cmdName = is_cgps ? "CGPS" : "FGPS";
+			LOGData(TAG_OTA,"%s cmd", cmdName);
+			double flat=0, flng=0, pdop=0, hdop=0; // SET FGPS/CGPS 28234345,76123123,180,120,8,200,25,180
 			uint8_t nofsat=0;
 			int altitude=0, speed=0, heading=0;
 			
-			i=GetValueFromData(ls,"FGPS",' ',0,',',ss);
+			i=GetValueFromData(ls,cmdName,' ',0,',',ss);
 			if(i)
 			{
 				flat = (double)atol(ss)/1000000;
 				LOGData(TAG_OTA,"FLat : %f",flat);
 			}
-			i=GetValueFromData(ls,"FGPS",',',1,',',ss);
+			i=GetValueFromData(ls,cmdName,',',1,',',ss);
 			if(i)
 			{
 				flng = (double)atol(ss)/1000000;
 				LOGData(TAG_OTA,"Flng : %f",flng);
 			}
-			i=GetValueFromData(ls,"FGPS",',',2,',',ss);
+			i=GetValueFromData(ls,cmdName,',',2,',',ss);
 			if(i)
 			{
 				pdop = (double)atol(ss)/100;
 				LOGData(TAG_OTA,"pdop : %f",pdop);
 			}
-			i=GetValueFromData(ls,"FGPS",',',3,',',ss);
+			i=GetValueFromData(ls,cmdName,',',3,',',ss);
 			if(i)
 			{
 				hdop = (double)atol(ss)/100;
 				LOGData(TAG_OTA,"hdop : %f",hdop);
 			}
-			i=GetValueFromData(ls,"FGPS",',',4,',',ss);
+			i=GetValueFromData(ls,cmdName,',',4,',',ss);
 			if(i)
 			{
 				nofsat = atoi(ss);
 				LOGData(TAG_OTA,"sats : %i",nofsat);
 			}
-			i=GetValueFromData(ls,"FGPS",',',5,',',ss);
+			i=GetValueFromData(ls,cmdName,',',5,',',ss);
 			if(i)
 			{
 				altitude = atoi(ss);
 				LOGData(TAG_OTA,"altitude : %d",altitude);
 			}
-			i=GetValueFromData(ls,"FGPS",',',6,',',ss);
+			i=GetValueFromData(ls,cmdName,',',6,',',ss);
 			if(i)
 			{
 				speed = atoi(ss);
 				LOGData(TAG_OTA,"speed : %d",speed);
 			}
-			i=GetValueFromData(ls,"FGPS",',',7,'\0',ss);
+			i=GetValueFromData(ls,cmdName,',',7,'\0',ss);
 			if(i)
 			{
 				heading = atoi(ss);
@@ -2044,7 +2056,8 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 				fGPSSats = nofsat;
 				fGPSSpeed = speed;
 				fGPSHeading = heading;
-				LOGData(TAG_OTA,"FGPS Set complete with Alt: %d, Speed: %d, Heading: %d", fGPSAlt, fGPSSpeed, fGPSHeading);
+				fGPSForce = is_cgps ? 1 : 0;
+				LOGData(TAG_OTA,"%s Set complete with Alt: %d, Speed: %d, Heading: %d, Force: %d", cmdName, (int)fGPSAlt, (int)fGPSSpeed, (int)fGPSHeading, (int)fGPSForce);
 				SendResponce(SMSSender,"System Config Complete",IsServer,0);
 			}
 			return 1;

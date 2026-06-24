@@ -27,7 +27,7 @@
 #include <ctype.h>
 extern uint8_t IsFTPReq;
 extern int lastcrc;
-extern double fGPSLat,fGPSLong,fGPSAlt,fGPSpdop,fGPShdop,fGPSSats,fGPSSpeed, fGPSHeading;
+extern double fGPSLat,fGPSLong,fGPSAlt,fGPSpdop,fGPShdop,fGPSSats,fGPSSpeed, fGPSHeading, fGPSForce;
 
 
 #ifdef PROTO_CDAC

@@ -9,6 +9,7 @@ This document compiles all firmware modifications, feature implementations, bug 
 2. [Centralized LED Manager Implementation](#2-centralized-led-manager-implementation)
 3. [HTTP Queue IsSendProcess Memory Corruption Fixes](#3-http-queue-issendprocess-memory-corruption-fixes)
 4. [GPS Fault MCU Reset Logic](#4-gps-fault-mcu-reset-logic)
+5. [ACTVR Format, VDETAIL Version Prefix, and FOTA/MOTA Watchdog Reset Protection](#5-actvr-format-vdetail-version-prefix-and-fotamota-watchdog-reset-protection)
 
 ---
 
@@ -427,3 +428,51 @@ ACTVR,345855,APMG,V1.5.5,868329088626522,01,022.08427550,N,073.20458283,E,1,1906
 ```text
 ACTVR,496849,APMG,1.2.1,865510088614401,1,22.08933780,N,69.27737450,E,1,19062026 083707,109.94,00.0,31,404,0098,20EA,0,0,00.0,000136,IF
 ```
+
+---
+
+## 5. ACTVR Format, VDETAIL Version Prefix, and FOTA/MOTA Watchdog Reset Protection
+
+### 1. Updated ACTVR and HCHKR Packet Format
+The packet generation format in `MakeACTMessage()` has been updated to the new specification:
+* **Firmware Version:** Preserves or adds the `V` prefix (e.g., `V1.6.1`).
+* **Latitude and Longitude:** Formatted to exactly 6 digits after the decimal point (`%.6f`).
+* **Speed:** Formatted with width 3 (`%03.1f`), resulting in `0.0` when stationary instead of `00.0`.
+* **Voltage:** Display the main voltage (`PeriPheralVal.MainsVolt`) instead of internal battery voltage (`PeriPheralVal.BattVolt`).
+
+Example Output:
+```text
+ACTVR,163262,APMG,V1.6.1,868329086201534,1,15.025661,N,78.924909,E,1,22062026 104204,246.4,0.0,30,404,0040,1B73,1,1,11.5,000135,IN
+```
+
+### 2. State Tag Prefix in VDETAIL Version Response
+In [SMS.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/SMS.c), the `GETVDETAILS` response version has been modified to prepend the state abbreviation tag (`PROTO_TAG`):
+* **Format:** `FirVer = <PROTO_TAG>_<FirmVer>` (e.g. `TN1_1.5.5` or `TN1_V1.5.5`).
+
+### 3. FOTA & MOTA Watchdog and Reset Protection
+To ensure FOTA and MOTA update processes do not fail from unexpected watchdog timeouts or software resets, the following improvements have been made:
+* **Correct Watchdog Pins for FOTA:** In [FTP.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/FTP.c), `FOTAUpdate` now initializes `ST_FotaConfig` using the real watchdog pins (`pinWtd1` and `pinWtd2` from `Ql_WTD_GetWDIPinCfg()`) instead of the dummy `LED_GPS_GPIO`. This ensures the FOTA bootloader correctly feeds the external hardware watchdog.
+* **Bypass GPS Timeout Resets:** In [GPS.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/GPS.c), `gps_reset_routine` is bypassed if `IsMotaProcessing || IsFotaProcessing` is active.
+* **Bypass GPRS Profile Switching and Reboots:** In [GPRS.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/GPRS.c), reboots in GPRS registration denied loop (`ProcessREGISTER`) and profile switching logic (`CheckprfReq`) are bypassed when `IsMotaProcessing || IsFotaProcessing` is active.
+
+---
+
+## 6. GPS Simulation Modes (CGPS and FGPS)
+
+The firmware includes a built-in simulation engine that allows developers to override or supplement real GPS coordinates using OTA/SMS commands for testing and validation.
+
+### 1. Conceptual Overview
+* **FGPS (Fallback GPS Simulation):** Supplements the real GPS receiver. It overrides GPS data with simulated coordinates **only** if the real GPS module has no valid lock (`GPS.GPSFix == 0`) or if a GPS receive timeout occurs. Once the real GPS achieves a valid fix, the simulation is bypassed, and real coordinates are used.
+* **CGPS (Continuous Forced GPS Simulation):** Unconditionally overrides the real GPS module. It completely skips NMEA parsing from the GPS UART stream, preventing real coordinates from being used regardless of hardware lock status.
+
+### 2. Stationary Speed Lock (Zero Fluctuations)
+* To prevent false movement logs, when simulated speed is set to `0` (`fGPSSpeed == 0`), the simulated speed is mapped directly (`GPS.Speed = 0.0`) without any random walk fluctuations.
+
+### 3. Hardware Reset Bypass
+* When simulation is active (`GPS_IsSimulationActive()`), the GPS thread's fault recovery routine (`gps_reset_routine()`) is bypassed to prevent cycling power or soft resetting the module during testing.
+
+### 4. Implementation Details
+* **Global parameters:** `fGPSLat`, `fGPSLong`, `fGPSAlt`, `fGPSpdop`, `fGPShdop`, `fGPSSats`, `fGPSSpeed`, `fGPSHeading`, and `fGPSForce` are defined in [Server.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/Server.c) and exported in [Server.h](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/inc/Server.h).
+* **SMS Command Format:** `SET FGPS lat,long,hdop,pdop,noofsat,altitude,speed,heading` or `SET CGPS ...`. Latitude/longitude are scaled by $10^6$, HDOP/PDOP by $100$.
+* **Simulation Loop:** Inside `gps_thread_entry` in [GPS.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/GPS.c), a periodic 1-second clock checks the status of `fGPSForce` and the real GPS fix status to determine whether to apply simulated coordinates via `ApplyFGPS()`.
+
