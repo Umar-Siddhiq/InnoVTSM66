@@ -175,6 +175,7 @@ extern Providertypedef prfReq;
 extern uint8_t PrfChanged;
 s32 SetupAutoTimesync(void);
 
+void GetDeviceIMEI(void);
 void InitGPRSThread(u32 taskId);
 void GPRSThreadEntry(s32 taskId);
 #endif

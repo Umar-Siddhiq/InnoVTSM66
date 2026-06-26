@@ -564,6 +564,14 @@ typedef struct
 }VehicleTypedef;
 
 
+/*
+typedef struct
+{
+	uint8_t IsEnable;
+	char Imei[18];
+}FIMEITypeDef;
+*/
+
 typedef struct
 {
 	char VendorID[30];
@@ -582,6 +590,8 @@ typedef struct
 	char mSPN[20];
 	SIMMakeTypedef SIMMake;
 	uint8_t DisableSOS;
+	// uint8_t DisableImiCmd;
+	// FIMEITypeDef CustomImei;
 }VTSTypedef;
 
 extern VTSTypedef VTSData;

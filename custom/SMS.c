@@ -1596,6 +1596,32 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			SendResponce(SMSSender,SimData,IsServer,0);
 			return 1;
 		}
+		/*
+		if(Ql_strstr(fn,"IMIDISABLE"))
+		{
+			Ql_sprintf(SimData,"IMI Disable: %d",VTSData.DisableImiCmd);
+			SendResponce(SMSSender,SimData,IsServer,0);
+			return 1;
+		}
+		if(Ql_strstr(fn,"IMI"))
+		{
+			if(VTSData.DisableImiCmd == 1)
+			{
+				SendResponce(SMSSender,"IMI Command Disabled",IsServer,0);
+				return 1;
+			}
+			if(VTSData.CustomImei.IsEnable)
+			{
+				Ql_sprintf(SimData,"Custom IMEI: Enabled, %s", VTSData.CustomImei.Imei);
+			}
+			else
+			{
+				Ql_sprintf(SimData,"Custom IMEI: Disabled");
+			}
+			SendResponce(SMSSender,SimData,IsServer,0);
+			return 1;
+		}
+		*/
 
 		if(Ql_strstr(fn,"VDETAIL"))
 		{
@@ -2124,6 +2150,68 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			SendResponce(SMSSender, "Invalid IPCON command", IsServer, 0);
 			return 1;
 		}
+		/*
+		ls = Ql_strstr(fn,"IMIDISABLE");
+		if(ls)
+		{
+			i=GetValueFromData(ls,"IMIDISABLE",' ',0,'\0',ss);
+			if(i)
+			{
+				i=atoi(ss);
+				if(i == 0 || i == 1)
+				{
+					VTSData.DisableImiCmd = i;
+					UpdateConfigInFlash();
+					Ql_sprintf(SimData,"IMI Disable set to %d", VTSData.DisableImiCmd);
+					SendResponce(SMSSender,SimData,IsServer,1);
+					return 1;
+				}
+			}
+			SendResponce(SMSSender,"Invalid Param",IsServer,0);
+			return 1;
+		}
+		ls = Ql_strstr(fn, "IMI");
+		if (ls)
+		{
+			if(VTSData.DisableImiCmd == 1)
+			{
+				SendResponce(SMSSender,"IMI Command Disabled",IsServer,0);
+				return 1;
+			}
+			i = GetValueFromData(ls, "IMI", ' ', 0, '\0', ss);
+			if (i)
+			{
+				if (ss[0] == '0' && ss[1] == '\0')
+				{
+					VTSData.CustomImei.IsEnable = 0;
+					Ql_memset(VTSData.CustomImei.Imei, 0, sizeof(VTSData.CustomImei.Imei));
+					UpdateConfigInFlash();
+					SendResponce(SMSSender, "Config MI reset", IsServer, 1);
+					GetDeviceIMEI();
+					InitSockets();
+					return 1;
+				}
+				if (Ql_strlen(ss) != 15)
+				{
+					SendResponce(SMSSender, "Invalid IMEI !", IsServer, 0);
+					return 1;
+				}
+				LOGData(TAG_OTA, "Setting Custom IMEI : %s", ss);
+				Ql_strncpy(VTSData.CustomImei.Imei, ss, sizeof(VTSData.CustomImei.Imei));
+				VTSData.CustomImei.IsEnable = 1;
+				UpdateConfigInFlash();
+				SendResponce(SMSSender, "Config MI set", IsServer, 1);
+				GetDeviceIMEI();
+				InitSockets();
+				return 1;
+			}
+			else
+			{
+				SendResponce(SMSSender, "Invalid Config IMI!", IsServer, 0);
+				return 1;
+			}
+		}
+		*/
 
 		ls=Ql_strstr(fn,"DFTP");
 		if(ls)
@@ -3004,6 +3092,24 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			SendResponce(SMSSender,"SOS Data Cleared",IsServer,1);
 			return 1;
 		}
+		/*
+		ls = Ql_strstr(fn, "IMI");
+		if (ls)
+		{
+			if(VTSData.DisableImiCmd == 1)
+			{
+				SendResponce(SMSSender,"IMI Command Disabled",IsServer,0);
+				return 1;
+			}
+			VTSData.CustomImei.IsEnable = 0;
+			Ql_memset(VTSData.CustomImei.Imei, 0, sizeof(VTSData.CustomImei.Imei));
+			UpdateConfigInFlash();
+			SendResponce(SMSSender, "Custom IMEI Cleared", IsServer, 1);
+			GetDeviceIMEI();
+			InitSockets();
+			return 1;
+		}
+		*/
 	}
 
 	return 0;

@@ -10,6 +10,9 @@ This document compiles all firmware modifications, feature implementations, bug 
 3. [HTTP Queue IsSendProcess Memory Corruption Fixes](#3-http-queue-issendprocess-memory-corruption-fixes)
 4. [GPS Fault MCU Reset Logic](#4-gps-fault-mcu-reset-logic)
 5. [ACTVR Format, VDETAIL Version Prefix, and FOTA/MOTA Watchdog Reset Protection](#5-actvr-format-vdetail-version-prefix-and-fotamota-watchdog-reset-protection)
+6. [GPS Simulation Modes (CGPS and FGPS)](#6-gps-simulation-modes-cgps-and-fgps)
+7. [GPS Heading Precision Tuning](#7-gps-heading-precision-tuning)
+8. [Dynamic Custom/Virtual IMEI Configuration](#8-dynamic-customvirtual-imei-configuration)
 
 ---
 
@@ -475,4 +478,39 @@ The firmware includes a built-in simulation engine that allows developers to ove
 * **Global parameters:** `fGPSLat`, `fGPSLong`, `fGPSAlt`, `fGPSpdop`, `fGPShdop`, `fGPSSats`, `fGPSSpeed`, `fGPSHeading`, and `fGPSForce` are defined in [Server.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/Server.c) and exported in [Server.h](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/inc/Server.h).
 * **SMS Command Format:** `SET FGPS lat,long,hdop,pdop,noofsat,altitude,speed,heading` or `SET CGPS ...`. Latitude/longitude are scaled by $10^6$, HDOP/PDOP by $100$.
 * **Simulation Loop:** Inside `gps_thread_entry` in [GPS.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/GPS.c), a periodic 1-second clock checks the status of `fGPSForce` and the real GPS fix status to determine whether to apply simulated coordinates via `ApplyFGPS()`.
+
+---
+
+## 7. GPS Heading Precision Tuning
+
+Modified the precision of the GPS heading field in packets. The heading is formatted to exactly one decimal place (e.g. `355.0` instead of `355.00`) to match requirements and remove trailing redundant decimal zeros.
+
+### Files Modified:
+* **[GPS.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/GPS.c)**: Updated formatting strings from `%3.2f` and `%03.2f` to `%3.1f` and `%03.1f` in `gps_parameter_init()`, `gps_gga_update()`, and GPS simulation logic.
+* **[Server.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/Server.c)**: Updated `sHead` tracking buffer formatter in `PrepareFTKBuffer()` to output `%3.1f`.
+
+---
+
+## 8. Dynamic Custom/Virtual IMEI Configuration (DISABLED / COMMENTED OUT)
+
+> [!WARNING]
+> This feature and all corresponding structures, initialization logic, IMEI checking overrides, and SMS parsing commands (`SET IMIDISABLE`, `GET IMIDISABLE`, `SET IMI`, `GET IMI`, `CLR IMI`) have been **fully disabled and commented out** from the source code. The device will default to its hardware IMEI (or virtual IMEI `VIMEI` if `VIRTUAL_IMEI` is configured).
+
+### Original Feature Details (For Reference)
+Implemented a feature allowing a virtual IMEI to be set on the device dynamically using SMS/OTA commands. The custom IMEI is stored in non-volatile flash memory, used in place of the hardware IMEI in communications, and is cleared when the device is reverted to defaults. An option is also provided to disable or enable the custom IMEI commands entirely.
+
+### SMS/OTA Commands (Now Disabled)
+1. `SET IMIDISABLE <0/1>`: Enables (`0`) or Disables (`1`) the custom IMEI configuration commands.
+2. `GET IMIDISABLE`: Returns the current command disable status (`IMI Disable: <0/1>`).
+3. `SET IMI <15-digit IMEI>`: Sets the custom IMEI (only allowed if `IMIDISABLE` is `0`).
+4. `SET IMI 0` / `CLR IMI`: Resets/Clears the custom IMEI back to hardware default (only allowed if `IMIDISABLE` is `0`).
+5. `GET IMI`: Returns the current custom IMEI status (only allowed if `IMIDISABLE` is `0`).
+
+### Files Modified & Commented Out:
+* **[VTS.h](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/inc/VTS.h)**: Defined `FIMEITypeDef` struct and added `uint8_t DisableImiCmd` and `FIMEITypeDef CustomImei` fields to `VTSTypedef` (now commented out).
+* **[GPRS.h](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/inc/GPRS.h)**: Expose `GetDeviceIMEI()` function declaration globally.
+* **[GPRS.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/GPRS.c)**: Updated `GetDeviceIMEI()` function to load IMEI from `VTSData.CustomImei.Imei` if custom IMEI is enabled (now commented out, defaulting to hardware/virtual IMEI).
+* **[File.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/File.c)**: Initialized `VTSData.DisableImiCmd = 1` (disabled by default) and cleared `CustomImei` parameters during defaults reload in `LoadDefault()` (now commented out).
+* **[SMS.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/SMS.c)**: Parsed `SET IMIDISABLE`, `GET IMIDISABLE`, `SET IMI`, `GET IMI`, and `CLR IMI` commands, and restricted IMEI configuration commands based on the `VTSData.DisableImiCmd` flag (now commented out).
+
 

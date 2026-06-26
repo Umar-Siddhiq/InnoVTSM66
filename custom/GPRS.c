@@ -1217,17 +1217,41 @@ void GetDeviceIMEI(void)
     ret = RIL_GetIMEI(imei);
     if (ret == RIL_AT_SUCCESS)
     {
-        #ifdef VIRTUAL_IMEI
-        Ql_strcpy(NetWork.IMEI, VIMEI);
-        LOGData(TAG_GPRS, "Device VIMEI: %s", NetWork.IMEI);
-        #else
-        Ql_strcpy(NetWork.IMEI, imei);
-        LOGData(TAG_GPRS, "Device IMEI: %s", NetWork.IMEI);
-        #endif
+        /*
+        if (VTSData.CustomImei.IsEnable)
+        {
+            Ql_strcpy(NetWork.IMEI, VTSData.CustomImei.Imei);
+            LOGData(TAG_GPRS, "Device Custom IMEI: %s", NetWork.IMEI);
+        }
+        else
+        {
+        */
+            #ifdef VIRTUAL_IMEI
+            Ql_strcpy(NetWork.IMEI, VIMEI);
+            LOGData(TAG_GPRS, "Device VIMEI: %s", NetWork.IMEI);
+            #else
+            Ql_strcpy(NetWork.IMEI, imei);
+            LOGData(TAG_GPRS, "Device IMEI: %s", NetWork.IMEI);
+            #endif
+        /*
+        }
+        */
     }
     else
     {
-        LOGData(TAG_GPRS, "Failed to get Device IMEI, error: %d", ret);
+        /*
+        if (VTSData.CustomImei.IsEnable)
+        {
+            Ql_strcpy(NetWork.IMEI, VTSData.CustomImei.Imei);
+            LOGData(TAG_GPRS, "Device Custom IMEI (Fallback): %s", NetWork.IMEI);
+        }
+        else
+        {
+        */
+            LOGData(TAG_GPRS, "Failed to get Device IMEI, error: %d", ret);
+        /*
+        }
+        */
     }
 }
 
