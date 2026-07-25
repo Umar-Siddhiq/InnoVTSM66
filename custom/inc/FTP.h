@@ -7,7 +7,7 @@
 
 
 
-//#define FTP_FILE_RAM
+
 
 #define FTP_DEFAULT_CHANNEL         1
 #define FTP_CALLBACK_TIMEOUT        5000
@@ -26,14 +26,9 @@
 
 
 
-#ifdef FTP_FILE_RAM
-
-#define SERVER_FOTA_FILEPATH        "RAM:app.bin"
-#define SERVER_MOTA_FILEPATH        "RAM:mcu.bin"
-#else
 #define SERVER_FOTA_FILEPATH        "app.bin"
 #define SERVER_MOTA_FILEPATH        "mcu.bin"
-#endif
+
 
 typedef enum {FTP_STATE_CLOSED,FTP_STATE_ERROR,FTP_STATE_INIT,FTP_STATE_CONNECTED}FTPStateTypedef;
 typedef enum {FTP_TRANSFER_CLOSED,FTP_TRANSFER_ERROR,FTP_TRANSFER_INIT,FTP_TRANSFER_GOTSIZE,FTP_TRANSFER_DATAREQ,FTP_TRANSFER_DATACALLBACK,FTP_TRANSFER_COMPLETED}FTPDownloadTypedef;
@@ -112,5 +107,20 @@ uint8_t FTPStart(download_req_info_s* ftpHandle);
 // Downloads `remotePath` from FTP to `localPath` using selected `storage` ("RAM" or "UFS").
 uint8_t FTP_DownloadOnce(const char* ip, uint16_t port, const char* user, const char* pass,
                          const char* remotePath, const char* localPath, const char* storage);
+
+void FTP_CleanupDiskSpace(uint32_t requiredSize);
+
+typedef struct
+{
+    uint32_t freeSpaceBefore;
+    uint32_t freeSpaceAfter;
+    uint16_t historyFilesDeleted;
+    uint16_t batchFilesDeleted;
+    uint16_t transientFilesDeleted;
+    uint16_t failures;
+} DiskCleanupResult;
+
+// Clears recoverable UFS data only. Device configuration and state are retained.
+uint8_t FTP_ClearRecoverableDiskData(DiskCleanupResult *result);
 
 #endif

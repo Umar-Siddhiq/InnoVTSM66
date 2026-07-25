@@ -7,7 +7,7 @@
 #include "ql_fs.h"
 #include "Systic.h"
 #include "Server.h"
-
+//#define TEST
 #ifndef TEST
 #define     DEFVAL                  0xA5A2
 #else

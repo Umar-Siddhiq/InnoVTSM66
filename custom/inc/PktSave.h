@@ -47,6 +47,12 @@ void DeleteLastPacket(void);
 void ReadLastPacket(void);
 uint8_t ReadPacket(uint16_t pktnum);
 void DeleteAllPackets(void);
+// Deletes every history packet, including files left behind by a damaged count file.
+// Returns 1 only when all existing packet files and the count file were cleared.
+uint8_t ClearHistoryStorage(uint16_t *deletedCount, uint16_t *failedCount);
+void DeleteFirstPacketsBulk(uint16_t countToDelete);
+void DeleteFirstPacket(void);
+uint16_t GetPacketCount(void);
 
 
 

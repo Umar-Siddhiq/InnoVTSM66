@@ -42,6 +42,7 @@
 #include "File.h"
 #include "SMS.h"
 #include "SMSlib.h"
+#include "Sensors.h"
 
 #if VTS_DEBUG_LOG_ENABLE
 char DBG_BUFFER[DBG_BUF_LEN]={0};
@@ -101,6 +102,10 @@ void system_init(void)
     hw_init();
     LoadConfig();
     LoadState();
+    #ifndef PROTO_CDAC
+    InitSensors();
+    LoadSensorConfigFromFlash();
+    #endif
     SOSInit(VTSData.IntervalData.SOSTimeOut);
     #ifdef PROTO_CDAC
     VehicleState.PacketState = NORMAL;

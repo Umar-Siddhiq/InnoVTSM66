@@ -1,5 +1,7 @@
 //C:\Users\Admin\Desktop\InnoVTSM66\custom\Server.c
 #include "Server.h"
+#include "Sensors.h"
+#include "MOTA.h"
 #ifdef PROTO_CDAC
 #include "HttpQueue.h"
 #include "HTTPS.h"
@@ -14,12 +16,15 @@ static void handleRFIDData(void);
 static void handleLoginRequests(void);
 static void handlePackets(void);
 static void handleServerResponses(void);
+static void handleSensorData(void);
 static void handleNormalPackets(void);
 static void handleHealthPackets(void);
 void InitBuffer(uint8_t alt);
 void LoginString(void);
 void CheckAlerts(void);
 void EmergencyPacket(uint8_t IsOff);
+void ChangeToHistoryPacket(char *buf);
+void ChangeToHistoryEPB(char *buf);
 void SendDatatoServer0(void);
 void ProcessHistoryPacket(void);
 void DecodeGeofence(char* data);
@@ -2580,6 +2585,11 @@ void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 void SMSAlert(uint8_t AlertNum)
 {
 	uint8_t tm=125;
+	if(AlertNum == 10 || AlertNum == 11 || AlertNum == 16)
+	{
+		SendSOSAlertSMS(AlertNum);
+		return;
+	}
 	if(GSM.GSMState < GPRS_INIT)
 		return;
 	Ql_memset(SimData,0x00,MSGSIZE);
@@ -4190,11 +4200,15 @@ void SendDatatoServer0(void)
 	if(!TCPSocket_SendString(&ServerSocket[0],dataBuffer))
 	{
 		#ifndef HISTORY_DISABLED
-		#ifdef HISTORY_INTERNAL
-		SavePacket();
-		#else
-		WriteHistoryData(dataBuffer);
-		#endif
+		if(!VTSData.DisableHistory)
+		{
+			ChangeToHistoryPacket(dataBuffer);
+			#ifdef HISTORY_INTERNAL
+			SavePacket();
+			#else
+			WriteHistoryData(dataBuffer);
+			#endif
+		}
 		#endif
 
 	}
@@ -4225,7 +4239,146 @@ void MakeSMSFallbackPacket(void)
 	InsertCurrentDateTime(dataBuffer,1);
 }
 
+#ifndef PROTO_CDAC
+void SaveOfflineAlerts(void)
+{
+	#ifndef HISTORY_DISABLED
+	if(VTSData.DisableHistory)
+		return;
 
+	if(VAlert[MAINS_FAIL_ALERT].Enable) // MAIN OFF 
+	{
+		InitBuffer(3);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[MAINS_FAIL_ALERT].Enable=0;
+		return;
+	}
+
+	if(VAlert[TILT_ALERT].Enable) // TILT 
+	{
+		InitBuffer(24);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[TILT_ALERT].Enable=0;	
+		return;
+	}
+
+	if(VAlert[TAMPER_ALERT].Enable)  // BOX TAMPER
+	{
+		InitBuffer(9);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[TAMPER_ALERT].Enable=0;	
+		return;
+	}
+
+	if(VAlert[OVER_SPEED_ALERT].Enable) //Over Speed
+	{
+		if(!IsOverSpeed)
+		{
+			InitBuffer(23);
+			ChangeToHistoryPacket(dataBuffer);
+			SavePacket();
+			IsOverSpeed=1;
+			return;
+		}
+	}
+	else if(IsOverSpeed)
+		IsOverSpeed=0;
+
+	if(VAlert[HARSH_BRK_ALERT].Enable) // Harsh Braking
+	{
+		InitBuffer(13);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[HARSH_BRK_ALERT].Enable=0;	
+		return;
+	}
+	
+	if(VAlert[HARSH_ACC_ALERT].Enable) // Harsh Accel
+	{
+		InitBuffer(14);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[HARSH_ACC_ALERT].Enable=0;	
+		return;
+	}
+
+	if(VAlert[RASH_TURN_ALERT].Enable) // Rash Turn
+	{
+		InitBuffer(15);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[RASH_TURN_ALERT].Enable=0;	
+		return;
+	}
+
+	if(VAlert[MAINS_RES_ALERT].Enable) // Mains Restore
+	{
+		InitBuffer(6);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[MAINS_RES_ALERT].Enable=0;	
+		return;
+	}
+
+	if(VAlert[BATT_LOW_ALERT].Enable) // Battery Low 
+	{
+		InitBuffer(4);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[BATT_LOW_ALERT].Enable=0;	
+		return;
+	}
+
+	if(VAlert[IGN_ON_ALERT].Enable) // IGNITION ON
+	{
+		InitBuffer(7);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[IGN_ON_ALERT].Enable=0;	
+		return;
+	}
+
+	if(VAlert[IGN_OFF_ALERT].Enable) // IGNITION OFF
+	{
+		InitBuffer(8);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[IGN_OFF_ALERT].Enable=0;	
+		return;
+	}
+
+	if(VAlert[BATT_LOW_RES_ALERT].Enable) // Battery Low Restore
+	{
+		InitBuffer(5);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[BATT_LOW_RES_ALERT].Enable=0;	
+		return;
+	}
+
+	if(VAlert[GFIN_ALERT].Enable) // GeoFence In
+	{
+		InitBuffer(17);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[GFIN_ALERT].Enable=0;
+		return;
+	}
+
+	if(VAlert[GFOUT_ALERT].Enable) // GeoFence Out
+	{
+		InitBuffer(18);
+		ChangeToHistoryPacket(dataBuffer);
+		SavePacket();
+		VAlert[GFOUT_ALERT].Enable=0;
+		return;
+	}
+	#endif
+}
+#endif
 
 void CheckAlerts(void)
 {
@@ -4478,7 +4631,7 @@ void CheckAlerts(void)
 		VAlert[BATT_LOW_RES_ALERT].Enable=0;	
 		return;
 	}
-	if(VAlert[GFIN_ALERT].IsSMS)
+	if(VAlert[GFIN_ALERT].Enable)
 	{
 		InitBuffer(17);
 		TCPSocket_SendString(&ServerSocket[0],dataBuffer);
@@ -4486,9 +4639,10 @@ void CheckAlerts(void)
 		#ifdef EXTENDED_IPS
 		TCPSocket_SendString(&ServerSocket[3],dataBuffer);
 		#endif
-		VAlert[GFIN_ALERT].IsSMS=0;
+		VAlert[GFIN_ALERT].Enable=0;
+		return;
 	}
-	if(VAlert[GFOUT_ALERT].IsSMS)
+	if(VAlert[GFOUT_ALERT].Enable)
 	{
 		InitBuffer(18);
 		TCPSocket_SendString(&ServerSocket[0],dataBuffer);
@@ -4496,7 +4650,8 @@ void CheckAlerts(void)
 		#ifdef EXTENDED_IPS
 		TCPSocket_SendString(&ServerSocket[3],dataBuffer);
 		#endif
-		VAlert[GFOUT_ALERT].IsSMS=0;
+		VAlert[GFOUT_ALERT].Enable=0;
+		return;
 	}
 
 }
@@ -4505,26 +4660,24 @@ void ChangeToHistoryPacket(char *buf)
 {
 	char *fn;
 	fn = Ql_strstr(buf,",NR,01");
-	if(!fn)
+	if(fn)
 	{
-		// Try alternate format with single digit
-		fn = Ql_strstr(buf,",NR,1");
-		if(!fn)
-			return;
-		// For ",NR,1", position is different (fn[4] instead of fn[5])
-		fn[4] = '2';
+		fn[5] = '2';
 	}
 	else
 	{
-		// For ",NR,01"
-		fn[5] = '2';
+		fn = Ql_strstr(buf,",NR,1");
+		if(fn)
+		{
+			fn[4] = '2';
+		}
 	}
 	
 	fn = Ql_strstr(buf,",L,");
-	if(!fn)
-		return;
-	fn[1] = 'H';
-	//LOGData(TAG_SERVER,"Changed to History Packet, Len :%d",Ql_strlen(buf));
+	if(fn)
+	{
+		fn[1] = 'H';
+	}
 	return;
 }
 
@@ -4569,7 +4722,7 @@ uint16_t GetMemeryPercentage(void)
 void ProcessHistoryPacket(void)
 {
 	int size;
-	if(ServerSocket[0].SocketState != SOCKET_CONNECTED)
+	if(ServerSocket[0].SocketState != SOCKET_CONNECTED || VTSData.DisableHistory || IsMotaProcessing || IsFotaProcessing)
 		return;
 
 	#ifdef HISTORY_DISABLED
@@ -5082,10 +5235,15 @@ static void handleLoginRequests(void) {
 }
 
 static void handlePackets(void) {
-    // Handle alerts if any server is connected
-    if(ServerSocket[0].SocketState == SOCKET_CONNECTED || ServerSocket[2].SocketState==SOCKET_CONNECTED) {
+    // Handle alerts if primary server (Server 1) is connected
+    if(ServerSocket[0].SocketState == SOCKET_CONNECTED) {
         CheckAlerts();
     }
+#ifndef PROTO_CDAC
+    else {
+        SaveOfflineAlerts();
+    }
+#endif
 
 #ifndef PROTO_CDAC
     // Handle history packets
@@ -5141,21 +5299,40 @@ static void handleNormalPackets(void) {
         // Handle SOS alerts
         if(VAlert[SOS_ON_ALERT].Enable) {
             EmergencyPacket(1); // SOS ON ALERT
-             /* OLD CODE - COMMENTED OUT AS REQUESTED:
-            if(ServerSocket[1].SocketState == SOCKET_CONNECTED) {
-                TCPSocket_SendString(&ServerSocket[1], dataBuffer);
-            }
-            */
-            // NEW CODE: Dynamic routing based on Server 2 state
+            // NEW CODE: Dynamic routing based on Server 2 state with history fallback
             if (VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A') {
                 // Server 2 is disabled, route EPB to Server 1
                 if (ServerSocket[0].SocketState == SOCKET_CONNECTED) {
                     TCPSocket_SendString(&ServerSocket[0], dataBuffer);
+                } else {
+                    #ifndef HISTORY_DISABLED
+                    if(!VTSData.DisableHistory)
+                    {
+                        ChangeToHistoryEPB(dataBuffer);
+                        #ifdef HISTORY_INTERNAL
+                        SavePacket();
+                        #else
+                        WriteHistoryData(dataBuffer);
+                        #endif
+                    }
+                    #endif
                 }
             } else {
                 // Server 2 is enabled, route EPB to Server 2
                 if (ServerSocket[1].SocketState == SOCKET_CONNECTED) {
                     TCPSocket_SendString(&ServerSocket[1], dataBuffer);
+                } else {
+                    #ifndef HISTORY_DISABLED
+                    if(!VTSData.DisableHistory)
+                    {
+                        ChangeToHistoryEPB(dataBuffer);
+                        #ifdef HISTORY_INTERNAL
+                        SavePacket();
+                        #else
+                        WriteHistoryData(dataBuffer);
+                        #endif
+                    }
+                    #endif
                 }
             }
         }
@@ -5186,11 +5363,15 @@ static void handleNormalPackets(void) {
         if(VAlert[SOS_ON_ALERT].Enable) {
             EmergencyPacket(1); //SOS Packet Save
 			#ifndef HISTORY_DISABLED
-            #ifdef HISTORY_INTERNAL
-            SavePacket();
-            #else
-            WriteHistoryData(dataBuffer); 
-            #endif
+			if(!VTSData.DisableHistory)
+			{
+				ChangeToHistoryEPB(dataBuffer);
+				#ifdef HISTORY_INTERNAL
+				SavePacket();
+				#else
+				WriteHistoryData(dataBuffer); 
+				#endif
+			}
 			#endif
         }
     }
@@ -5232,6 +5413,12 @@ static void handleHealthPackets(void) {
     #endif
 }
 
+static void handleSensorData(void) {
+    #ifndef PROTO_CDAC
+    ProcessSensors();
+    #endif
+}
+
 // Main server thread entry point
 void ServerThreadEntry(s32 taskId) {
     server_thread_init(taskId);
@@ -5264,6 +5451,9 @@ void ServerThreadEntry(s32 taskId) {
 
         // Handle server responses
         handleServerResponses();
+
+        // Handle sensors
+        handleSensorData();
 
         #else
         // PROTO_CDAC specific handling

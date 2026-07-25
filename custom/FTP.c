@@ -13,6 +13,7 @@
 #include "File.h"
 #include "MOTA.h"
 #include "ql_common.h"
+#include "PktSave.h"
 
 extern ST_ExtWatchdogCfg* Ql_WTD_GetWDIPinCfg(void);
 
@@ -26,7 +27,8 @@ uint8_t IsFotaProcessing = 0;
 
 
 uint8_t FTPFileBuffer[FOTA_MAX_BUFF_SIZE]={0};
-uint32_t FTPFileSize=0, DownloadedFileSize=0;
+u32 FTPFileSize=0;
+uint32_t DownloadedFileSize=0;
 
 #ifdef FTP_EVENT_BASED
 nwy_osi_thread_t CurrentThread=NULL;
@@ -117,6 +119,23 @@ void UpdateFTPConfigInFlash(download_req_info_s* FTPHandle)
     SaveToFlash(FOTA_CONFIG_PATH, (void*)FTPHandle, sizeof(download_req_info_s));
 }
 
+void LoadFTPConfig(download_req_info_s* FTPHandle)
+{
+    extern uint8_t IsFTPReq;
+    if (LoadFromFlash(FOTA_CONFIG_PATH, (void*)FTPHandle, sizeof(download_req_info_s), NULL))
+    {
+        if (FTPHandle->IsValid == FOTA_REQ_VALID_CODE)
+        {
+            LOGData(TAG_FTP, "FOTA REQUEST FOUND, Attempting Upon Data Connection...");
+            IsFTPReq = 1;
+        }
+        else
+        {
+            LOGData(TAG_FTP, "No Fota Req!");
+        }
+    }
+}
+
 
 
 
@@ -159,7 +178,7 @@ uint8_t FTP_Login(char* IP, uint16_t Port, uint8_t IsActiveMode, char* User, cha
     FTPState = FTP_STATE_INIT;
     do
     {
-        ret = RIL_FTP_QFTPOPEN(IP, Port, User, Pass, 1);
+        ret = RIL_FTP_QFTPOPEN((u8*)IP, Port, (u8*)User, (u8*)Pass, 1);
         LOGData(TAG_FTP,"<-- FTP open connection, ret=%d -->\r\n", ret);
         if (RIL_AT_SUCCESS == ret)
         {
@@ -196,7 +215,7 @@ uint8_t FTPGetFileSize(char* FileName, int *size)
     FTPDownloadState = FTP_TRANSFER_INIT;
     do
     {
-        ret =  RIL_FTP_QFTPSIZE(FileName,&FTPFileSize);
+        ret =  RIL_FTP_QFTPSIZE((u8*)FileName,&FTPFileSize);
         LOGData(TAG_FTP,"<-- FTP get size, ret=%d -->\r\n", ret);
         if (RIL_AT_SUCCESS == ret)
         {
@@ -233,6 +252,105 @@ uint8_t FLS_DeleteExistingFile(char* Filename)
         return 0;
     }
     return 1;
+}
+
+void FTP_CleanupDiskSpace(uint32_t requiredSize)
+{
+    uint32_t freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
+    LOGData(TAG_FTP, "UFS Free Space before cleanup: %lu bytes. Required: %lu bytes", freeSpace, requiredSize);
+    
+    // Clear space if requiredSize is 0 (forced clean) or free space is less than required size + 50KB safety margin
+    if (requiredSize == 0 || freeSpace < (requiredSize + 51200))
+    {
+        LOGData(TAG_FTP, "Initiating selective cleanup...");
+        
+        // 1. Delete large logs
+        Ql_FS_Delete("FOTA.txt");
+        Ql_FS_Delete("EVENT.txt");
+        
+        // 2. Delete old firmware/temp downloads
+        Ql_FS_Delete("app.bin");
+        Ql_FS_Delete("mcu.bin");
+        Ql_FS_Delete("app_fota.bin");
+        
+        freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
+        
+#ifndef HISTORY_DISABLED
+        // 3. Purge history packets if space is still insufficient for download
+        if (requiredSize > 0 && freeSpace < (requiredSize + 51200))
+        {
+            uint32_t neededSpace = (requiredSize + 51200) - freeSpace;
+            // Each history packet is 512 bytes on disk
+            uint16_t packetsToDelete = (neededSpace + 511) / 512;
+            LOGData(TAG_FTP, "UFS space still low (%lu bytes), purging oldest %u history packets...", freeSpace, packetsToDelete);
+            DeleteFirstPacketsBulk(packetsToDelete);
+            freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
+        }
+#endif
+        
+        LOGData(TAG_FTP, "UFS Free Space after cleanup: %lu bytes", freeSpace);
+    }
+}
+
+static void FTP_DeleteCleanupFile(const char *filename, DiskCleanupResult *result)
+{
+    if (Ql_FS_Check((char *)filename) != QL_RET_OK)
+        return;
+
+    if (Ql_FS_Delete((char *)filename) == QL_RET_OK)
+    {
+        result->transientFilesDeleted++;
+        LOGData(TAG_FTP, "Deleted cleanup file %s", filename);
+    }
+    else
+    {
+        result->failures++;
+        LOGData(TAG_FTP, "Unable to delete cleanup file %s", filename);
+    }
+}
+
+uint8_t FTP_ClearRecoverableDiskData(DiskCleanupResult *result)
+{
+#ifndef HISTORY_DISABLED
+    uint16_t failed = 0;
+#endif
+    static const char *const transientFiles[] = {
+        "app.bin", "mcu.bin", "app_fota.bin", "FOTA.txt", "EVENT.txt"
+    };
+    uint8_t i;
+
+    if (result == NULL)
+        return 0;
+
+    Ql_memset(result, 0, sizeof(*result));
+    result->freeSpaceBefore = Ql_FS_GetFreeSpace(Ql_FS_UFS);
+
+    // Never remove files while they may be read or written by an OTA transfer.
+    if (IsFotaProcessing || IsMotaProcessing)
+    {
+        result->failures = 1;
+        result->freeSpaceAfter = result->freeSpaceBefore;
+        LOGData(TAG_FTP, "CLR DISK rejected while FOTA/MOTA is active");
+        return 0;
+    }
+
+#ifndef HISTORY_DISABLED
+    if (!ClearHistoryStorage(&result->historyFilesDeleted, &failed))
+        result->failures += failed;
+
+    failed = 0;
+    if (!ClearBatchStorage(&result->batchFilesDeleted, &failed))
+        result->failures += failed;
+#endif
+
+    for (i = 0; i < (sizeof(transientFiles) / sizeof(transientFiles[0])); i++)
+        FTP_DeleteCleanupFile(transientFiles[i], result);
+
+    result->freeSpaceAfter = Ql_FS_GetFreeSpace(Ql_FS_UFS);
+    LOGData(TAG_FTP, "CLR DISK complete: free %lu -> %lu, history=%u, batch=%u, files=%u, failures=%u",
+            result->freeSpaceBefore, result->freeSpaceAfter, result->historyFilesDeleted,
+            result->batchFilesDeleted, result->transientFilesDeleted, result->failures);
+    return result->failures == 0;
 }
 
 static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFilePath, const char* storage)
@@ -287,6 +405,7 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
         return 0;
     }
     LOGData(TAG_FTP,"Got File Size: %d",FileSize);
+    FTP_CleanupDiskSpace(FileSize);
     // if(!FLS_DeleteExistingFile(InternalFilePath))
     // {
     //     LOGData(TAG_FTP,"Cant Delete Existing File!");
@@ -439,15 +558,8 @@ uint8_t FOTAUpdate(char *firmwareFileName)
     u32 totalBytesWritten = 0;
     u8 *chunkBuffer = NULL;
     const u32 CHUNK_SIZE = 512;  // Match reference implementation (was 256)
-    bool isRAMFile = false;
 
     LOGData(TAG_FTP, "FOTA Update Started, Filename: %s\r\n", firmwareFileName);
-
-    // Check if this is a RAM file
-    if (Ql_strncmp(firmwareFileName, "RAM:", 4) == 0) {
-        isRAMFile = true;
-        LOGData(TAG_FTP, "Detected RAM file for FOTA");
-    }
 
     ST_FotaConfig fotaCfg = {0};
     fotaCfg.Q_gpio_pin1 = Ql_WTD_GetWDIPinCfg()->pinWtd1;
@@ -484,12 +596,8 @@ uint8_t FOTAUpdate(char *firmwareFileName)
         return 0;
     }
 
-    // Open firmware file based on type
-    if (isRAMFile) {
-        fileHandle = Ql_FS_OpenRAMFile(firmwareFileName, QL_FS_READ_ONLY, firmwareFileSize);
-    } else {
-        fileHandle = Ql_FS_Open(firmwareFileName, QL_FS_READ_ONLY);
-    }
+    // Open firmware file
+    fileHandle = Ql_FS_Open(firmwareFileName, QL_FS_READ_ONLY);
     
     if(fileHandle < 0)
     {

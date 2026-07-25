@@ -1,5 +1,6 @@
 #include "File.h"
 #include "Geofence.h"
+#include "FTP.h"
 
 VTSTypedef VTSData = {{0}};
 VTSStateTypedef VTSState = {0};
@@ -183,6 +184,9 @@ void LoadDefault(void) {
   Ql_sprintf(VTSData.mAPN, "AIRTELIOT.COM");
   ClearGeofence();
   VTSData.DisableSOS = 0;
+  VTSData.SOSSmsEnabled = SOS_SMS_FEATURE_ENABLED ? 1 : 0;
+  VTSData.DisableHistory = 0;
+  VTSData.SOSSmsConfigSignature = SOS_SMS_CONFIG_SIGNATURE;
   // VTSData.DisableImiCmd = 1;
   // VTSData.CustomImei.IsEnable = 0;
   // Ql_memset(VTSData.CustomImei.Imei, 0, sizeof(VTSData.CustomImei.Imei));
@@ -196,9 +200,34 @@ void LoadState(void) {
 }
 
 void LoadConfig(void) {
-  if (!LoadFromFlash(CONFIG_FILE_PATH, &VTSData, sizeof(VTSTypedef),
-                     LoadDefault))
+  s32 fileSize;
+  const u32 legacySize = (u32)(sizeof(VTSTypedef) - sizeof(uint64_t));
+
+  if (Ql_FS_Check(CONFIG_FILE_PATH) != QL_RET_OK) {
+    LoadDefault();
     return;
+  }
+
+  fileSize = Ql_FS_GetSize(CONFIG_FILE_PATH);
+  if (fileSize == legacySize) {
+    int fd = Ql_FS_Open(CONFIG_FILE_PATH, QL_FS_READ_ONLY);
+    u32 bytesRead = 0;
+    Ql_memset(&VTSData, 0, sizeof(VTSTypedef));
+    if (fd < 0 || Ql_FS_Read(fd, &VTSData, legacySize, &bytesRead) != QL_RET_OK ||
+        bytesRead != legacySize) {
+      if (fd >= 0) Ql_FS_Close(fd);
+      LoadDefault();
+      return;
+    }
+    Ql_FS_Close(fd);
+    VTSData.SOSSmsEnabled = SOS_SMS_FEATURE_ENABLED ? 1 : 0;
+    VTSData.SOSSmsConfigSignature = SOS_SMS_CONFIG_SIGNATURE;
+    UpdateConfigInFlash();
+    LOGData(TAG_FILE, "Migrated legacy SOS SMS configuration");
+  } else if (!LoadFromFlash(CONFIG_FILE_PATH, &VTSData, sizeof(VTSTypedef),
+                            LoadDefault)) {
+    return;
+  }
 
   if (VTSData.DefID != DEFVAL) {
     LOGData(TAG_FILE, "CONFIG file Def Mismatch! Loading Default...");
@@ -206,6 +235,16 @@ void LoadConfig(void) {
     return;
   }
 
+  if (VTSData.SOSSmsConfigSignature != SOS_SMS_CONFIG_SIGNATURE) {
+    VTSData.SOSSmsEnabled = SOS_SMS_FEATURE_ENABLED ? 1 : 0;
+    VTSData.SOSSmsConfigSignature = SOS_SMS_CONFIG_SIGNATURE;
+    UpdateConfigInFlash();
+  }
+#if !SOS_SMS_FEATURE_ENABLED
+  VTSData.SOSSmsEnabled = 0;
+#endif
+
   InitGeoState();
   InitSockets();
+  LoadFTPConfig(&DownloadReq);
 }

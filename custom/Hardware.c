@@ -406,7 +406,7 @@ void SystemStateSend(void)
         Ql_strcat(ss,", SPN: ");
         Ql_strcat(ss,NetWork.Network);
     }
-    if(GPS.State == 0)
+    if(GPS.State == 0 && !GPS_IsSimulationActive())
     {
         Ql_strcat(ss,", GPS: FLT\n");
     }

@@ -41,8 +41,9 @@ static bool FTP_DecodeURL(u8 *URL, s32 URLlength, u8 *serverAdd, u8* filePath,  
 
 s32 FTP_FotaMain(u8 contextId, u8* URL)
 {
-    s32 retValue;
+    s32 retValue = 0;
     bool ftpDecodeURL;
+    (void)retValue;
 
     UPGRADE_APP_DEBUG(FOTA_DBGBuffer,"<--Fota ftp Main entry !-->\r\n");
     FOTA_DBG_PRINT("Enter into FTP_FotaMain()");
@@ -80,7 +81,9 @@ bool FTP_IsFtpServer(u8* URL)
 void FTP_Callback_OnDownload(s32 result,s32 size)
 {
     s32 ret;
-    bool retValue;
+    bool retValue = FALSE;
+    (void)ret;
+    (void)retValue;
     if (result)
     {
         UPGRADE_APP_DEBUG(FOTA_DBGBuffer,"<---image bin file size =%d--->\r\n",size);
@@ -121,8 +124,9 @@ static void FTP_Program(void)
 {
     s32 ret;
     u8  attempts = 0;
-    bool retValue;
+    bool retValue = FALSE;
     u32 fileSize = 0;
+    (void)retValue;
     
     ret = RIL_NW_SetGPRSContext(Contextid);
     UPGRADE_APP_DEBUG(FOTA_DBGBuffer, "<-- Set GPRS PDP context, ret=%d -->\r\n", ret);
@@ -195,7 +199,7 @@ void DoUpgrade(void)
     u8 *file_buffer=NULL;
     s32 ret2,ret3;
     u32 realLen,lenToRead;
-    bool retValue;
+    bool retValue = FALSE;
     u8 binfilePath[FTP_BINFILENAME_LEN+4];
 
     // Prepare update data

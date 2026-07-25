@@ -1,6 +1,7 @@
 #include "PktSave.h"
 #include "Server.h"
 #include "GPRS.h"
+#include "MOTA.h"
 #include <time.h>
 #ifndef HISTORY_DISABLED
 
@@ -140,6 +141,52 @@ void DeleteAllPackets(void)
     }
 }
 
+uint8_t ClearHistoryStorage(uint16_t *deletedCount, uint16_t *failedCount)
+{
+    uint16_t i;
+    char packetname[20];
+    uint8_t success = 1;
+
+    if (deletedCount) *deletedCount = 0;
+    if (failedCount) *failedCount = 0;
+
+    // Do not rely on LastPkt: an interrupted write can leave orphaned packets.
+    for (i = 1; i <= MAX_PACKET_COUNT; i++)
+    {
+        Ql_memset(packetname, 0x00, sizeof(packetname));
+        Ql_sprintf(packetname, "%s%d%s", PKT_NAME_HEADER, i, PKT_NAME_FOOTER);
+        if (Ql_FS_Check(packetname) == QL_RET_OK)
+        {
+            if (Ql_FS_Delete(packetname) == QL_RET_OK)
+            {
+                if (deletedCount) (*deletedCount)++;
+            }
+            else
+            {
+                success = 0;
+                if (failedCount) (*failedCount)++;
+                LOGData(TAG_BACKUP, "Unable to delete history packet %s", packetname);
+            }
+        }
+    }
+
+    Ql_memset(&PacketConfig, 0, sizeof(PacketConfig));
+    PacketConfig.DefData = PKTCOUNT_DEF;
+    PacketConfig.LastPkt = 0;
+    // Removing the count file is safer than recreating it through SaveToFlash(),
+    // whose legacy error path formats UFS. CheckPacketCount() creates a clean
+    // count file on the next history write/read.
+    if (Ql_FS_Check(PKTCOUNT_LOC) == QL_RET_OK &&
+        Ql_FS_Delete(PKTCOUNT_LOC) != QL_RET_OK)
+    {
+        success = 0;
+        if (failedCount) (*failedCount)++;
+        LOGData(TAG_BACKUP, "Unable to delete history count file");
+    }
+
+    return success;
+}
+
 void ReadLastPacket(void)
 {
     CheckPacketCount();
@@ -159,43 +206,60 @@ void ReadLastPacket(void)
     return;
 }
 
-void DeleteFirstPacket(void)
+void DeleteFirstPacketsBulk(uint16_t countToDelete)
 {
     uint16_t i;
     char ss[30];
     char ff[30];
-    if(PacketConfig.LastPkt<=0)
+
+    CheckPacketCount();
+    if (PacketConfig.LastPkt <= 0 || countToDelete == 0)
         return;
 
-    if(PacketConfig.LastPkt == 1)
-    {
-        DeletePacket(1);
-        PacketConfig.LastPkt--;
-        UpdatePacketConfig();
-        return;
+    if (countToDelete > PacketConfig.LastPkt)
+        countToDelete = PacketConfig.LastPkt;
 
+    // 1. Delete the first K packets
+    for (i = 1; i <= countToDelete; i++)
+    {
+        DeletePacket(i);
     }
 
-    DeletePacket(1);
-
-    for(i = 2;i<=PacketConfig.LastPkt;i++)
+    // 2. Shift remaining packets: rename BK_i.bin to BK_(i-K).bin
+    if (countToDelete < PacketConfig.LastPkt)
     {
-        Ql_memset(ss,0x00,30);
-        Ql_memset(ff,0x00,30);
-        Ql_sprintf(ss,"%s%d%s",PKT_NAME_HEADER,i-1,PKT_NAME_FOOTER);
-        Ql_sprintf(ff,"%s%d%s",PKT_NAME_HEADER,i,PKT_NAME_FOOTER);
-        Ql_FS_Rename(ff, ss);
+        for (i = countToDelete + 1; i <= PacketConfig.LastPkt; i++)
+        {
+            Ql_memset(ss, 0x00, 30);
+            Ql_memset(ff, 0x00, 30);
+            Ql_sprintf(ss, "%s%d%s", PKT_NAME_HEADER, i - countToDelete, PKT_NAME_FOOTER);
+            Ql_sprintf(ff, "%s%d%s", PKT_NAME_HEADER, i, PKT_NAME_FOOTER);
+            Ql_FS_Rename(ff, ss);
+        }
     }
 
-    PacketConfig.LastPkt--;
+    // 3. Update the packet count configuration
+    PacketConfig.LastPkt -= countToDelete;
     UpdatePacketConfig();
-    return;
+    LOGData(TAG_BACKUP, "History Bulk Deleted %d packets, remaining: %d", countToDelete, PacketConfig.LastPkt);
+}
+
+void DeleteFirstPacket(void)
+{
+    DeleteFirstPacketsBulk(1);
 }
 //#define ROLLOVER
 void SavePacket(void)
 {
     int rem;
     
+    // Skip saving history packets during FOTA/MOTA updates
+    if (IsMotaProcessing || IsFotaProcessing)
+    {
+        LOGData(TAG_BACKUP, "FOTA/MOTA update in progress, skipping history save");
+        return;
+    }
+
     // Don't save history packets if datetime is not available
     if (!GSM.IsTimeSet)
     {
@@ -213,6 +277,19 @@ void SavePacket(void)
     }
     
     CheckPacketCount();
+    
+    // UFS Safety Reserve: Ensure at least 150 KB free space using efficient bulk deletion
+    uint32_t freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
+    if (freeSpace < 153600 && PacketConfig.LastPkt > 0)
+    {
+        uint32_t neededSpace = 153600 - freeSpace;
+        // Each packet is 512 bytes on disk
+        uint16_t packetsToDelete = (neededSpace + 511) / 512;
+        LOGData(TAG_BACKUP, "Low UFS space (%d bytes), bulk purging oldest %u history packets to restore 150KB reserve...", freeSpace, packetsToDelete);
+        DeleteFirstPacketsBulk(packetsToDelete);
+        CheckPacketCount();
+    }
+
     if(PacketConfig.LastPkt >= MAX_PACKET_COUNT)
     {
         #ifdef ROLLOVER
@@ -335,8 +412,8 @@ void FTK_ApplyVariation(FTKConfigtypedef *config)
     // Jitter ranges (you can tweak these for realism)
     double latJitterMax = 0.000006;    // ~0.6m
     double longJitterMax = 0.000006;
-    double altJitterMax = 2.5;         // ¡À1.5m
-    double headingJitterMax = 2.0;     // ¡À1¡ã
+    double altJitterMax = 2.5;         // Â¡Ã€1.5m
+    double headingJitterMax = 2.0;     // Â¡Ã€1Â¡Ã£
     double hdopJitterMax = 0.1;
     double pdopJitterMax = 0.1;
 

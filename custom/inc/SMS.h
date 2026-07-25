@@ -25,6 +25,7 @@ extern char CMD_Buff[];
 #define OTA_SRC_RS485   7
 
 void SendSOSSMS(uint8_t isFall);
+void SendSOSAlertSMS(uint8_t AlertNum);
 void SendSMS(char* ph,char* msg);
 
 uint8_t DecodeSMS(char* msg,uint8_t IsServer);

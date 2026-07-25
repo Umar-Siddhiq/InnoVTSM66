@@ -225,6 +225,9 @@ void Hdlr_RecvNewSMS(u32 nIndex, bool bAutoReply)
         return;
     }
     
+    // Delete the SMS immediately to free SIM card memory slot
+    RIL_SMS_DeleteSMS(nIndex, RIL_SMS_DEL_INDEXED_MSG);
+    
     pDeliverTextInfo = &((pTextInfo->param).deliverParam);    
 
     if(TRUE == pDeliverTextInfo->conPres)  //Receive CON-SMS segment

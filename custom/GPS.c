@@ -5,6 +5,15 @@
 #include "SMS.h"
 #include "Geofence.h"
 #include "EPO.h"
+
+// Define a simple LCG random number generator to avoid unsupported Ql_rand() log flood
+static uint32_t s_rand_seed = 12345;
+static s32 my_rand(void)
+{
+    s_rand_seed = s_rand_seed * 1103515245 + 12345;
+    return (s32)((s_rand_seed / 65536) % 32768);
+}
+#define Ql_rand my_rand
 u8 *gps_uart_buffer = NULL;
 uint8_t gps_data_available = 0;
 GPS_Typedef GPS = {0};
@@ -1082,12 +1091,10 @@ void gps_reset_routine(void)
 {
     if (GPS_IsSimulationActive())
     {
-        LOGData(TAG_GPS, "GPS Reset Routine bypassed because GPS simulation is active\r\n");
         return;
     }
     if (IsMotaProcessing || IsFotaProcessing)
     {
-        LOGData(TAG_GPS, "GPS Reset Routine bypassed because FOTA/MOTA is in progress\r\n");
         return;
     }
     LOGData(TAG_GPS,"GPS Reset Routine Triggered - Hardware Fault Detected\r\n");

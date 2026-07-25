@@ -7,9 +7,7 @@
 #include "TCP.h"
 #include "BLE.h"
 #include "ql_fs.h"
-#ifdef PROTO_CDAC
 #include "Batch.h"
-#endif
 
 // Forward declaration for RS232 response queueing (from Hardware.c)
 extern void QueueRS232Response(const char* response);
@@ -111,6 +109,67 @@ void SendGeoData(uint8_t index ,uint8_t IsServer)
 }
 #endif
 
+static uint8_t IsValidSOSMobileNumber(const char *number)
+{
+	return number != NULL && Ql_strlen(number) > 3 &&
+		!Ql_strstr(number, "0000000");
+}
+
+static void GetSOSISTDateTime(_RTC *ist)
+{
+	uint8_t daysInMonth;
+	ist->Year = CurrentDateTime.Year;
+	ist->Month = CurrentDateTime.Month;
+	ist->Date = CurrentDateTime.Date;
+	ist->Hour = CurrentDateTime.Hour;
+	ist->Min = CurrentDateTime.Min + 30;
+	ist->Sec = CurrentDateTime.Sec;
+	if (ist->Min >= 60) { ist->Min -= 60; ist->Hour++; }
+	if (ist->Hour < 24) return;
+	ist->Hour = 0;
+	ist->Date++;
+	daysInMonth = (ist->Month == 4 || ist->Month == 6 || ist->Month == 9 || ist->Month == 11) ? 30 :
+		(ist->Month == 2 ? (((ist->Year % 4) == 0) ? 29 : 28) : 31);
+	if (ist->Date <= daysInMonth) return;
+	ist->Date = 1;
+	ist->Month++;
+	if (ist->Month > 12) { ist->Month = 1; ist->Year++; }
+}
+
+void SendSOSAlertSMS(uint8_t AlertNum)
+{
+	const char *alertName;
+	_RTC ist;
+	char message[160];
+
+#if !SOS_SMS_FEATURE_ENABLED
+	LOGData(TAG_OTA, "SOS SMS disabled in firmware");
+	return;
+#endif
+	if (!VTSData.SOSSmsEnabled || GSM.GSMState < SIM_DETECTED)
+		return;
+	if (AlertNum == 16) {
+#if !SOS_WIRECUT_SMS_ENABLED
+		return;
+#endif
+		alertName = "Emergency wirecut";
+	} else if (AlertNum == 10) {
+		alertName = "Emergency State ON";
+	} else if (AlertNum == 11) {
+		alertName = "Emergency State OFF";
+	} else {
+		return;
+	}
+
+	GetSOSISTDateTime(&ist);
+	Ql_sprintf(message, "ID:%d %s\nIMEI:%s\nLAT:%s%c LON:%s%c\nhttp://maps.google.com/?q=%s,%s\nT:%02d-%02d-20%02d %02d:%02d:%02d IST",
+		AlertNum, alertName, NetWork.IMEI, sLatitude, GPS.LatDir, sLongitude, GPS.LngDir,
+		sLatitude, sLongitude, ist.Date, ist.Month, ist.Year, ist.Hour, ist.Min, ist.Sec);
+	if (IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob0))
+		SendSMS(VTSData.PhoneNumber.Mob0, message);
+	if (IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob1))
+		SendSMS(VTSData.PhoneNumber.Mob1, message);
+}
 
 void SendSMS(char* ph, char* msg)
 {
@@ -1503,6 +1562,54 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 		}
 	}
 	#endif
+	ls = Ql_strstr(msg,"TESTRIG");
+	if(!ls) ls = Ql_strstr(msg,"TESRIG");
+	if(ls)
+	{
+		i=GetValueFromData(ls,"TESTRIG",' ',0,'\0',ss);
+		if(!i) i=GetValueFromData(ls,"TESRIG",' ',0,'\0',ss);
+		if(i)
+		{
+			LOGData(TAG_OTA,"ss:%s",ss);
+			i = atoi(ss);
+			if((i>0) && (i<ALERT_COUNT))
+			{
+				LOGData(TAG_OTA,"activating alert %d",i);
+				AddAlert(i);
+				return 1;
+			}
+			if(i == 0)
+			{
+				SOS.IsSOS=1;
+				#ifndef PROTO_CDAC
+				SendSOSAlertSMS(10);
+				#endif
+				SLED_ON;
+				SOS.SOSTimeLasped=0;
+				VAlert[SOS_ON_ALERT].Enable=1;
+				LOGData(TAG_OTA,"********************\nSOS Alert Manual ON\n***********************\n");
+				AddAlert(SOS_ON_ALERT);
+				#ifndef PROTO_CDAC
+				VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.SOSInterval;
+				#endif
+				return 1;
+			}
+			else if(i == 1)
+			{
+				SOS.SOSTimeLasped=0;
+				SOS.IsSOS=0;
+				SLED_OFF;
+				LOGData(TAG_OTA,"********************\nSOS Alert Manual OFF********************\n");
+				AddAlert(SOS_OFF_ALERT);
+				RemoveAlert(SOS_ON_ALERT);
+				SendSOSAlertSMS(11);
+				#ifndef PROTO_CDAC
+				VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.DataInterval;
+				#endif
+				return 1;
+			}
+		}
+	}
 	fn=Ql_strstr(msg,"GET");
 	if(fn)
 	{
@@ -1690,7 +1797,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 				Ql_strcat(SimData,", E.IP NC");
 			#endif
 
-			if(GPS.State!=1)
+			if(GPS.State!=1 && !GPS_IsSimulationActive())
 			{
 				Ql_strcat(SimData,"\nGPS FLT");
 			}
@@ -1704,13 +1811,23 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			}
 			
 			#ifndef PROTO_CDAC
+			#ifdef HISTORY_INTERNAL
+			CheckPacketCount();
+			Ql_sprintf(ss,"\nHP: %d",PacketConfig.LastPkt);
+			#else
 			Ql_sprintf(ss,"\nHP: %d",StoredHistoryDataCount);
+			#endif
 			#else
 			Ql_sprintf(ss,"\nHP: %d",FTable.TotalFiles);
 			#endif
 			Ql_strcat(SimData,ss);
 
 
+			SendResponce(SMSSender,SimData,IsServer,0);
+		}
+		if(Ql_strstr(fn,"HISTORY") || Ql_strstr(fn,"HIST"))
+		{
+			Ql_sprintf(SimData,"History: %s", VTSData.DisableHistory ? "DISABLED" : "ENABLED");
 			SendResponce(SMSSender,SimData,IsServer,0);
 			return 1;
 		}
@@ -1943,6 +2060,14 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 		}
 		#endif
 
+		if(Ql_strstr(fn,"DISK"))
+		{
+			int freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
+			double free_mb = (double)freeSpace / (1024.0 * 1024.0);
+			Ql_sprintf(SimData,"UFS Disk Space: %0.2f MB Free", free_mb);
+			SendResponce(SMSSender,SimData,IsServer,0);
+			return 1;
+		}
 	}
 	fn = Ql_strstr(msg,"SET");
 	if(fn)
@@ -2809,71 +2934,73 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			SendResponce(SMSSender,"Invalid Param",IsServer,0);
 			return 1;
 		}
-		ls= Ql_strstr(fn,"TESTRIG");
+		ls=Ql_strstr(fn,"SOSSMS");
 		if(ls)
 		{
-			i=GetValueFromData(ls,"TESTRIG",' ',0,'\0',ss);
-			if(i)
+			if(Ql_strstr(fn,"GET") || !GetValueFromData(ls,"SOSSMS",' ',0,'\0',ss))
 			{
-				LOGData(TAG_OTA,"ss:%s",ss);
-				i = atoi(ss);
-				if((i>1) && (i<ALERT_COUNT))
-				{
-					LOGData(TAG_OTA,"activatiing alert %d",i);
-					#ifndef PROTO_CDAC
-					if(i == GFIN_ALERT || i == GFOUT_ALERT)
-					{
-						VAlert[i].Enable=1;
-						VAlert[i].IsSMS=1;
-					}
-					else
-						AddAlert(i);
-					#else
-					AddAlert(i);
-					#endif
-					return 1;
-				}
-				if(i == 0)
-				{
-					SOS.IsSOS=1;
-					#ifndef PROTO_CDAC
-					/* OLD CODE - COMMENTED OUT AS REQUESTED:
-					if(ServerSocket[1].SocketState != SOCKET_CONNECTED)
-						SendSOSSMS(1);
-					*/
-					// NEW CODE: Dynamic SMS fallback based on Server 2 enabled state
-					uint8_t isServer2Disabled = (VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A');
-					uint8_t isEmergencyConnected = isServer2Disabled ? 
-						(ServerSocket[0].SocketState == SOCKET_CONNECTED) : 
-						(ServerSocket[1].SocketState == SOCKET_CONNECTED);
-
-					if (!isEmergencyConnected) {
-						SendSOSSMS(1);
-					}
-					#endif
-
-					SLED_ON;
-					SOS.SOSTimeLasped=0;
-					VAlert[SOS_ON_ALERT].Enable=1;
-					LOGData(TAG_OTA,"********************\nSOS Alert Manual ON\n***********************\n");
-					AddAlert(SOS_ON_ALERT);
-					#ifndef PROTO_CDAC
-					VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.SOSInterval;
-					#endif
-				}
-				else if(i == 1)
-				{
-					SOS.SOSTimeLasped=0;
-					SOS.IsSOS=0;
-					SLED_OFF;
-					LOGData(TAG_OTA,"********************\nSOS Alert Manual OFF********************\n");
-					AddAlert(SOS_OFF_ALERT);
-					RemoveAlert(SOS_ON_ALERT);
-					#ifndef PROTO_CDAC
-					VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.DataInterval;
-					#endif
-				}
+#if SOS_SMS_FEATURE_ENABLED
+				SendResponce(SMSSender, VTSData.SOSSmsEnabled ? "SOS SMS: ON" : "SOS SMS: OFF", IsServer, 1);
+#else
+				SendResponce(SMSSender, "SOS SMS: DISABLED IN FIRMWARE", IsServer, 1);
+#endif
+				return 1;
 			}
+			i=GetValueFromData(ls,"SOSSMS",' ',0,'\0',ss);
+			if(i && (ss[0] == '0' || ss[0] == '1') && ss[1] == '\0')
+			{
+#if SOS_SMS_FEATURE_ENABLED
+				VTSData.SOSSmsEnabled = ss[0] - '0';
+				UpdateConfigInFlash();
+				SendResponce(SMSSender, VTSData.SOSSmsEnabled ? "SOS SMS Enabled" : "SOS SMS Disabled", IsServer, 1);
+#else
+				if (ss[0] == '1')
+				{
+					SendResponce(SMSSender, "SOS SMS Disabled In Firmware", IsServer, 0);
+				}
+				else
+				{
+					VTSData.SOSSmsEnabled = 0;
+					UpdateConfigInFlash();
+					SendResponce(SMSSender, "SOS SMS Disabled", IsServer, 1);
+				}
+#endif
+				return 1;
+			}
+			SendResponce(SMSSender,"Invalid Param (0/1)",IsServer,0);
+			return 1;
+		}
+		ls = Ql_strstr(fn,"HISTORY");
+		if(!ls) ls = Ql_strstr(fn,"HIST");
+		if(ls)
+		{
+			if(Ql_strstr(fn,"GET"))
+			{
+				Ql_sprintf(SimData,"History: %s", VTSData.DisableHistory ? "DISABLED" : "ENABLED");
+				SendResponce(SMSSender,SimData,IsServer,1);
+				return 1;
+			}
+			i = GetValueFromData(ls,"HISTORY",' ',0,'\0',ss);
+			if(!i) i = GetValueFromData(ls,"HIST",' ',0,'\0',ss);
+			if(i && (ss[0] == '0' || ss[0] == '1') && ss[1] == '\0')
+			{
+				VTSData.DisableHistory = (ss[0] == '0') ? 1 : 0;
+				UpdateConfigInFlash();
+				SendResponce(SMSSender, VTSData.DisableHistory ? "History Disabled" : "History Enabled", IsServer, 1);
+				return 1;
+			}
+			if(Ql_strstr(fn,"CLR") || Ql_strstr(fn,"CLEAR"))
+			{
+				#ifndef HISTORY_DISABLED
+				DeleteAllPackets();
+				SendResponce(SMSSender,"History Cleared",IsServer,1);
+				#else
+				SendResponce(SMSSender,"History Clear Not Supported",IsServer,0);
+				#endif
+				return 1;
+			}
+			SendResponce(SMSSender,"Invalid Param (0/1 or CLR)",IsServer,0);
+			return 1;
 		}
 	
 		ls = Ql_strstr(fn,"FTK");
@@ -3066,6 +3193,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 	{
 		fn=fn+3;
 		ls = Ql_strstr(fn,"HISTORY");
+		if(!ls) ls = Ql_strstr(fn,"HIST");
 		if(ls)
 		{
 			#ifndef HISTORY_DISABLED
@@ -3090,6 +3218,30 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 		{
 			ResetSOS();
 			SendResponce(SMSSender,"SOS Data Cleared",IsServer,1);
+			return 1;
+		}
+		
+		ls = Ql_strstr(fn,"DISK");
+		if(ls)
+		{
+			DiskCleanupResult cleanup = {0};
+			double freed_mb;
+			if (FTP_ClearRecoverableDiskData(&cleanup))
+			{
+				freed_mb = cleanup.freeSpaceAfter >= cleanup.freeSpaceBefore ?
+					(double)(cleanup.freeSpaceAfter - cleanup.freeSpaceBefore) / (1024.0 * 1024.0) : 0.0;
+				Ql_sprintf(SimData, "Disk Cleared. Free: %0.2f MB (+%0.2f MB), H:%u B:%u F:%u",
+					(double)cleanup.freeSpaceAfter / (1024.0 * 1024.0),
+					freed_mb,
+					cleanup.historyFilesDeleted, cleanup.batchFilesDeleted, cleanup.transientFilesDeleted);
+				SendResponce(SMSSender,SimData,IsServer,1);
+			}
+			else
+			{
+				Ql_sprintf(SimData, "Disk Clear Failed. Free: %0.2f MB, Errors:%u",
+					(double)cleanup.freeSpaceAfter / (1024.0 * 1024.0), cleanup.failures);
+				SendResponce(SMSSender,SimData,IsServer,0);
+			}
 			return 1;
 		}
 		/*

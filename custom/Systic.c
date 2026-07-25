@@ -4,6 +4,7 @@
 #include "Hardware.h"
 #include "GPS.h"
 #include "LEDManager.h"
+#include "Sensors.h"
 #ifdef PROTO_CDAC
 #include "HTTP.h"
 #endif
@@ -132,20 +133,25 @@ void UpdateTick(void)
     #endif
     
     #ifndef PROTO_CDAC
-    if(PeriPheralVal.IGN)
+    if(SensorsConfig.isEnabled)
     {
-        if(++IntervalTick.SensTick > VTSData.SensorSetting.IGNInterval)
+        uint16_t sensorInterval = GetCurrentSensorInterval();
+        if(sensorInterval > 0)
         {
-            IsPacketReady.IsSensPacket=1;
-            IntervalTick.SensTick=0;
-        }
-    }
-    else
-    {
-        if(++IntervalTick.SensTick > VTSData.SensorSetting.OFFInterval)
-        {
-            IsPacketReady.IsSensPacket=1;
-            IntervalTick.SensTick=0;
+            LOGData(TAG_SYSTIC, "Sensor Interval: %d, Current Tick: %d", sensorInterval, IntervalTick.SensTick);
+            
+            // Query CLS sensor 3 seconds before packet is due (gives time for response)
+            // Only query if interval is greater than 5 seconds
+            if(sensorInterval >= 5 && IntervalTick.SensTick == (sensorInterval - 3))
+            {
+                QueryCLSSensor();
+            }
+            
+            if(++IntervalTick.SensTick >= sensorInterval)
+            {
+                IsPacketReady.IsSensPacket = 1;
+                IntervalTick.SensTick = 0;
+            }
         }
     }
 
@@ -256,10 +262,30 @@ void UpdateTick(void)
         && ServerSocket[2].SocketState!=SOCKET_CONNECTED && FTPState != FTP_STATE_CONNECTED && GSM.GSMState>=SIM_DETECTED)
     #else
     if(HTTPState!=HTTP_STATE_SET && !SleepConfig.IsEnabled && ServerSocket[1].SocketState!=SOCKET_CONNECTED 
-        && ServerSocket[2].SocketState!=SOCKET_CONNECTED && FTPState != FTP_STATE_CONNECTED && GSM.GSMState>=SIM_DETECTED&&GSM.GSMState< GPRS_ACTIVE)
+        && ServerSocket[2].SocketState!=SOCKET_CONNECTED && FTPState != FTP_STATE_CONNECTED && GSM.GSMState>=SIM_DETECTED)
     #endif
     {
-            if(++IntervalTick.ProfileChangeCount >= (PRF_TIMEOUT))
+        uint32_t current_timeout = PRF_TIMEOUT; // Default to 10 minutes (600s)
+        #ifdef SIM_PROFILE_AIRTEL
+        if (VTSState.CurrentProfile == SIM_PROFILE_AIRTEL)
+        {
+            current_timeout = 300; // Airtel gets 5 minutes
+        }
+        #endif
+        #ifdef SIM_PROFILE_BSNL
+        else if (VTSState.CurrentProfile == SIM_PROFILE_BSNL)
+        {
+            current_timeout = 120; // BSNL gets 2 minutes
+        }
+        #endif
+        #ifdef SIM_PROFILE_VI
+        else if (VTSState.CurrentProfile == SIM_PROFILE_VI)
+        {
+            current_timeout = 600; // VI gets 10 minutes
+        }
+        #endif
+
+        if(++IntervalTick.ProfileChangeCount >= current_timeout)
         {
             IntervalTick.ProfileChangeCount = 0;
             if(ZigTestMode)
@@ -282,7 +308,7 @@ void UpdateTick(void)
             }
         }
         else
-            LOGData(TAG_SYSTIC,"Profile connection timeout in  %d/%d",IntervalTick.ProfileChangeCount,PRF_TIMEOUT);
+            LOGData(TAG_SYSTIC,"Profile connection timeout in  %d/%d",IntervalTick.ProfileChangeCount,current_timeout);
     }
     else
     IntervalTick.ProfileChangeCount=0;

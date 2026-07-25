@@ -357,4 +357,37 @@ void ClearFileTable(void)
 	}
 }
 
+uint8_t ClearBatchStorage(uint16_t *deletedCount, uint16_t *failedCount)
+{
+    const char *files[] = { BATCH_DATA_FILE, BATCH_INDEX_FILE };
+    uint8_t success = 1;
+    uint8_t i;
+
+    if (deletedCount) *deletedCount = 0;
+    if (failedCount) *failedCount = 0;
+
+    // Delete both files rather than recreating an index file, so CLR DISK
+    // actually returns their space. ReadFileTable() recreates a clean index on demand.
+    for (i = 0; i < (sizeof(files) / sizeof(files[0])); i++)
+    {
+        if (Ql_FS_Check((char *)files[i]) == QL_RET_OK)
+        {
+            if (Ql_FS_Delete((char *)files[i]) == QL_RET_OK)
+            {
+                if (deletedCount) (*deletedCount)++;
+            }
+            else
+            {
+                success = 0;
+                if (failedCount) (*failedCount)++;
+                LOGData(TAG_BATCH, "Unable to delete batch storage file %s", files[i]);
+            }
+        }
+    }
+
+    Ql_memset(&FTable, 0, sizeof(FTable));
+    FTable.magic = BATCH_TABLE_MAGIC;
+    return success;
+}
+
 #endif

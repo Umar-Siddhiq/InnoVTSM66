@@ -106,7 +106,7 @@ void ProcessSOS(void)
 				SOS.IsSOSTamper=1;
 				VAlert[SOS_TMP_ALERT].Enable=1;
 				AddAlert(SOS_TMP_ALERT);
-				SMSAlert(16);
+				SendSOSAlertSMS(16);
 			//	VTSData.IntervalData.CurrentInterval=VTSData.IntervalData.EnergencyInterval;
 			}
 			return;
@@ -201,6 +201,7 @@ void ProcessSOS(void)
 				LOGData(TAG_SOS,"********************\nSOS Temper Alert ON********************\n");
 				SOS.IsSOSTamper=1;
 				AddAlert(SOS_TMP_ALERT);
+				SendSOSAlertSMS(16);
 				
 			}
 			return;
@@ -219,15 +220,7 @@ void ProcessSOS(void)
 				if(ServerSocket[1].SocketState != SOCKET_CONNECTED)
 					SendSOSSMS(1);
 				*/
-				// NEW CODE: Dynamic SMS fallback based on Server 2 enabled state
-				uint8_t isServer2Disabled = (VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A');
-				uint8_t isEmergencyConnected = isServer2Disabled ? 
-					(ServerSocket[0].SocketState == SOCKET_CONNECTED) : 
-					(ServerSocket[1].SocketState == SOCKET_CONNECTED);
-
-				if (!isEmergencyConnected) {
-					SendSOSSMS(1);
-				}
+				SendSOSAlertSMS(10);
 
 				
 				SOS.SOSTimeLasped=0;
@@ -260,6 +253,7 @@ void ProcessSOS(void)
 			AddAlert(SOS_OFF_ALERT);
 			RemoveAlert(SOS_ON_ALERT);
 			VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.DataInterval;
+			SendSOSAlertSMS(11);
 		}
 	}	
 	

@@ -30,8 +30,9 @@ extern s32 Ql_GPRS_GetPDPCntxtState(u8 contextId);
 s32 Ql_FOTA_StartUpgrade(u8* url, ST_GprsConfig* apnCfg, Callback_Upgrade_State callbcak_UpgradeState_Ind)
 {
     s32 ret = 0;
-    bool retValue;
+    bool retValue = FALSE;
     u8 contextId;
+    (void)retValue;
     
     ret = Ql_GPRS_GetPDPContextId();
     if (GPRS_PDP_ERROR == ret)

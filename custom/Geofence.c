@@ -152,6 +152,7 @@ static void GeoStatus(double lat, double lng)
 				{
 					VAlert[GFIN_ALERT].Enable = 1;
 					VAlert[GFIN_ALERT].IsSMS = 1;
+					AddAlert(GFIN_ALERT);
 					return;
 				}
 			}
@@ -170,6 +171,7 @@ static void GeoStatus(double lat, double lng)
 				{
 					VAlert[GFOUT_ALERT].Enable = 1;
 					VAlert[GFOUT_ALERT].IsSMS = 1;
+					AddAlert(GFOUT_ALERT);
 					return;
 				}
 			}

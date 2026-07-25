@@ -55,7 +55,7 @@ extern char FirmVer[];
 #warning "PROFILE BLACKLIST is enabled - broken profiles will be skipped. Comment out this line to allow all profiles to cycle"
 #endif
 
-#define			FIRMWAREVERSION			"1.5.7"
+#define			FIRMWAREVERSION			"1.5.8"
 #define 		DevModel				"02"
 #define			SDKFirm					"01/V1.0"
 #define 		PROTOVER				"AIS140"
@@ -106,7 +106,7 @@ extern char FirmVer[];
 	#error "No SIM MAKE defined"
 #endif
 
-#define MAX_BATT		4.0f
+#define MAX_BATT		4.2f
 #define MIN_BATT		3.3f
 
 #define EXTENDED_IPS
@@ -196,10 +196,11 @@ extern char FirmVer[];
 	//#define NIC_GOA
 	//#define NIC_MDP
 	//#define NIC_ISLAND
-	//#define NIC_TAMIL
+	#define NIC_TAMIL
 	//#define NIC_TRIPURA
-	#define NIC_VAHAN
+	//#define NIC_VAHAN
 	//#define NIC_HIMACHEL
+	//#define NIC_RAJASTHAN
 
 	#define NO_PARAM
 	#define DBM_IN_CSQ
@@ -276,6 +277,18 @@ extern char FirmVer[];
 	#define 	DEFAULT_IP3  	"13.234.160.106"
 	#define		DEFAULT_PORT3	"8224"
 
+	#elif defined(NIC_RAJASTHAN)
+	#define PRF_AUTOSWITCH
+	#define PROTO_TAG 	"RJ1"
+	#define 	DEFAULT_IP1  	"vltspvt.rajasthan.gov.in"
+	#define		DEFAULT_PORT1	"9031"
+	#define 	DEFAULT_IP2  	"vltsemg.rajasthan.gov.in"
+	#define		DEFAULT_PORT2	"9032"
+	#define 	DEFAULT_IP3  	"13.234.160.106"
+	#define		DEFAULT_PORT3	"8224"
+	#define 	DEFAULT_IP4  	"78.46.190.117"
+	#define		DEFAULT_PORT4	"50011"
+
 	#elif defined(NIC_TAMIL)
 	#define PRF_AUTOSWITCH
 	#define PROTO_TAG 	"TN1"
@@ -299,6 +312,7 @@ extern char FirmVer[];
 	#define		DEFAULT_PORT2	"9032" 	
 	#define 	DEFAULT_IP3  	"13.234.160.106"
 	#define		DEFAULT_PORT3	"8224"
+	
 
 	#endif
 
@@ -323,7 +337,7 @@ extern char FirmVer[];
 	#define 	DEFAULT_TL			42
 #elif defined (PROTO_ODISA1)
 
-	#define ODISA_LD
+	#define ODISA_OD
 
 	#ifdef ODISA_LD
 	#define PROTO_TAG	"LD1"
@@ -346,7 +360,7 @@ extern char FirmVer[];
 	
 	#else
 	#define PROTO_TAG	"OD1"
-	#define HISTORY_DISABLED
+	//#define HISTORY_DISABLED
 	#define NO_TAMPER
 	#define 	DEFAULT_IP1  	"pvtdevices.odishatransport.gov.in"
 	#define		DEFAULT_PORT1	"8205"
@@ -354,8 +368,8 @@ extern char FirmVer[];
 	#define		DEFAULT_PORT2	"9202" 	
 	#define 	DEFAULT_IP3  	"13.234.160.106"
 	#define		DEFAULT_PORT3	"8224"
-	#define 	DEFAULT_IP4  	"13.234.160.106"
-	#define		DEFAULT_PORT4	"8224"
+	#define 	DEFAULT_IP4  	"NA"
+	#define		DEFAULT_PORT4	"0"
 
 	#define 	DEFAULT_INV_DATA	300
 	#define 	DEFAULT_INV_IGN		60
@@ -590,9 +604,24 @@ typedef struct
 	char mSPN[20];
 	SIMMakeTypedef SIMMake;
 	uint8_t DisableSOS;
+	uint8_t SOSSmsEnabled;
+	uint8_t DisableHistory;
+	/* Marks configurations written after SOSSmsEnabled was introduced. */
+	uint64_t SOSSmsConfigSignature;
 	// uint8_t DisableImiCmd;
 	// FIMEITypeDef CustomImei;
 }VTSTypedef;
+
+/*
+ * Set to 0 for builds where SOS SMS must remain disabled even when an old
+ * flash configuration has the feature enabled.  Set to 1 to permit the
+ * SET SOSSMS command to control the persisted setting.
+ */
+#define SOS_SMS_FEATURE_ENABLED 0
+
+/* Tamper/wire-cut SMS is deliberately independent of normal SOS SMS. */
+#define SOS_WIRECUT_SMS_ENABLED 0
+#define SOS_SMS_CONFIG_SIGNATURE 0x534F53534D533031ULL
 
 extern VTSTypedef VTSData;
 
