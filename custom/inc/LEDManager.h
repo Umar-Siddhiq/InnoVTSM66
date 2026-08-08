@@ -24,7 +24,8 @@ typedef enum {
     // Battery States (20-29)
     LEDSTATE_BATT_LOW = 20,
     LEDSTATE_BATT_NORMAL,
-    
+    LEDSTATE_BATT_FAULT,         // battery not connected / faulty → solid ON
+
     // SOS States (30-39)
     LEDSTATE_SOS_ACTIVE = 30,
     LEDSTATE_SOS_OFF,

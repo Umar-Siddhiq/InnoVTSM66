@@ -88,6 +88,25 @@ static void FTP_CleanupDiskSpace(uint32_t requiredSize)
         Ql_FS_Delete("app_fota.bin");
         
         freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
+        
+#ifndef HISTORY_DISABLED
+        // 3. Purge history packets or CDAC batch storage if space is still insufficient
+        if (requiredSize > 0 && freeSpace < (requiredSize + 51200))
+        {
+            #if defined(PROTO_CDAC)
+            LOGData(TAG_FTP, "UFS space still low (%lu bytes), clearing CDAC batch storage...", freeSpace);
+            ClearFileTable();
+            #else
+            uint32_t neededSpace = (requiredSize + 51200) - freeSpace;
+            // Each history packet is 512 bytes on disk
+            uint16_t packetsToDelete = (neededSpace + 511) / 512;
+            LOGData(TAG_FTP, "UFS space still low (%lu bytes), purging oldest %u history packets...", freeSpace, packetsToDelete);
+            DeleteFirstPacketsBulk(packetsToDelete);
+            #endif
+            freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
+        }
+#endif
+        
         LOGData(TAG_FTP, "UFS Free Space after cleanup: %lu bytes", freeSpace);
     }
 }

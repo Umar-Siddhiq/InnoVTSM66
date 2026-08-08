@@ -50,6 +50,11 @@
 /*----------------------------------------------------------------------------------------------------
  |        Task Entry Function | Task Id Name   | Task Stack Size (Bytes) | Default Value1 | Default Value2 |
  *----------------------------------------------------------------------------------------------------*/
+#ifdef SYSTEM_MINIMAL_FOTA_FORMATTER_BUILD
+TASK_ITEM(proc_main_task,       main_task_id,   10*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
+TASK_ITEM(GPRSThreadEntry,       gprs_task_id,   8*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
+TASK_ITEM(SysticThreadEntry,     systic_task_id,   6*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
+#else
 TASK_ITEM(proc_main_task,       main_task_id,   10*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
 TASK_ITEM(GPRSThreadEntry,       gprs_task_id,   8*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
 TASK_ITEM(SysticThreadEntry,     systic_task_id,   6*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
@@ -57,7 +62,7 @@ TASK_ITEM(mcu_rcv_thread,       mcu_task_id,   5*1024, DEFAULT_VALUE1, DEFAULT_V
 TASK_ITEM(gps_thread_entry,      gps_task_id,   10*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
 #ifdef PROTO_CDAC
 TASK_ITEM(HTTPThreadEntry,      http_task_id,   6*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
-TASK_ITEM(HttpQueueThreadEntry, queue_task_id,  4*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
+// TASK_ITEM(HttpQueueThreadEntry, queue_task_id,  4*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
 #else
 TASK_ITEM(TCPThreadEntry,      tcp_task_id,   5*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
 #endif
@@ -65,6 +70,8 @@ TASK_ITEM(ServerThreadEntry,      server_task_id,   10*1024, DEFAULT_VALUE1, DEF
 TASK_ITEM(HardwareThreadEntry,      hardware_task_id,   5*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
 TASK_ITEM(proc_reserved1,       reserved1_id,   5*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
 TASK_ITEM(proc_reserved2,       reserved2_id,   5*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)
+#endif
+
 
 #if __ECHO_REMOTE_APP__ 
 TASK_ITEM(proc_subtask1,  subtask1_id, 1*1024, DEFAULT_VALUE1, DEFAULT_VALUE2)

@@ -734,8 +734,8 @@ The SOS management subsystem supports protocol-independent alert processing, mas
 
 ### 2. Implemented Fixes
 - **UFS Safety Reserve Watchdog (150 KB Reserve)**: Modified `SavePacket()` inside [custom/PktSave.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/PktSave.c#L204) to monitor free storage before writing any tracking packets. If free space is less than `153,600` bytes (150 KB), the oldest history packet is deleted (FIFO rollover) until the reserve is recovered. This guarantees that UFS never reaches 0 MB free space.
-- **FOTA Cleanup Purge**: Updated `FTP_CleanupDiskSpace()` inside [custom/FTP.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/FTP.c#L239) to dynamically purge the oldest history files one-by-one (`DeleteFirstPacket()`) if the remaining free space is still insufficient for the requested FOTA binary size (with a 50 KB safety margin) after deleting logs and temp files.
-- **Header Declarations**: Declared public functions `DeleteFirstPacket` and `GetPacketCount` in [custom/inc/PktSave.h](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/inc/PktSave.h#L50).
+- **FOTA Cleanup Purge**: Updated `FTP_CleanupDiskSpace()` inside [custom/FTP.c](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/FTP.c) to dynamically purge the oldest history files. If `PROTO_CDAC` is defined, it clears the CDAC batch storage via `ClearFileTable()`. Otherwise, it purges the oldest history files in bulk via `DeleteFirstPacketsBulk(packetsToDelete)` to reclaim enough space for the requested FOTA binary size (with a 50 KB safety margin).
+- **Header Declarations**: Declared public functions `DeleteFirstPacketsBulk` and `GetPacketCount` in [custom/inc/PktSave.h](file:///d:/QUICKTEL/InnoVTSM66_VY/InnoVTSM66/custom/inc/PktSave.h).
 
 ---
 

@@ -108,7 +108,7 @@ uint8_t FTPStart(download_req_info_s* ftpHandle);
 uint8_t FTP_DownloadOnce(const char* ip, uint16_t port, const char* user, const char* pass,
                          const char* remotePath, const char* localPath, const char* storage);
 
-void FTP_CleanupDiskSpace(uint32_t requiredSize);
+uint8_t FTP_CleanupDiskSpace(uint32_t requiredSize);
 
 typedef struct
 {

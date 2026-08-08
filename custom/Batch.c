@@ -2,7 +2,10 @@
 
 FTableTypedef FTable = {0};
 
-#ifndef HISTORY_DISABLED
+// CDAC (CD1) uses flash-file store-and-forward (BTH batching + HttpQueue eviction),
+// so its Batch.c primitives must be built even though HISTORY_DISABLED is set
+// globally to strip the legacy RAM-history path for the other protocols.
+#if !defined(HISTORY_DISABLED) || defined(PROTO_CDAC)
 
 static uint32_t SlotToAddress(uint16_t slot)
 {
@@ -52,7 +55,7 @@ uint16_t ReadFileTable(void)
 	s32 fileSize;
 	s32 ret;
 
-	LOGData(TAG_BATCH, "Reading Batch Table...");
+	LOGVerbose(TAG_BATCH, "Reading Batch Table...");
 	if(Ql_FS_Check(BATCH_INDEX_FILE) != QL_RET_OK)
 		goto INIT_NEW;
 
@@ -91,7 +94,7 @@ uint16_t ReadFileTable(void)
 		goto INIT_NEW;
 	}
 
-	LOGData(TAG_BATCH, "Batch: %d files (head=%d, tail=%d)", FTable.TotalFiles, FTable.head, FTable.tail);
+	LOGVerbose(TAG_BATCH, "Batch: %d files (head=%d, tail=%d)", FTable.TotalFiles, FTable.head, FTable.tail);
 	return FTable.TotalFiles;
 
 INIT_NEW:
@@ -111,7 +114,6 @@ static uint8_t WriteFileData(uint32_t addr, void *data, int len)
 	s32 seekPos;
 	s32 ret;
 	u32 bytesWritten = 0;
-	u8 padding = 0xFF;
 
 	LOGData(TAG_BATCH, "Writing Batch Data, addr=%lu len=%d", addr, len);
 
@@ -133,15 +135,20 @@ static uint8_t WriteFileData(uint32_t addr, void *data, int len)
 	if((addr + len) > (uint32_t)currentSize)
 	{
 		Ql_FS_Seek(fd, 0, QL_FS_FILE_END);
-		for(s32 i = currentSize; i < (s32)(addr + len); i++)
+		uint32_t padLen = (addr + len) - currentSize;
+		u8 *padBuf = Ql_MEM_Alloc(padLen);
+		if(padBuf)
 		{
+			Ql_memset(padBuf, 0xFF, padLen);
 			u32 wrote = 0;
-			Ql_FS_Write(fd, &padding, 1, &wrote);
+			Ql_FS_Write(fd, padBuf, padLen, &wrote);
+			Ql_MEM_Free(padBuf);
 		}
+		Ql_FS_Flush(fd);
 	}
 
 	seekPos = Ql_FS_Seek(fd, addr, QL_FS_FILE_BEGIN);
-	if(seekPos != (s32)addr)
+	if(seekPos != QL_RET_OK)
 	{
 		LOGData(TAG_BATCH, "Batch data seek error exp=%lu got=%d", addr, seekPos);
 		Ql_FS_Close(fd);
@@ -189,7 +196,7 @@ static uint8_t ReadFileData(uint32_t addr, void *data, int len)
 	}
 
 	seekPos = Ql_FS_Seek(fd, addr, QL_FS_FILE_BEGIN);
-	if(seekPos != (s32)addr)
+	if(seekPos != QL_RET_OK)
 	{
 		LOGData(TAG_BATCH, "Batch read seek error exp=%lu got=%d", addr, seekPos);
 		Ql_FS_Close(fd);
@@ -249,12 +256,15 @@ uint16_t GetTotalFiles(void)
 	return FTable.TotalFiles;
 }
 
-uint16_t ReadDataBatch(char *data, uint8_t type, uint8_t istypemasked, uint8_t lifocount, uint8_t isDelete)
+uint16_t ReadDataBatchExt(char *data, uint8_t type, uint8_t istypemasked, uint8_t lifocount, uint8_t isDelete, int16_t *outSlot)
 {
 	uint16_t slotsToCheck;
 	uint16_t pos;
 	uint8_t matchCount = 0;
 	uint8_t validFound = 0;
+
+	if (outSlot)
+		*outSlot = -1;
 
 	if(isDelete)
 		LOGData(TAG_BATCH, "Deleting batch data [skip=%d] mode:%d/%d", lifocount, istypemasked, type);
@@ -323,6 +333,11 @@ uint16_t ReadDataBatch(char *data, uint8_t type, uint8_t istypemasked, uint8_t l
 			return 1;
 		}
 
+		if(outSlot)
+		{
+			*outSlot = (int16_t)pos;
+		}
+
 		if(ReadFileData(SlotToAddress(pos), (void *)data, FILE_SIZE))
 		{
 			print_long_string(data);
@@ -339,6 +354,48 @@ uint16_t ReadDataBatch(char *data, uint8_t type, uint8_t istypemasked, uint8_t l
 	}
 
 	return 0;
+}
+
+uint16_t ReadDataBatch(char *data, uint8_t type, uint8_t istypemasked, uint8_t lifocount, uint8_t isDelete)
+{
+	return ReadDataBatchExt(data, type, istypemasked, lifocount, isDelete, NULL);
+}
+
+uint8_t DeleteDataBatchSlot(uint16_t pos)
+{
+	if(pos >= MAX_FILE)
+	{
+		return 0;
+	}
+
+	ReadFileTable();
+
+	if(!FTable.fInfo[pos].valid)
+	{
+		LOGData(TAG_BATCH, "DeleteDataBatchSlot: slot %d already invalid", pos);
+		return 0;
+	}
+
+	uint16_t expectedTailSlot = (FTable.tail == 0) ? (MAX_FILE - 1) : (uint16_t)(FTable.tail - 1);
+
+	LOGData(TAG_BATCH, "DeleteDataBatchSlot: Removing packet at slot %d", pos);
+	FTable.fInfo[pos].valid = 0;
+	FTable.fInfo[pos].packet = 0;
+	if(pos == expectedTailSlot)
+		FTable.tail = pos;
+	if(pos == FTable.head)
+	{
+		while(FTable.TotalFiles > 1 && !FTable.fInfo[FTable.head].valid)
+		{
+			FTable.head = (uint16_t)((FTable.head + 1) % MAX_FILE);
+			if(FTable.head == FTable.tail)
+				break;
+		}
+	}
+
+	FTable.TotalFiles--;
+	UpdateFileTable();
+	return 1;
 }
 
 void ClearFileTable(void)

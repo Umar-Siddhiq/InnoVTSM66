@@ -63,7 +63,7 @@ void PrintHexBuffer(const char *tag, const char* action, const uint8_t *data, si
     char line[128]; // Temporary buffer for one line
     uint8_t offset = 0;
 
-    LOGData(tag, "%s[%d]:", action, len); // Print action and total length
+    LOGVerbose(tag, "%s[%d]:", action, len); // Print action and total length
 
     for (size_t i = 0; i < len; i++) 
     {
@@ -71,7 +71,7 @@ void PrintHexBuffer(const char *tag, const char* action, const uint8_t *data, si
         {
             if (i != 0) 
             {
-                LOGData(tag, "%s", line); // Print the current line
+                LOGVerbose(tag, "%s", line); // Print the current line
                 offset = 0;               // Reset for next line
             }
         }
@@ -82,7 +82,7 @@ void PrintHexBuffer(const char *tag, const char* action, const uint8_t *data, si
 
     if (offset > 0) 
     {
-        LOGData(tag, "%s", line); // Print any remaining bytes
+        LOGVerbose(tag, "%s", line); // Print any remaining bytes
     }
 }
 
@@ -224,12 +224,12 @@ void ProcessMCUData(uint8_t* data)
             break;
 
         case MCOMM_COM_FUNCTION_SUCCESS:
-            LOGData(TAG_MCU, "Function: SUCCESS");
+            LOGVerbose(TAG_MCU, "Function: SUCCESS");
             break;
 
         case MCOMM_COM_FUNCTION_GETPH:
         {
-            LOGData(TAG_MCU, "Function: GETPH");
+            LOGVerbose(TAG_MCU, "Function: GETPH");
             MCUPepheralTypedef * mcuData = (MCUPepheralTypedef*)&data[MCOMM_COM_DATA_INDEX];
             PeriPheralVal.AN1 = mcuData->ADCVal1; 
             PeriPheralVal.AN2 = mcuData->ADCVal2;
@@ -242,13 +242,19 @@ void ProcessMCUData(uint8_t* data)
             PeriPheralVal.IsMems = mcuData->IsMems;
             if(!PeriPheralVal.IsTilt && mcuData->IsTilt)
             {
-                LOGData(TAG_MCU, "[TILT_DEBUG] TILT DETECTED! Calling AddAlert(TILT_ALERT=%d)", TILT_ALERT);
+                LOGVerbose(TAG_MCU, "[TILT_DEBUG] TILT DETECTED! Calling AddAlert(TILT_ALERT=%d)", TILT_ALERT);
                 AddAlert(TILT_ALERT);
+            }
+            else if(PeriPheralVal.IsTilt && !mcuData->IsTilt)
+            {
+                /* Clear the tilt alert when the sensor reports level again —
+                 * CURRENT previously latched TILT_ALERT forever. */
+                RemoveAlert(TILT_ALERT);
             }
             PeriPheralVal.IsTilt = mcuData->IsTilt;
 
             //PeriPheralVal.BattVolt = mcuData->BattVolt;
-            LOGData(TAG_MCU, "Mains ADC Value: %d, final:%f",mcuData->MainVolt,PeriPheralVal.MainsVolt);
+            LOGVerbose(TAG_MCU, "Mains ADC Value: %d, final:%d.%02d", mcuData->MainVolt, (int)PeriPheralVal.MainsVolt, (int)(PeriPheralVal.MainsVolt * 100) % 100);
             break;
         }
         case MCOMM_COM_FUNCTION_SETPH:
@@ -452,7 +458,7 @@ uint8_t MCOMM_SendData(uint8_t* data, int len, uint8_t isWait, uint8_t waitFlag,
         MCOMMRcvFlags[waitFlag] = 0;
     }
 
-    LOGData(TAG_MCU,"Sending data: len=%d, isWait=%d, waitFlag=%d, timeout=%d",len, isWait, waitFlag, timeout);
+    LOGVerbose(TAG_MCU,"Sending data: len=%d, isWait=%d, waitFlag=%d, timeout=%d",len, isWait, waitFlag, timeout);
 
     int ret = Ql_UART_Write(MCOMM_UART_PORT, data, len);
     if (ret != len)

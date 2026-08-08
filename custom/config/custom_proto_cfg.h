@@ -2,8 +2,8 @@
 #define __CUSTOM_PROTO_CFG_H__
 
 //#define PROTO_MAHARASHTRA1
-#define PROTO_NIC1
-//#define PROTO_CDAC
+//#define PROTO_NIC1
+#define PROTO_CDAC
 //#define PROTO_ODISA1
 //#define PROTO_OG
 

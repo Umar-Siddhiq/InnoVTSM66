@@ -54,13 +54,10 @@ void AlertInitStruct(void)			//AlertInitStruct
 
 void AddAlert(uint8_t alert)
 {
-	if(alert==0xff)
-		return;
-	if(alert >= ALERT_COUNT)
-	{
-		LOGData(TAG_ALERT,"ERROR: AddAlert() index out of bounds: %d >= %d", alert, ALERT_COUNT);
-		return;
-	}
+	if(alert == 0xff || !IsValidAlertIndex(alert))
+		return;                // guard: out-of-range VAlert[] write corrupts RAM -> M66 reboot
+		                       // no LOGData here — tracing in the alert-state path
+		                       // triggers the documented M66 trace crash.
 	for(int i=0;i<8;i++)
 	{
 		if(StoredAlert.Alerts[i]==alert)
@@ -79,12 +76,13 @@ void AddAlert(uint8_t alert)
 	{
 		IsPacketReady.IsNormalPacket=1;
 	}
-	LOGData(TAG_ALERT,"alert %d added",alert);
+	// no LOGData here — see the M66 trace-crash note above.
 }
 
 void RemoveAlert(uint8_t alert)
 {
-	//uint16_t i,fn=0,rm=0;
+	if(alert == 0xff || !IsValidAlertIndex(alert))
+		return;                // same out-of-range guard as AddAlert()
 	VAlert[alert].Enable=0;
 	VAlert[alert].WithACK=0;
 	if(Ql_strlen(VAlert[alert].ACK)>0)
@@ -109,7 +107,7 @@ void RemoveAlert(uint8_t alert)
 	// 	StoredAlert.Alerts[StoredAlert.TotalAlert]=0xFF;
 	// 	StoredAlert.TotalAlert--;
 	// }
-	LOGData(TAG_ALERT,"alert %d removed",alert);
+	// no LOGData here — see the M66 trace-crash note in AddAlert().
 }
 
 void RemoveNonRepeatAlert(uint8_t pos)
@@ -140,6 +138,7 @@ void RemoveNonRepeatAlert(uint8_t pos)
 		case TAMPER_ALERT:
 			RemoveAlert(TAMPER_ALERT);
 			break;
+
 			///
 		case HARSH_ACC_ALERT:
 			RemoveAlert(HARSH_ACC_ALERT);
@@ -152,6 +151,15 @@ void RemoveNonRepeatAlert(uint8_t pos)
 			break;
 		case IMPACT_ALERT:
 			RemoveAlert(IMPACT_ALERT);
+			break;
+		case GFIN_OS_ALERT:
+			RemoveAlert(GFIN_OS_ALERT);
+			break;
+		case GFOUT_OS_ALERT:
+			RemoveAlert(GFOUT_OS_ALERT);
+			break;
+		case MAINS_FAIL_ALERT:
+			RemoveAlert(MAINS_FAIL_ALERT);
 			break;
 	}
 }

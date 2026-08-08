@@ -908,7 +908,7 @@ void gps_data_process(char* nmea)
         valid_data_received = true;  
     }
     else
-        LOGData(TAG_GPS,"NO GGA Packet!");
+        LOGVerbose(TAG_GPS,"NO GGA Packet!");
 
     if(gps_nmea_extract(nmea,"VTG",0,packet,GPS_SENTENCE_MAX_LENGTH))
     {
@@ -921,7 +921,10 @@ void gps_data_process(char* nmea)
 
     if(gps_nmea_extract(nmea,"RMC",0,packet,GPS_SENTENCE_MAX_LENGTH))
     {
-        if(NMEA_Parse_RMC(&RMCData,packet))
+        /* Only accept a VALID ('A') fix. A void ('V') RMC on cold-start carries
+         * the 1980 GPS-epoch date, which would leak through as a real time and
+         * stamp packets with Date:000180 (1980). */
+        if(NMEA_Parse_RMC(&RMCData,packet) && RMCData.Valid)
             gps_rmc_update(&RMCData);
     }
 
@@ -941,11 +944,12 @@ void gps_data_process(char* nmea)
 
 
     if(GPS.GPSFix){
-        LOGData(TAG_GPS,"FIX Success, Lat: %3.6f, Long: %3.6f, Alt: %4.2f, Speed: %3.2f, dateTime: %02d:%02d:%02d %02d/%02d/%02d",GPS.Latitude,GPS.Longitude,GPS.Altitude,
-                                            GPS.Speed, GPS.Time.Hours,GPS.Time.Minutes,GPS.Time.Seconds,GPS.Date.Day,GPS.Date.Month,GPS.Date.Year);
+        LOGData(TAG_GPS,"FIX Success, Lat: %s %c, Long: %s %c, Speed: %d, Time: %02d:%02d:%02d %02d/%02d/%02d",
+                sLatitude, GPS.LatDir, sLongitude, GPS.LngDir, (int)GPS.Speed,
+                GPS.Time.Hours, GPS.Time.Minutes, GPS.Time.Seconds, GPS.Date.Day, GPS.Date.Month, GPS.Date.Year);
     }
     else
-        LOGData(TAG_GPS,"GPS Not Fixed\r\n");
+        LOGVerbose(TAG_GPS,"GPS Not Fixed\r\n");
 
 }
 
@@ -954,6 +958,16 @@ extern uint8_t IsOverSpeed;
 void gps_overspeed_check(void)
 {   
     if (!GPS.GPSFix) {
+#ifdef PROTO_CDAC
+        // Clear stale overspeed state on fix loss so alerts don't stay latched.
+        if (IsOverSpeed) {
+            ovsCount = 0;
+            VAlert[OVER_SPEED_ALERT].Enable = 0; RemoveAlert(OVER_SPEED_ALERT);
+            VAlert[GFIN_OS_ALERT].Enable = 0;    RemoveAlert(GFIN_OS_ALERT);
+            VAlert[GFOUT_OS_ALERT].Enable = 0;   RemoveAlert(GFOUT_OS_ALERT);
+            IsOverSpeed = 0;
+        }
+#endif
         return;  // Only check overspeed when GPS has fix
     }
 
@@ -969,25 +983,34 @@ void gps_overspeed_check(void)
                 #ifdef PROTO_CDAC
                 if (CheckIfInside())
                 {
+                    // Inside a geofence: overspeed-in-fence (CD1 id 20)
+                    // Attach the geofence ID as the ACK payload (per tested reference)
+                    int geoId = GetInsideGeofenceID();
                     VAlert[GFIN_OS_ALERT].Enable = 1;
+                    VAlert[GFIN_OS_ALERT].WithACK = 1;
+                    Ql_memset(VAlert[GFIN_OS_ALERT].ACK, 0x00, sizeof(VAlert[GFIN_OS_ALERT].ACK));
+                    Ql_sprintf(VAlert[GFIN_OS_ALERT].ACK, "%05d", geoId);
                     AddAlert(GFIN_OS_ALERT);
                     SMSAlert(20);
                     IsOverSpeed = 1;
                 }
                 else
                 {
-                #endif
+                    // Outside all fences: overspeed-out-of-fence (CD1 id 21)
                     if ((!VAlert[GFIN_OS_ALERT].Enable) && (!VAlert[GFOUT_OS_ALERT].Enable))
                     {
-                        VAlert[OVER_SPEED_ALERT].Enable = 1;  
-                        AddAlert(OVER_SPEED_ALERT);
-                        #ifdef PROTO_CDAC
-                        SMSAlert(17);
+                        VAlert[GFOUT_OS_ALERT].Enable = 1;
+                        AddAlert(GFOUT_OS_ALERT);
+                        SMSAlert(21);
                         IsOverSpeed = 1;
-                        #endif
                     }
-                #ifdef PROTO_CDAC
                 }
+                #else
+                    if ((!VAlert[GFIN_OS_ALERT].Enable) && (!VAlert[GFOUT_OS_ALERT].Enable))
+                    {
+                        VAlert[OVER_SPEED_ALERT].Enable = 1;
+                        AddAlert(OVER_SPEED_ALERT);
+                    }
                 #endif
             }
         #ifdef PROTO_CDAC
@@ -1006,9 +1029,11 @@ void gps_overspeed_check(void)
             VAlert[GFIN_OS_ALERT].Enable = 0;
             RemoveAlert(GFIN_OS_ALERT);
             #ifdef PROTO_CDAC
+            VAlert[GFOUT_OS_ALERT].Enable = 0;
+            RemoveAlert(GFOUT_OS_ALERT);
             IsOverSpeed = 0;
         }
-        #endif  
+        #endif
     }
 }
 

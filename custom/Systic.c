@@ -5,8 +5,10 @@
 #include "GPS.h"
 #include "LEDManager.h"
 #include "Sensors.h"
+#include "SOS.h"
 #ifdef PROTO_CDAC
 #include "HTTP.h"
+extern void SMSAlert(uint8_t AlertNum);
 #endif
 
 u32 Heartbeat_timer = 0x100;
@@ -14,14 +16,14 @@ ThreadSystem HyperThread= {0};
 void InitSysticthread(void);
 
 volatile TickTypeDef IntervalTick={0};
-PacketReadyTypedef IsPacketReady={0};
+volatile PacketReadyTypedef IsPacketReady={0};
 volatile uint8_t oc=0, ServerThreadTimeout=0, HourlyResetCount=0;
 volatile uint16_t GSMRegTimeout=0;
 #ifdef PROTO_CDAC
 VehicleTypeDef VehicleState = {0};
 volatile uint32_t HaltCounter = 0;
 volatile uint32_t SleepCounter = 0;
-char VehicleMovingMode = 'H';
+volatile char VehicleMovingMode = 'H';
 #endif
 
 uint8_t InitializeThread(OSThread *Thread)
@@ -193,7 +195,8 @@ void UpdateTick(void)
 //	else
 //		IntervalTick.CriticalTick++;
     #else
-    if(SOS.IsSOS && (IntervalTick.CriticalTick >= VTSData.IntervalData.EnergencyInterval-CONNTECTION_PRETIME))
+    uint8_t inContinuousCritical = SOS.IsSOS || SOS.IsSOSTamper || PeriPheralVal.IsTilt || IsOverSpeed;
+    if(inContinuousCritical && (IntervalTick.CriticalTick >= VTSData.IntervalData.EnergencyInterval-CONNTECTION_PRETIME))
         HTTPConnectFlag=1;
     else
     {
@@ -227,13 +230,19 @@ void UpdateTick(void)
 	else
 		IntervalTick.HealthTick++;
 
-	if(IntervalTick.CriticalTick >= VTSData.IntervalData.EnergencyInterval-1)
+	if(inContinuousCritical && IntervalTick.CriticalTick >= VTSData.IntervalData.EnergencyInterval-1)
 	{
 		IsPacketReady.IsCriticalPacket=1;
 		IntervalTick.CriticalTick=0;
 	}
-	else
+	else if(inContinuousCritical)
+	{
 		IntervalTick.CriticalTick++;
+	}
+	else
+	{
+		IntervalTick.CriticalTick=0;
+	}
     #endif
     if(GSM.IsNeighbourCells)
     {
@@ -308,7 +317,7 @@ void UpdateTick(void)
             }
         }
         else
-            LOGData(TAG_SYSTIC,"Profile connection timeout in  %d/%d",IntervalTick.ProfileChangeCount,current_timeout);
+            LOGVerbose(TAG_SYSTIC,"Profile connection timeout in  %d/%d",IntervalTick.ProfileChangeCount,current_timeout);
     }
     else
     IntervalTick.ProfileChangeCount=0;
@@ -318,9 +327,9 @@ void UpdateTick(void)
     #ifdef PRINTF
 
     #ifdef PROTO_CDAC
-    LOGData(TAG_SYSTIC,"NTick: %d/%d  CTick: %d/%d  HTick: %d/%d  FTick: %d/%d  Vehicle Mode: %c",
+    LOGVerbose(TAG_SYSTIC,"NTick: %d/%d  CTick: %d/%d  HTick: %d/%d  FTick: %d/%d  Vehicle Mode: %c",
                            IntervalTick.NormalTick, VTSData.IntervalData.CurrentInterval,
-                           IntervalTick.CriticalTick, VTSData.IntervalData.EnergencyInterval, 
+                           IntervalTick.CriticalTick, VTSData.IntervalData.EnergencyInterval,
                            IntervalTick.HealthTick,VTSData.IntervalData.HealthInterval,
                            IntervalTick.FullTick,VTSData.IntervalData.FullDataPacketInterval,VehicleMovingMode);
     #else
@@ -334,6 +343,42 @@ void UpdateTick(void)
     }
     #endif
 
+    /* SOS tick handling — fires every 1s when SOS is active */
+    if(SOS.IsSOS)
+    {
+        SOS.SOSTimeLasped++;
+        if(SOS.SOSTimeLasped % 5 == 0)
+            LOGData(TAG_SYSTIC,"SOS Tick: %d / %d", SOS.SOSTimeLasped, SOS.SOSTimeOut);
+        if(SOS.SOSTimeLasped >= SOS.SOSTimeOut)
+        {
+            SOS.SOSTimeLasped = 0;
+            SOS.IsSOS = 0;
+            SLED_OFF;
+            AddAlert(SOS_OFF_ALERT);
+            RemoveAlert(SOS_ON_ALERT);
+            IsPacketReady.IsCriticalPacket = 1;
+            VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.DataInterval;
+            #if defined(PROTO_CDAC)
+            SMSAlert(11);
+            #endif
+            LOGData(TAG_SOS, "SOS Alert Timeout OFF");
+        }
+    }
+    /* SOS tamper timeout — clears SOS_TMP_ALERT if button/input is stuck. */
+    if(SOS.IsSOSTamper)
+    {
+        SOS.SOSTamperTimeLapsed++;
+        if(SOS.SOSTamperTimeLapsed >= SOS.SOSTimeOut)
+        {
+            SOS.SOSTamperTimeLapsed = 0;
+            SOS.IsSOSTamper = 0;
+            SOS.SOSPushCount = 0;
+            SOS.RequireRelease = 1;
+            RemoveAlert(SOS_TMP_ALERT);
+            LOGData(TAG_SOS, "SOS Tamper Timeout OFF");
+        }
+    }
+
 }
 #ifdef PROTO_CDAC
 void UpdateVehicle(void)
@@ -342,14 +387,14 @@ void UpdateVehicle(void)
 	{
 		if((VehicleState.VehicleMode==HALT) || (VehicleState.VehicleMode==SLEEP))
 		{
-//			HaltCounter++;
-//			if(HaltCounter >= VTSData.IntervalData.HaltTime)
-//			{
+			HaltCounter++;
+			if(HaltCounter >= VTSData.IntervalData.HaltTime)
+			{
+				HaltCounter = 0;
 				VehicleState.VehicleMode=MOTION;
 				VehicleMovingMode='M';
 				VTSData.IntervalData.CurrentInterval=VTSData.IntervalData.MotionInterval;
-				HaltCounter=0;
-		//	}
+			}
 		}
 	}
 	else
@@ -404,6 +449,11 @@ void Systic_Event_1s(void)
     msprevSec=stime;
     UpdateTick();
     CheckGPSAlerts();
+#ifdef PROTO_CDAC
+    // CDAC Halt/Motion/Sleep state machine — drives VehicleMovingMode and the
+    // NRM reporting cadence (CurrentInterval). Must run every second.
+    UpdateVehicle();
+#endif
 }
 
 void Systic_Event_1m(void)

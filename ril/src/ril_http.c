@@ -124,7 +124,10 @@ s32 RIL_HTTP_RequestToPost(char* strPostMsg, u16 len)
     http_post_msg = strPostMsg;
     http_post_msg_len = len;
     m_httpAction = HTTP_ACTION_POST_REQ;
-    Ql_sprintf(strAT, "AT+QHTTPPOST=%d,120,120\0", len);
+    /* Input/response timeout shortened from 120,120 to 30,30: a single
+     * unreachable-server POST must not block the shared QHTTP session (and thus
+     * the other server's sends) for up to 2 minutes. Fail fast and retry. */
+    Ql_sprintf(strAT, "AT+QHTTPPOST=%d,30,30\0", len);
     retRes = Ql_RIL_SendATCmd(strAT, Ql_strlen(strAT), ATRsp_QHTTP_Handler, &errCode, 0);
     if (retRes != RIL_AT_SUCCESS)
     {

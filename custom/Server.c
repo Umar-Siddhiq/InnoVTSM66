@@ -1,10 +1,7 @@
-//C:\Users\Admin\Desktop\InnoVTSM66\custom\Server.c
 #include "Server.h"
-#include "Sensors.h"
-#include "MOTA.h"
-#ifdef PROTO_CDAC
+#include "File.h"
+#if defined(PROTO_CDAC)
 #include "HttpQueue.h"
-#include "HTTPS.h"
 #endif
 
 
@@ -16,22 +13,19 @@ static void handleRFIDData(void);
 static void handleLoginRequests(void);
 static void handlePackets(void);
 static void handleServerResponses(void);
-static void handleSensorData(void);
 static void handleNormalPackets(void);
 static void handleHealthPackets(void);
 void InitBuffer(uint8_t alt);
 void LoginString(void);
 void CheckAlerts(void);
 void EmergencyPacket(uint8_t IsOff);
-void ChangeToHistoryPacket(char *buf);
-void ChangeToHistoryEPB(char *buf);
 void SendDatatoServer0(void);
 void ProcessHistoryPacket(void);
 void DecodeGeofence(char* data);
 void GetActiveGeoID(char* buff);
 void InsertCurrentDateTime_OLD(char* target, uint8_t IsTime);
 
-#ifdef PROTO_CDAC
+#if defined(PROTO_CDAC)
 static void handleCriticalPackets(void);
 static void handleNormalCDACPackets(void);
 static void handleHealthCDACPackets(void);
@@ -45,27 +39,58 @@ static void handleRegularPackets(void);
 static void handleRepeatingCriticalPackets(void);
 #endif
 
+/* Returns 1 if the URL string starts with http:// or https://, 0 for bare IP:port */
+static uint8_t IsHttpUrl(const char* url)
+{
+    if (!url) return 0;
+    return (Ql_strncmp(url, "http://", 7) == 0 || Ql_strncmp(url, "https://", 8) == 0);
+}
+
 char Server1RxData[RECV_BUFFER_LEN] = {0};
 char Server2RxData[RECV_BUFFER_LEN] = {0};
+char Server3RxData[RECV_BUFFER_LEN] = {0};
 int lastcrc;
 
-uint16_t IsCritical=0;
-uint16_t IsPackeAlert=0;
-uint16_t DeltaDis=0;
-#ifdef PROTO_CDAC
+uint16_t IsCritical = 0;
+uint16_t IsPackeAlert = 0;
+
+#if defined(ENABLE_UNIFIED_FIRMWARE)
 #define _REGULAR_SIZE	109
-volatile uint8_t IsSendProcess;
-uint32_t FrameNumber=1;
+uint8_t IsSendProcess = 0;
+uint32_t FrameNumber = 1;
 OTATypeDef OTAValue;
 extern VehicleTypeDef VehicleState;
-extern char VehicleMovingMode;
+extern volatile char VehicleMovingMode;
 uint8_t IsOverSpeed;
-
-#else
-uint16_t StoredHistoryDataCount=0;
-uint8_t IsEMRSend=0, IsEMRTSend=0, CNFChange=0, IsOverSpeed=0;
-uint32_t FrameNumber=0;
+uint16_t DeltaDis = 0;
+uint16_t StoredHistoryDataCount = 0;
+uint8_t IsEMRSend = 0, IsEMRTSend = 0, CNFChange = 0;
 uint8_t IsStored = 0;
+char SendString[DATA_MAX_BUFF];
+char CriticalString[5][CRITICAL_MAX_BUFF];
+char ActivationKey[18];
+char dataBuffer[DATA_MAX_BUFF];
+#else
+#ifdef PROTO_CDAC
+#define _REGULAR_SIZE	109
+volatile uint8_t IsSendProcess = 0;
+uint32_t FrameNumber = 1;
+OTATypeDef OTAValue;
+extern VehicleTypeDef VehicleState;
+extern volatile char VehicleMovingMode;
+uint8_t IsOverSpeed = 0;
+char SendString[DATA_MAX_BUFF];
+char CriticalString[5][CRITICAL_MAX_BUFF];
+uint8_t CriticalAlertIdx[5]; /* alert index that produced each CriticalString slot */
+char ActivationKey[18];
+#else
+uint16_t DeltaDis = 0;
+uint16_t StoredHistoryDataCount = 0;
+uint8_t IsEMRSend = 0, IsEMRTSend = 0, CNFChange = 0, IsOverSpeed = 0;
+uint32_t FrameNumber = 0;
+uint8_t IsStored = 0;
+char dataBuffer[DATA_MAX_BUFF];
+#endif
 #endif
 
 double prevLat=0,prevLong=0;
@@ -76,27 +101,17 @@ uint8_t IsServerRes=0;
 
 extern volatile uint8_t ServerThreadTimeout;
 
-#ifdef PROTO_CDAC
-char SendString[DATA_MAX_BUFF];
-char CriticalString[5][CRITICAL_MAX_BUFF];
-char ActivationKey[18] = {0};
-#else
-char dataBuffer[DATA_MAX_BUFF];
-#endif
-
-
-
 uint8_t MemoryPercent;
 uint16_t GetMemeryPercentage(void);
-#ifdef PROTO_CDAC
+#if defined(PROTO_CDAC)
 uint8_t SendDataToServer(char* data, uint8_t KeepAlive, uint16_t currentIntervalSec);
 #else
 uint8_t SendDataToServer(char* data, uint8_t KeepAlive);
 #endif
-volatile uint8_t SendLogin1 = 0;
-volatile uint8_t SendLogin2 = 0;
+volatile uint8_t SendLogin1;
+volatile uint8_t SendLogin2;
 #ifdef EXTENDED_IPS
-volatile uint8_t SendLogin3 = 0;
+volatile uint8_t SendLogin3;
 #endif
 
 unsigned short CRC16(char* buf, int len)
@@ -151,15 +166,14 @@ char CRC8(const char *data,int length)
    }
    return crc;
 }
-
-#ifdef PROTO_CDAC
+#if defined(PROTO_CDAC)
 void InsertStringValue(const char* value, uint16_t position, uint16_t length, uint8_t wh)
 {
 	uint16_t n=0,i=0;
 	char vl;
-	uint16_t ln=Ql_strlen(value);
-	if(!value) // Or ln == 0
+	if(!value)
 		return;
+	uint16_t ln=Ql_strlen(value);
 	if(ln > 0)
 	{
 		if(ln <= length)
@@ -186,7 +200,11 @@ void InsertStringValue(const char* value, uint16_t position, uint16_t length, ui
 	}
 }
 
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void InsertIntValueCDAC(uint16_t value, uint16_t position, uint16_t length)
+#else
 void InsertIntValue(uint16_t value, uint16_t position, uint16_t length)
+#endif
 {
 	uint16_t n=0, i=0;
 	uint16_t ln;
@@ -217,7 +235,11 @@ void InsertIntValue(uint16_t value, uint16_t position, uint16_t length)
 	}
 }
 
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void InsertFloatValueCDAC(double value, uint16_t position, uint16_t length,const char* decimal)
+#else
 void InsertFloatValue(double value, uint16_t position, uint16_t length,const char* decimal)
+#endif
 {
 	uint16_t n=0, i=0;
 	uint16_t ln;
@@ -245,6 +267,7 @@ void InsertFloatValue(double value, uint16_t position, uint16_t length,const cha
 		}
 	}
 }
+
 static void InsertCurrentDateTimeAt(uint16_t position)
 {
 	char tempData[16];
@@ -270,15 +293,13 @@ void ConnectedCallback(int socketno)
     {
         hw_led_state_set(GSMLED,1,10,10);
     }
-	if(SendLogin1 != 2)  // Only set if not already completed
+	if(socketno == 0)
 	{
 		SendLogin1 = 1;
-		LOGData(TAG_SERVER,"[DBG_CONN] Socket 0 Connected! SendLogin1 set to 1, DNS=%s:%d",ServerSocket[0].DNSorIP, ServerSocket[0].Port);
 	}
 	else if(socketno == 2)
 	{
 		SendLogin2 = 1;
-		LOGData(TAG_SERVER,"[DBG_CONN] Socket 2 Connected! SendLogin2 set to 1, DNS=%s:%d",ServerSocket[2].DNSorIP, ServerSocket[2].Port);
 	}
 	else if(socketno == 3)
 	{
@@ -287,6 +308,11 @@ void ConnectedCallback(int socketno)
 		#endif
 	}
 	LOGData(TAG_SERVER,"Socket %d Connected Callback!!",socketno);
+    if ((socketno == 0 || socketno == 2 || socketno == 3) &&
+        VTSState.CurrentProfile != 0)
+    {
+        MarkActiveProfile(VTSState.CurrentProfile, ACTIVE_PROFILE_REASON_SERVER);
+    }
 }
 
 void whileConnected(int socketno)
@@ -305,8 +331,15 @@ void DisConnectedCallback(int socketno)
 
 void InitSockets(void)
 {
+#ifdef PROTO_CDAC
+    UpdateURL(VTSData.ServerData.IP1);
+    UpdateSecondaryURL(VTSData.ServerData.IP3);
+    #ifdef EXTENDED_IPS
+    UpdateTertiaryURL(VTSData.ServerData.IP4);
+    #endif
+#endif
     if(VTSData.ServerData.IPConfig[0])
-	ServerSocket[0].isEnabled=1;
+        ServerSocket[0].isEnabled=1;
     ServerSocket[0].SocketNo = 0;
     ServerSocket[0].SocketIndex = -1;
     ServerSocket[0].SocketState = SOCKET_CLOSED;
@@ -318,7 +351,6 @@ void InitSockets(void)
     ServerSocket[0].OnDisconnect = &DisConnectedCallback;
     ServerSocket[0].rxSizeMAX = RECV_BUFFER_LEN;
     ServerSocket[0].rxBuffer = Server1RxData;
-    LOGData(TAG_SERVER,"[DBG_INIT] ServerSocket[0] configured: IP=%s, Port=%d, Enabled=%d", ServerSocket[0].DNSorIP, ServerSocket[0].Port, ServerSocket[0].isEnabled);
     
     if(VTSData.ServerData.IPConfig[1])
         ServerSocket[1].isEnabled=1;
@@ -329,21 +361,24 @@ void InitSockets(void)
     ServerSocket[1].DNSorIP[sizeof(ServerSocket[1].DNSorIP) - 1] = '\0';
     ServerSocket[1].Port = Ql_atoi(VTSData.ServerData.Port2);
 
-    if(VTSData.ServerData.IPConfig[2])
-        ServerSocket[2].isEnabled=1;
+    /* ServerSocket[2] (Server 3): TCP if bare IP:port, HTTP if http(s):// URL */
+    if(VTSData.ServerData.IPConfig[2] && !IsHttpUrl(VTSData.ServerData.IP3))
+        ServerSocket[2].isEnabled = 1;
+    else
+        ServerSocket[2].isEnabled = 0;
     ServerSocket[2].SocketNo = 2;
     ServerSocket[2].SocketIndex = -1;
     ServerSocket[2].SocketState = SOCKET_CLOSED;
     Ql_strncpy(ServerSocket[2].DNSorIP, VTSData.ServerData.IP3, sizeof(ServerSocket[2].DNSorIP) - 1);
     ServerSocket[2].DNSorIP[sizeof(ServerSocket[2].DNSorIP) - 1] = '\0';
     ServerSocket[2].Port = Ql_atoi(VTSData.ServerData.Port3);
-    ServerSocket[2].OnConnect = &ConnectedCallback;
-    ServerSocket[2].OnDisconnect= &DisConnectedCallback;
+    ServerSocket[2].OnConnect = ServerSocket[2].isEnabled ? &ConnectedCallback : NULL;
+    ServerSocket[2].OnDisconnect = ServerSocket[2].isEnabled ? &DisConnectedCallback : NULL;
     ServerSocket[2].rxSizeMAX = RECV_BUFFER_LEN;
     ServerSocket[2].rxBuffer = Server2RxData;
-    LOGData(TAG_SERVER,"[DBG_INIT] ServerSocket[2] configured: IP=%s, Port=%d, Enabled=%d", ServerSocket[2].DNSorIP, ServerSocket[2].Port, ServerSocket[2].isEnabled);
     #ifdef EXTENDED_IPS
-    ServerSocket[3].isEnabled=1;
+    /* ServerSocket[3] (Server 4): TCP if bare IP:port, HTTP if http(s):// URL */
+    ServerSocket[3].isEnabled = !IsHttpUrl(VTSData.ServerData.IP4) ? 1 : 0;
     ServerSocket[3].SocketNo = 3;
     ServerSocket[3].SocketIndex = -1;
     ServerSocket[3].SocketState = SOCKET_CLOSED;
@@ -351,9 +386,9 @@ void InitSockets(void)
     ServerSocket[3].DNSorIP[sizeof(ServerSocket[3].DNSorIP) - 1] = '\0';
     ServerSocket[3].Port = Ql_atoi(VTSData.ServerData.Port4);
     ServerSocket[3].OnConnect = NULL;
-    ServerSocket[3].OnDisconnect=  NULL;
+    ServerSocket[3].OnDisconnect = NULL;
     ServerSocket[3].rxSizeMAX = RECV_BUFFER_LEN;
-    ServerSocket[3].rxBuffer = Server2RxData;
+    ServerSocket[3].rxBuffer = Server3RxData;
     
     #endif  
 }
@@ -391,9 +426,12 @@ void InitSockets(void)
 // }
 #endif
 
-#ifdef PROTO_MAHARASHTRA1
-
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_MAHARASHTRA1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void LoginStringMH(void)
+#else
 void LoginString(void)
+#endif
 {
 	char ss[18];
 	uint8_t crc;
@@ -425,10 +463,14 @@ void LoginString(void)
 	Ql_strcat(dataBuffer,ss);
 	// FrameNumber = 1;
 }
+#endif
 
-#elif defined(PROTO_NIC1) 
-
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_NIC1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void LoginStringNIC(void)
+#else
 void LoginString(void)
+#endif
 {
 	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
 	strcpy(dataBuffer,"$LGN,");
@@ -447,31 +489,39 @@ void LoginString(void)
 	InsertChar(dataBuffer,'*');
 	// FrameNumber = 1;
 }
+#endif
 
-#elif defined(PROTO_CDAC)
-
+#if defined(PROTO_CDAC)
 void LoginPacket(void)
 {
 	// vltdata=
 	uint16_t dLen=8;
-    if(Ql_strlen(ActivationKey)<12)
-	{
-        Ql_strncpy(ActivationKey,"1234567890123456",sizeof(ActivationKey)-1);
-	}
-    Ql_memset(SendString,0,DATA_MAX_BUFF);	
-    Ql_memset(SendString,'0',150);
-    InsertStringValue("vltdata=LGN",0,11,0);
-    InsertStringValue(NetWork.IMEI,dLen + 3,15,0);
-    InsertStringValue(ActivationKey,dLen + 18,16,0);  // wh=0, not 1
-
-
-	InsertFloatValue(GPS.Latitude,dLen + 34,10,"%010.6f");
+	if(Ql_strlen(ActivationKey)<12)
+		strcpy(ActivationKey,"1234567890123456");
+	Ql_memset(SendString,0,DATA_MAX_BUFF);	
+	Ql_memset(SendString,'0',150);
+	InsertStringValue("vltdata=LGN",0,11,0);
+	InsertStringValue(NetWork.IMEI,dLen + 3,15,1);
+	InsertStringValue(ActivationKey,dLen + 18,16,1);
+	InsertFloatValueCDAC(GPS.Latitude,dLen + 34,10,"%010.6f");
 	SendString[dLen + 44]=GPS.LatDir;
-	InsertFloatValue(GPS.Longitude,dLen + 45,10,"%010.6f");
+	InsertFloatValueCDAC(GPS.Longitude,dLen + 45,10,"%010.6f");
 	SendString[dLen + 55]=GPS.LngDir;
 	InsertCurrentDateTimeAt(dLen + 56);
-	InsertFloatValue(GPS.Speed,dLen + 68,6,"%06.2f");
+	InsertFloatValueCDAC(GPS.Speed,dLen + 68,6,"%06.2f");
 	SendString[dLen + 74]=0;
+}
+
+static void InsertMNCCDAC(uint16_t mnc, uint16_t offset)
+{
+	char buff[4];
+	if (mnc < 10)
+		Ql_sprintf(buff, "xx%d", mnc);
+	else if (mnc < 100)
+		Ql_sprintf(buff, "x%02d", mnc);
+	else
+		Ql_sprintf(buff, "%03d", mnc);
+	InsertStringValue(buff, offset, 3, 0);
 }
 
 void DataPacket(void)
@@ -482,23 +532,23 @@ void DataPacket(void)
 	InsertStringValue(NetWork.IMEI,dLen + 3,15,0);
 	SendString[dLen + 21]=GPS.GPSFix + '0';
 	InsertCurrentDateTimeAt(dLen + 22);
-	InsertFloatValue(GPS.Latitude,dLen + 34,10,"%010.6f");
+	InsertFloatValueCDAC(GPS.Latitude,dLen + 34,10,"%010.6f");
 	SendString[dLen + 44]=GPS.LatDir;
-	InsertFloatValue(GPS.Longitude,dLen + 45,10,"%010.6f");
+	InsertFloatValueCDAC(GPS.Longitude,dLen + 45,10,"%010.6f");
 	SendString[dLen + 55]=GPS.LngDir;
-	InsertIntValue(GSM.MCC,dLen + 56,3);
-	InsertIntValue(GSM.MNC,dLen + 59,3);
+	InsertIntValueCDAC(GSM.MCC,dLen + 56,3);
+	InsertMNCCDAC(GSM.MNC,dLen + 59);
 	InsertStringValue(GSM.LAC,dLen + 62,4,1);
 	InsertStringValue(GSM.CellID,dLen + 66,9,1);
-	InsertFloatValue(GPS.Speed,dLen + 75,6,"%03.2f");
-	InsertFloatValue(GPS.Heading,dLen + 81,6,"%03.2f");
-	InsertIntValue(GPS.NoOfSatalite,dLen + 87,2);
-	InsertIntValue((uint16_t)GPS.HDOP,dLen + 89,2);
-	InsertIntValue(GSM.SignalStrength,dLen + 91,2);
+	InsertFloatValueCDAC(GPS.Speed,dLen + 75,6,"%03.2f");
+	InsertFloatValueCDAC(GPS.Heading,dLen + 81,6,"%03.2f");
+	InsertIntValueCDAC(GPS.NoOfSatalite,dLen + 87,2);
+	InsertIntValueCDAC((uint16_t)GPS.HDOP,dLen + 89,2);
+	InsertIntValueCDAC(GSM.SignalStrength,dLen + 91,2);
 	SendString[dLen + 93]=PeriPheralVal.IGN + '0';
 	SendString[dLen + 94]=PeriPheralVal.IsMain + '0';
 	SendString[dLen + 95]=VehicleMovingMode;	
-	InsertFloatValue(GPS.Altitude,dLen + 96,7,"%04.2f");
+	InsertFloatValueCDAC(GPS.Altitude,dLen + 96,7,"%04.2f");
 	char spn[7];
 	Ql_sprintf(spn,"%s",NetWork.Network);
 	int rem = 6 - Ql_strlen(NetWork.Network);
@@ -512,10 +562,14 @@ void DataPacket(void)
 	// SendString[dLen+110] = 0;
 	InsertStringValue(spn,dLen + 103,6,1);
 }
+#endif
 
-#elif defined(PROTO_OG)
-
-void LoginString(void)  // Original
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_OG)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void LoginStringOG(void)
+#else
+void LoginString(void)
+#endif
 {
 	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
 	strcpy(dataBuffer,"$");
@@ -535,14 +589,18 @@ void LoginString(void)  // Original
 	InsertChar(dataBuffer,'N');
 	Ql_strcat(dataBuffer,sLongitude);
 	InsertChar(dataBuffer,'E');
-
 }
+#endif
 
-
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_ODISA1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void LoginStringOD(void)
 #else
-
-
-void LoginString(void)  // ODISA
+#if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG)
+void LoginString(void)
+#endif
+#endif
+#if defined(ENABLE_UNIFIED_FIRMWARE) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 {
 	char ss[18];
 	uint32_t crc;
@@ -568,6 +626,22 @@ void LoginString(void)  // ODISA
 	Ql_strcat(dataBuffer,ss);
 	InsertChar(dataBuffer,'\n');
 	// FrameNumber = 1;
+}
+#endif
+#endif
+
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void LoginString(void)
+{
+	if (IS_PROTO_NIC()) {
+		LoginStringNIC();
+	} else if (IS_PROTO_MH()) {
+		LoginStringMH();
+	} else if (IS_PROTO_ODISHA()) {
+		LoginStringOD();
+	} else if (IS_PROTO_OG()) {
+		LoginStringOG();
+	}
 }
 #endif
 
@@ -596,8 +670,12 @@ void LoginString(void)  // ODISA
 // }
 
 
-#ifdef PROTO_MAHARASHTRA1
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_MAHARASHTRA1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void InitBufferMH(uint8_t alt)
+#else
 void InitBuffer(uint8_t alt)
+#endif
 {
 	char ss[20];
 	uint16_t i;
@@ -810,7 +888,9 @@ void InitBuffer(uint8_t alt)
 	
 }
 
-#elif defined(PROTO_NIC1) 
+#endif
+
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_NIC1) 
 
 void PrepareFTKBuffer(FTKConfigtypedef *ftk)
 {
@@ -839,7 +919,7 @@ void PrepareFTKBuffer(FTKConfigtypedef *ftk)
 	Ql_sprintf(sSPD, "%3.2f", ftk->Speed);
 	Ql_sprintf(sHD, "%3.2f", ftk->HDOP);
 	Ql_sprintf(sPD, "%3.2f", ftk->PDOP);
-	Ql_sprintf(sHead, "%3.1f", ftk->Heading);
+	Ql_sprintf(sHead, "%3.2f", ftk->Heading);
 
 	//uint16_t dLen=23;
 	//GPS.sLngDir='E';
@@ -1004,7 +1084,11 @@ uint8_t ProcessFTK(FTKConfigtypedef* ftk)
     return 1;
 }
 
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void InitBufferNIC(uint8_t alt)
+#else
 void InitBuffer(uint8_t alt)
+#endif
 {
 	char ss[20];
 	uint16_t i;
@@ -1240,10 +1324,16 @@ void InitBuffer(uint8_t alt)
 	
 }
 
-#elif defined(PROTO_OG)
+#endif
+
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_OG)
 
 
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void InitBufferOG(uint8_t alt)
+#else
 void InitBuffer(uint8_t alt)
+#endif
 {
 	char ss[20];
 	uint16_t i;
@@ -1437,7 +1527,9 @@ void InitBuffer(uint8_t alt)
 }
 
 
-#elif defined(PROTO_CDAC)
+#endif
+
+#if defined(PROTO_CDAC)
 
 
 
@@ -1485,20 +1577,28 @@ void InitBuffer(uint8_t alt)
 
 void MakeNormalPacket(void)
 {
-    uint16_t dLen = 8;
-    Ql_memset(SendString, 0, DATA_MAX_BUFF);
-    Ql_memset(SendString, '0', 117);
-    InsertStringValue("vltdata=", 0, 8, 0);
-    InsertStringValue("NRM", dLen + 0, 3, 0);
-    InsertStringValue(NetWork.IMEI, dLen + 3, 15, 0);
-    InsertStringValue("01", dLen + 18, 2, 0);
-    SendString[dLen + 20] = 'L';
-    SendString[dLen + _REGULAR_SIZE] = 0;
-    DataPacket();
+	uint16_t dLen=8;
+	Ql_memset(SendString,0,DATA_MAX_BUFF);	
+	Ql_memset(SendString,'0',118);
+	InsertStringValue("vltdata=",0,8,0);
+	InsertStringValue("NRM",dLen + 0,3,0);
+	InsertStringValue("01L",dLen + 18,3,0);
+	SendString[dLen + _REGULAR_SIZE]=0;
+	DataPacket();
+	return;
 }
 
+#endif
+
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_ODISA1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void InitBufferOD(uint8_t alt)
 #else
-void InitBuffer(uint8_t alt) // ODISA
+#if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG)
+void InitBuffer(uint8_t alt)
+#endif
+#endif
+#if defined(ENABLE_UNIFIED_FIRMWARE) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 {
 	char ss[20];
 	uint16_t i;
@@ -1722,12 +1822,30 @@ void InitBuffer(uint8_t alt) // ODISA
 	
 }
 #endif
+#endif
+
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void InitBuffer(uint8_t alt)
+{
+	if (IS_PROTO_NIC()) {
+		InitBufferNIC(alt);
+	} else if (IS_PROTO_MH()) {
+		InitBufferMH(alt);
+	} else if (IS_PROTO_ODISHA()) {
+		InitBufferOD(alt);
+	} else if (IS_PROTO_OG()) {
+		InitBufferOG(alt);
+	}
+}
+#endif
 
 
-#ifdef PROTO_MAHARASHTRA1
-
-
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_MAHARASHTRA1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void EmergencyPacketMH(uint8_t IsOff)
+#else
 void EmergencyPacket(uint8_t IsOff)
+#endif
 {
 	char ss[20];
 	uint8_t crc;
@@ -1788,9 +1906,14 @@ void EmergencyPacket(uint8_t IsOff)
 	
 }
 
-#elif defined(PROTO_NIC1)
+#endif
 
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_NIC1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void EmergencyPacketNIC(uint8_t IsOff)
+#else
 void EmergencyPacket(uint8_t IsOff)
+#endif
 {
 	char ss[20];
 	uint16_t crc;
@@ -1840,10 +1963,14 @@ void EmergencyPacket(uint8_t IsOff)
 	
 }
 
-#elif defined(PROTO_OG)
+#endif
 
-
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_OG)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void EmergencyPacketOG(uint8_t IsOff)
+#else
 void EmergencyPacket(uint8_t IsOff)
+#endif
 {
 	char ss[20];
 	uint8_t crc;
@@ -1906,7 +2033,9 @@ void EmergencyPacket(uint8_t IsOff)
 }
 
 
-#elif defined(PROTO_CDAC)
+#endif
+
+#if defined(PROTO_CDAC)
 
 uint16_t MakeCriticalString(uint8_t IsURE)
 {
@@ -1922,7 +2051,6 @@ uint16_t MakeCriticalString(uint8_t IsURE)
 	Ql_memset(&CriticalString[3][0],0x00,CRITICAL_MAX_BUFF);
 	Ql_memset(&CriticalString[4][0],0x00,CRITICAL_MAX_BUFF);
 	InsertStringValue("vltdata=",0,8,0);
-
 	for(int i=0;i<ALERT_COUNT;i++)
 	{
 		if(VTAlertHeaderType[i] > 1)
@@ -1941,8 +2069,19 @@ uint16_t MakeCriticalString(uint8_t IsURE)
 					if(VAlert[i].ContMode == ALT_CONT_NONE)
 						continue;
 
-					if(VAlert[i].ContMode == ALT_CONT_NORMAL && !SOS.IsSOS)
-						continue;
+					if(VAlert[i].ContMode == ALT_CONT_NORMAL)
+					{
+						uint8_t continueCondition = 0;
+						if(i == TILT_ALERT && PeriPheralVal.IsTilt)
+							continueCondition = 1;
+						else if(i == OVER_SPEED_ALERT && IsOverSpeed)
+							continueCondition = 1;
+						else if(SOS.IsSOS || SOS.IsSOSTamper)
+							continueCondition = 1;
+
+						if(!continueCondition)
+							continue;
+					}
 				}
 			}
 
@@ -1958,11 +2097,12 @@ uint16_t MakeCriticalString(uint8_t IsURE)
 			else
 				SendString[dLen+_REGULAR_SIZE]=0;
 			DataPacket();
-			strcpy(&CriticalString[cn][0],SendString);
+			Ql_strncpy(&CriticalString[cn][0], SendString, CRITICAL_MAX_BUFF - 1);
+			CriticalString[cn][CRITICAL_MAX_BUFF - 1] = '\0';
+			CriticalAlertIdx[cn] = (uint8_t)i;
 			cn++;
-			RemoveNonRepeatAlert(i);
 			VAlert[i].AlertSent=1;
-			if(cn >= CRITICAL_MAX_BUFF)
+			if(cn >= 5)
 				break;
 		}
 	}
@@ -2008,8 +2148,9 @@ uint16_t MakeAlertString(void)
 			DataPacket();
 			Ql_strncpy(&CriticalString[cn][0], SendString, CRITICAL_MAX_BUFF - 1);
 			CriticalString[cn][CRITICAL_MAX_BUFF - 1] = '\0';
+			CriticalAlertIdx[cn] = (uint8_t)i;
 			cn++;
-			RemoveNonRepeatAlert(i);
+			VAlert[i].AlertSent = 1;
 			if(cn >= 5)  // Max 5 critical strings (array size check)
 				break;
 		}
@@ -2019,9 +2160,17 @@ uint16_t MakeAlertString(void)
 }
 
 
-#else
+#endif
 
-void EmergencyPacket(uint8_t IsOff) // ODISA
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_ODISA1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void EmergencyPacketOD(uint8_t IsOff)
+#else
+#if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG)
+void EmergencyPacket(uint8_t IsOff)
+#endif
+#endif
+#if defined(ENABLE_UNIFIED_FIRMWARE) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 {
 	char ss[20];
 	uint32_t crc;
@@ -2084,13 +2233,30 @@ void EmergencyPacket(uint8_t IsOff) // ODISA
     InsertChar(dataBuffer,'\n');
     #endif
 }
-
+#endif
 #endif
 
-#ifdef PROTO_MAHARASHTRA1
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void EmergencyPacket(uint8_t IsOff)
+{
+	if (IS_PROTO_NIC()) {
+		EmergencyPacketNIC(IsOff);
+	} else if (IS_PROTO_MH()) {
+		EmergencyPacketMH(IsOff);
+	} else if (IS_PROTO_ODISHA()) {
+		EmergencyPacketOD(IsOff);
+	} else if (IS_PROTO_OG()) {
+		EmergencyPacketOG(IsOff);
+	}
+}
+#endif
 
-
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_MAHARASHTRA1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void HealthPacketMH(void)
+#else
 void HealthPacket(void)
+#endif
 {
 	GetMemeryPercentage();
 	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
@@ -2137,9 +2303,14 @@ void HealthPacket(void)
 		Ql_strcat(dataBuffer,"0*");
 	
 }
-#elif defined(PROTO_CDAC)
+#endif
 
+#if defined(PROTO_CDAC)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void HealthPacketCDAC(void)
+#else
 void HealthPacket(void)
+#endif
 {
 	uint16_t dLen=8;
 	Ql_memset(SendString,0,DATA_MAX_BUFF);	
@@ -2149,10 +2320,10 @@ void HealthPacket(void)
 	InsertStringValue(VTSData.VendorID,dLen + 3,6,1);
 	InsertStringValue(FirmVer,dLen + 9,6,1);
 	InsertStringValue(NetWork.IMEI,dLen + 15,15,1);
-	InsertIntValue(VTSData.IntervalData.MotionInterval,dLen + 30,3);
-	InsertIntValue(VTSData.IntervalData.HaltInterval,dLen + 33,3);
-	InsertIntValue((uint16_t)PeriPheralVal.BattPerc,dLen + 36,3);
-	InsertIntValue(batteryVoltageToPercentage(VTSData.BattThrs),dLen + 39,2);
+	InsertIntValueCDAC(VTSData.IntervalData.MotionInterval,dLen + 30,3);
+	InsertIntValueCDAC(VTSData.IntervalData.HaltInterval,dLen + 33,3);
+	InsertIntValueCDAC((uint16_t)PeriPheralVal.BattPerc,dLen + 36,3);
+	InsertIntValueCDAC(batteryVoltageToPercentage(VTSData.BattThrs),dLen + 39,2);
 	InsertStringValue("060",dLen + 41,3,0);
 	SendString[dLen + 44]=PeriPheralVal.IP1 + '0';
 	SendString[dLen + 45]=PeriPheralVal.IP2 + '0';
@@ -2164,9 +2335,14 @@ void HealthPacket(void)
 	
 }
 
-#elif defined(PROTO_OG)
+#endif
 
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_OG)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void HealthPacketOG(void)
+#else
 void HealthPacket(void)
+#endif
 {
 	GetMemeryPercentage();
 	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
@@ -2209,10 +2385,17 @@ void HealthPacket(void)
 	// Ql_strcat(dataBuffer,ss);
 	
 }
+#endif
 
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_ODISA1) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void HealthPacketOD(void)
 #else
-
+#if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_CDAC) && !defined(PROTO_OG)
 void HealthPacket(void)
+#endif
+#endif
+#if defined(ENABLE_UNIFIED_FIRMWARE) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 {
 	GetMemeryPercentage();
 	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
@@ -2265,11 +2448,27 @@ void HealthPacket(void)
 	
 }
 #endif
+#endif
 
-#ifdef PROTO_MAHARASHTRA1
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void HealthPacket(void)
+{
+	if (IS_PROTO_MH()) {
+		HealthPacketMH();
+	} else if (IS_PROTO_OG()) {
+		HealthPacketOG();
+	} else {
+		HealthPacketOD();
+	}
+}
+#endif
 
-
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_MAHARASHTRA1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void MakeParamChangeStringMH(char* Sender, char* param, uint8_t IsServer)
+#else
 void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
+#endif
 {
 
 	char ss[20];
@@ -2428,10 +2627,14 @@ void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 
 }
 
-#elif defined(PROTO_OG)
+#endif
 
-
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_OG)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void MakeParamChangeStringOG(char* Sender, char* param, uint8_t IsServer)
+#else
 void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
+#endif
 {
 
 	char ss[20];
@@ -2578,18 +2781,14 @@ void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 		Ql_strcat(dataBuffer,CMD_Buff);
 	}
 
-} 
+}
+#endif
 
-#elif defined(PROTO_CDAC)
+#if defined(PROTO_CDAC)
 
 void SMSAlert(uint8_t AlertNum)
 {
 	uint8_t tm=125;
-	if(AlertNum == 10 || AlertNum == 11 || AlertNum == 16)
-	{
-		SendSOSAlertSMS(AlertNum);
-		return;
-	}
 	if(GSM.GSMState < GPRS_INIT)
 		return;
 	Ql_memset(SimData,0x00,MSGSIZE);
@@ -2624,10 +2823,11 @@ void SMSAlert(uint8_t AlertNum)
 		case 3 : Ql_strcpy(SimData,"Main Battery Removed");break;
 		case 10: Ql_strcpy(SimData,"Emergency State ON");break;
 		case 11: Ql_strcpy(SimData,"Emergency State OFF");break;
-		case 16: Ql_strcpy(SimData,"Emergency button wire diconnect");break;
+		case 16: Ql_strcpy(SimData,"Emergency button wire disconnect");break;
 		case 17: Ql_strcpy(SimData,"OverSpeed");break;
 		case 22: Ql_strcpy(SimData,"Vehicle Tilt");break;
 		case 20: Ql_strcpy(SimData,"Overspeed in Geofence");break;
+		case 23: Ql_strcpy(SimData,"Impact");break;
 	}
 	InsertChar(SimData,' ');
 	Ql_strcat(SimData,VTSData.VehicleData.VehicleRegNo);
@@ -2645,6 +2845,7 @@ void SMSAlert(uint8_t AlertNum)
 		if(--tm == 0)
 			break;
 	}
+	SendSMS(VTSData.PhoneNumber.Mob0, SimData);
 	if(!Ql_strstr(VTSData.PhoneNumber.Mob1,"0000000") && Ql_strlen(VTSData.PhoneNumber.Mob1) > 3)
 		SendSMS(VTSData.PhoneNumber.Mob1,SimData);
 	if(!Ql_strstr(VTSData.PhoneNumber.Mob2,"0000000") && Ql_strlen(VTSData.PhoneNumber.Mob2) > 3)
@@ -2671,27 +2872,27 @@ void FullPacket(void)
 	InsertStringValue("25L",dLen + 18,3,0);
 	SendString[dLen + 21]=GPS.GPSFix + '0';
 	InsertCurrentDateTimeAt(dLen + 22);
-	InsertFloatValue(GPS.Latitude,dLen + 34,10,"%010.6f");
+	InsertFloatValueCDAC(GPS.Latitude,dLen + 34,10,"%010.6f");
 	SendString[dLen + 44]=GPS.LatDir;
-	InsertFloatValue(GPS.Longitude,dLen + 45,10,"%010.6f");
+	InsertFloatValueCDAC(GPS.Longitude,dLen + 45,10,"%010.6f");
 	SendString[dLen + 55]=GPS.LngDir;
-	InsertIntValue(GSM.MCC,dLen + 56,3);
-	InsertIntValue(GSM.MNC,dLen + 59,3);
+	InsertIntValueCDAC(GSM.MCC,dLen + 56,3);
+	InsertMNCCDAC(GSM.MNC,dLen + 59);
 	InsertStringValue(GSM.LAC,dLen + 62,4,1);
 	InsertStringValue(GSM.CellID,dLen + 66,9,1);
-	InsertFloatValue(GPS.Speed,dLen + 75,6,"%06.2f");
-	InsertFloatValue(GPS.Heading,dLen + 81,6,"%06.2f");
-	InsertIntValue(GPS.NoOfSatalite,dLen + 87,2);
-	InsertIntValue((uint16_t)GPS.HDOP,dLen + 89,2);
-	InsertIntValue(GSM.SignalStrength,dLen + 91,2);
+	InsertFloatValueCDAC(GPS.Speed,dLen + 75,6,"%06.2f");
+	InsertFloatValueCDAC(GPS.Heading,dLen + 81,6,"%06.2f");
+	InsertIntValueCDAC(GPS.NoOfSatalite,dLen + 87,2);
+	InsertIntValueCDAC((uint16_t)GPS.HDOP,dLen + 89,2);
+	InsertIntValueCDAC(GSM.SignalStrength,dLen + 91,2);
 	SendString[dLen + 93]=PeriPheralVal.IGN + '0';
 	SendString[dLen + 94]=PeriPheralVal.IsMain + '0';
 	SendString[dLen + 95]=VehicleMovingMode;
 	InsertStringValue(VTSData.VendorID,dLen + 96,6,1);
 	InsertStringValue(FirmVer,dLen + 102,6,1);
 	InsertStringValue(VTSData.VehicleData.VehicleRegNo,dLen + 108,16,1);
-	InsertFloatValue(GPS.Altitude,dLen + 124,7,"%07.2f");
-	InsertIntValue((uint16_t)GPS.PDOP,dLen + 131,2);
+	InsertFloatValueCDAC(GPS.Altitude,dLen + 124,7,"%07.2f");
+	InsertIntValueCDAC((uint16_t)GPS.PDOP,dLen + 131,2);
 	InsertStringValue(NetWork.Network,dLen + 133,6,1);
 	pos=dLen + 139;
 	while(i<4)
@@ -2704,8 +2905,8 @@ void FullPacket(void)
 		
 		pos += 9;
 	}
-	InsertFloatValue(PeriPheralVal.MainsVolt,dLen + 199,5,"%05.1f");
-	InsertFloatValue(PeriPheralVal.BattVolt,dLen + 204,5,"%05.1f");
+	InsertFloatValueCDAC(PeriPheralVal.MainsVolt,dLen + 199,5,"%05.1f");
+	InsertFloatValueCDAC(PeriPheralVal.BattVolt,dLen + 204,5,"%05.1f");
 	if(PeriPheralVal.IsCoverOpen)
 		SendString[dLen + 209]='O';
 	else
@@ -2714,7 +2915,7 @@ void FullPacket(void)
 	SendString[dLen + 211]=PeriPheralVal.IP2 + '0';
 	SendString[dLen + 212]=PeriPheralVal.OP1 + '0';
 	SendString[dLen + 213]=PeriPheralVal.OP2 + '0';
-	InsertIntValue(FrameNumber,dLen + 214,6);
+	InsertIntValueCDAC(FrameNumber,dLen + 214,6);
 	crc = CRC16(&SendString[dLen],220);
 	Ql_sprintf(tempData,"%08X",crc);
 	lastcrc= crc;
@@ -2742,10 +2943,17 @@ static uint8_t GetBatchPacketPriority(const char *packet)
 	return 4;
 }
 
+static int16_t s_batchPacketsSlots[2] = {-1, -1};
+static uint8_t s_batchPacketsCount = 0;
+
 void MakeBatchPacket(uint8_t count, uint8_t* nmcount, uint8_t* critcount)
 {
 	uint16_t dLen=8;
 	char histPackets[2][256];
+
+	s_batchPacketsCount = 0;
+	s_batchPacketsSlots[0] = -1;
+	s_batchPacketsSlots[1] = -1;
 	uint8_t histPriority[2] = {0};
 	uint8_t histStorageType[2] = {0};
 	char tempPacket[256];
@@ -2759,48 +2967,49 @@ void MakeBatchPacket(uint8_t count, uint8_t* nmcount, uint8_t* critcount)
 	InsertStringValue("vltdata=",0,8,0);
 	InsertStringValue("BTH",dLen + 0,3,0);	
 	InsertStringValue(NetWork.IMEI,dLen + 3,15,0);
-	InsertIntValue(count+1,dLen + 18,3);
+	InsertIntValueCDAC(count,dLen + 18,3);
 	InsertStringValue("01L",dLen + 21,3,0);
 	SendString[dLen + 24]=GPS.GPSFix + '0';
 	InsertCurrentDateTimeAt(dLen + 25);
-	InsertFloatValue(GPS.Latitude,dLen + 37,10,"%010.6f");
+	InsertFloatValueCDAC(GPS.Latitude,dLen + 37,10,"%010.6f");
 	SendString[dLen + 47]=GPS.LatDir;
-	InsertFloatValue(GPS.Longitude,dLen + 48,10,"%010.6f");
+	InsertFloatValueCDAC(GPS.Longitude,dLen + 48,10,"%010.6f");
 	SendString[dLen + 58]=GPS.LngDir;
-	InsertIntValue(GSM.MCC,dLen + 59,3);
-	InsertIntValue(GSM.MNC,dLen + 62,3);
+	InsertIntValueCDAC(GSM.MCC,dLen + 59,3);
+	InsertMNCCDAC(GSM.MNC,dLen + 62);
 	InsertStringValue(GSM.LAC,dLen + 65,4,1);
 	InsertStringValue(GSM.CellID,dLen + 69,9,1);
-	InsertFloatValue(GPS.Speed,dLen + 78,6,"%03.2f");
-	InsertFloatValue(GPS.Heading,dLen + 84,6,"%03.2f");
-	InsertIntValue(GPS.NoOfSatalite,dLen + 90,2);
-	InsertIntValue((uint16_t)GPS.HDOP,dLen + 92,2);
-	InsertIntValue(GSM.SignalStrength,dLen + 94,2);
+	InsertFloatValueCDAC(GPS.Speed,dLen + 78,6,"%03.2f");
+	InsertFloatValueCDAC(GPS.Heading,dLen + 84,6,"%03.2f");
+	InsertIntValueCDAC(GPS.NoOfSatalite,dLen + 90,2);
+	InsertIntValueCDAC((uint16_t)GPS.HDOP,dLen + 92,2);
+	InsertIntValueCDAC(GSM.SignalStrength,dLen + 94,2);
 	SendString[dLen + 96]=PeriPheralVal.IGN + '0';
 	SendString[dLen + 97]=PeriPheralVal.IsMain + '0';
 	SendString[dLen + 98]=VehicleMovingMode;	
-	InsertFloatValue(GPS.Altitude,dLen + 99,7,"%04.2f");
+	InsertFloatValueCDAC(GPS.Altitude,dLen + 99,7,"%04.2f");
 	char spn[7];
 	Ql_sprintf(spn,"%s",NetWork.Network);
 	int rem = 6 - Ql_strlen(NetWork.Network);
 	for(int i =0; i < rem; i++)
 		spn[5 - i] = 'X';
 
-	// SendString[dLen + 103] = 0;
+	// SendString[dLen + 100] = 0;
 	// Ql_strncat(SendString,NetWork.Network,6);
 	
 	
-	// SendString[dLen+110] = 0;
-	InsertStringValue(spn,dLen + 106,6,1);
+	// SendString[dLen+107] = 0;
+	InsertStringValue(spn,dLen + 103,6,1);
 	uint8_t nmindex=0, critindex=0;
 	*nmcount=0;
 	*critcount=0;
 	while(histCount < count && histCount < 2)
 	{
 		int status=0;
+		int16_t slotNum = -1;
 		Ql_memset(tempPacket,0,sizeof(tempPacket));
 		if(readAlerts){
-			status = ReadDataBatch(tempPacket,ALERT,1,critindex++,0);
+			status = ReadDataBatchExt(tempPacket,ALERT,1,critindex++,0, &slotNum);
 			if(!status)
 			{
 				readAlerts=0;
@@ -2808,7 +3017,7 @@ void MakeBatchPacket(uint8_t count, uint8_t* nmcount, uint8_t* critcount)
 			}
 		}
 		else
-			status = ReadDataBatch(tempPacket,NORMAL,1,nmindex++,0);
+			status = ReadDataBatchExt(tempPacket,NORMAL,1,nmindex++,0, &slotNum);
 		
 		if(status)
 		{
@@ -2816,14 +3025,12 @@ void MakeBatchPacket(uint8_t count, uint8_t* nmcount, uint8_t* critcount)
 			int pklen = Ql_strlen(tempPacket);
 			if(!pt)
 			{
-				LOGData(TAG_SERVER,"invalid history packet:");
-				LOGData(TAG_SERVER,"%s",tempPacket);
+				LOGData(TAG_SERVER,"invalid history packet: IMEI not found, skip=%d", nmindex - 1);
 				continue;
 			}
 			if(pklen < 50 || pklen > 256)
 			{
-				LOGData(TAG_SERVER,"invalid history packet len %d",pklen);
-				LOGData(TAG_SERVER,"%s",tempPacket);
+				LOGData(TAG_SERVER,"invalid history packet len %d, skip=%d", pklen, nmindex - 1);
 				continue;
 			}
 
@@ -2836,6 +3043,11 @@ void MakeBatchPacket(uint8_t count, uint8_t* nmcount, uint8_t* critcount)
 				critcount[0]++;
 			else
 				nmcount[0]++;
+			
+			if(s_batchPacketsCount < 2)
+			{
+				s_batchPacketsSlots[s_batchPacketsCount++] = slotNum;
+			}
 			histCount++;
 		}
 		else if(!readAlerts)
@@ -2991,120 +3203,309 @@ void MakeBatchPacket(uint8_t count, uint8_t* nmcount, uint8_t* critcount)
 	
 		
 // }
+static char* OTA_SkipCommand(char *requestData)
+{
+	char *p = requestData;
+
+	while(*p && *p != ' ' && *p != '\t') {
+		p++;
+	}
+	while(*p == ' ' || *p == '\t') {
+		p++;
+	}
+	return p;
+}
+
+static void OTA_TrimTrailingSpaces(char *text)
+{
+	int len = Ql_strlen(text);
+
+	while(len > 0 && (text[len - 1] == ' ' || text[len - 1] == '\t')) {
+		text[len - 1] = '\0';
+		len--;
+	}
+}
+
 void UpdateOTA(char* requestData, uint8_t isSetCommand)
 {
-    char* currentChar = requestData + 4;  // Skip "SET " or "GET "
-    Ql_memset(&OTAValue, 0, sizeof(OTAValue));
+	char* currentChar;
 
-    uint8_t charIndex = 0; // Index for constructing keys or values
-    uint8_t isParsingValue = 0; // 0 = parsing key, 1 = parsing value
+	Ql_memset(&OTAValue, 0, sizeof(OTAValue));
+	if(requestData == NULL) {
+		return;
+	}
 
-    while (*currentChar && OTAValue.TotalOTA < MAX_OTA_SIZE)
-    {
-        if (*currentChar == ':' && !isParsingValue) // First `:` switches to value parsing
-        {
-            isParsingValue = 1;
-            OTAValue.OTData[OTAValue.TotalOTA].KeyVal[charIndex] = '\0';
-            charIndex = 0;
-            currentChar++;
-            continue;
-        }
-        else if (*currentChar == ',' || *currentChar == '\0' || *currentChar == '\r' || *currentChar == '\n') // End of key-value pair
-        {
-            if (isParsingValue)
-            {
-                OTAValue.OTData[OTAValue.TotalOTA].Value[charIndex] = '\0';
-            }
-            else
-            {
-                OTAValue.OTData[OTAValue.TotalOTA].KeyVal[charIndex] = '\0';
-            }
+	currentChar = OTA_SkipCommand(requestData);
+	while(*currentChar && OTAValue.TotalOTA < MAX_OTA_SIZE)
+	{
+		uint8_t keyIndex = 0;
+		uint8_t valueIndex = 0;
+		ParamOTATypedef *item = &OTAValue.OTData[OTAValue.TotalOTA];
 
-            OTAValue.TotalOTA++;
-            isParsingValue = 0;
-            charIndex = 0;
-            currentChar++;
-            continue;
-        }
+		while(*currentChar == ' ' || *currentChar == '\t' || *currentChar == ',') {
+			currentChar++;
+		}
+		if(*currentChar == '\0' || *currentChar == '\r' || *currentChar == '\n') {
+			break;
+		}
 
-        // Populate Key or Value based on the state
-        if (!isParsingValue)
-        {
-            OTAValue.OTData[OTAValue.TotalOTA].KeyVal[charIndex++] = *currentChar;
-        }
-        else
-        {
-            OTAValue.OTData[OTAValue.TotalOTA].Value[charIndex++] = *currentChar;
-        }
+		while(*currentChar &&
+			  *currentChar != ':' &&
+			  *currentChar != ',' &&
+			  *currentChar != '\r' &&
+			  *currentChar != '\n' &&
+			  *currentChar != ' ' &&
+			  *currentChar != '\t')
+		{
+			if(keyIndex < (sizeof(item->KeyVal) - 1)) {
+				item->KeyVal[keyIndex++] = *currentChar;
+			}
+			currentChar++;
+		}
+		item->KeyVal[keyIndex] = '\0';
 
-        currentChar++;
-    }
+		if(isSetCommand) {
+			if(*currentChar == ':') {
+				currentChar++;
+			} else {
+				while(*currentChar == ' ' || *currentChar == '\t') {
+					currentChar++;
+				}
+			}
 
-    // Handle last key or value without a trailing delimiter
-    if (charIndex > 0)
-    {
-        if (isParsingValue)
-        {
-            OTAValue.OTData[OTAValue.TotalOTA].Value[charIndex] = '\0';
-        }
-        else
-        {
-            OTAValue.OTData[OTAValue.TotalOTA].KeyVal[charIndex] = '\0';
-        }
-        OTAValue.TotalOTA++;
-    }
+			while(*currentChar &&
+				  *currentChar != ',' &&
+				  *currentChar != '\r' &&
+				  *currentChar != '\n')
+			{
+				if(valueIndex < (sizeof(item->Value) - 1)) {
+					item->Value[valueIndex++] = *currentChar;
+				}
+				currentChar++;
+			}
+			item->Value[valueIndex] = '\0';
+			OTA_TrimTrailingSpaces(item->Value);
+		}
+
+		OTA_TrimTrailingSpaces(item->KeyVal);
+		if(item->KeyVal[0] != '\0') {
+			OTAValue.TotalOTA++;
+		}
+
+		if(*currentChar == ',') {
+			currentChar++;
+		}
+	}
 }
+static void ServerCopyText(char *dest, uint16_t destSize, const char *src)
+{
+	if(destSize == 0) {
+		return;
+	}
+
+	dest[0] = '\0';
+	if(src == NULL) {
+		return;
+	}
+
+	Ql_strncpy(dest, src, destSize - 1);
+	dest[destSize - 1] = '\0';
+}
+
+static void ServerAppendText(char *dest, uint16_t destSize, const char *src)
+{
+	uint16_t used;
+
+	if(destSize == 0 || src == NULL) {
+		return;
+	}
+
+	used = Ql_strlen(dest);
+	if(used >= (destSize - 1)) {
+		return;
+	}
+
+	Ql_strncpy(dest + used, src, destSize - used - 1);
+	dest[destSize - 1] = '\0';
+}
+
+static char* ServerEndpointAfterScheme(char *value)
+{
+	if(Ql_strncmp(value, "https://", 8) == 0) {
+		return value + 8;
+	}
+	if(Ql_strncmp(value, "http://", 7) == 0) {
+		return value + 7;
+	}
+	return value;
+}
+
+static uint8_t ServerTextIsDigits(char *start, char *end)
+{
+	if(start >= end) {
+		return 0;
+	}
+
+	while(start < end) {
+		if(*start < '0' || *start > '9') {
+			return 0;
+		}
+		start++;
+	}
+	return 1;
+}
+
+static char* ServerFindPortSeparator(char *url)
+{
+	char *host = ServerEndpointAfterScheme(url);
+	char *slash = Ql_strchr(host, '/');
+	char *colon = NULL;
+	char *p = host;
+
+	while(*p && (slash == NULL || p < slash)) {
+		if(*p == ':') {
+			colon = p;
+		}
+		p++;
+	}
+
+	if(colon == NULL) {
+		return NULL;
+	}
+
+	if(ServerTextIsDigits(colon + 1, (slash != NULL) ? slash : p)) {
+		return colon;
+	}
+	return NULL;
+}
+
+static void ServerNormalizeEndpoint(const char *value, char *urlOut, uint16_t urlOutSize, char *portOut, uint16_t portOutSize)
+{
+	char url[128];
+	char host[128];
+	char *endpoint;
+	char *slash;
+	char *colon;
+	char *portEnd;
+	uint16_t portLen;
+
+	if(urlOutSize == 0 || portOutSize == 0) {
+		return;
+	}
+
+	ServerCopyText(url, sizeof(url), value);
+	if(Ql_strncmp(url, "//", 2) == 0) {
+		char repairedUrl[128];
+		ServerCopyText(repairedUrl, sizeof(repairedUrl), "https:");
+		ServerAppendText(repairedUrl, sizeof(repairedUrl), url);
+		ServerCopyText(url, sizeof(url), repairedUrl);
+	}
+
+	endpoint = ServerEndpointAfterScheme(url);
+	slash = Ql_strchr(endpoint, '/');
+	if(slash != NULL) {
+		*slash = '\0';
+	}
+
+	ServerCopyText(host, sizeof(host), endpoint);
+	colon = ServerFindPortSeparator(host);
+	if(colon != NULL) {
+		portEnd = host + Ql_strlen(host);
+		portLen = (uint16_t)(portEnd - (colon + 1));
+		if(portLen >= portOutSize) {
+			portLen = portOutSize - 1;
+		}
+		Ql_memcpy(portOut, colon + 1, portLen);
+		portOut[portLen] = '\0';
+		*colon = '\0';
+	} else if(Ql_strncmp(url, "https://", 8) == 0) {
+		/* Only apply scheme default when no port was pre-configured */
+		if(portOut[0] == '\0' || Ql_strcmp(portOut, "0") == 0)
+			ServerCopyText(portOut, portOutSize, "443");
+	} else if(Ql_strncmp(url, "http://", 7) == 0) {
+		/* Only apply scheme default when no port was pre-configured */
+		if(portOut[0] == '\0' || Ql_strcmp(portOut, "0") == 0)
+			ServerCopyText(portOut, portOutSize, "80");
+	}
+
+	/* Preserve the full URL (scheme + host + path) so IsHttpUrl() can detect
+	 * HTTP servers correctly after storage. For bare IP:port inputs (no scheme)
+	 * store just the host as before. */
+	if(Ql_strncmp(url, "http://", 7) == 0 || Ql_strncmp(url, "https://", 8) == 0) {
+		/* Rebuild: scheme://host:port/path  — use original value, normalised only */
+		ServerCopyText(urlOut, urlOutSize, value);
+	} else {
+		ServerCopyText(urlOut, urlOutSize, host);
+	}
+}
+
 void UpdateURL(char* value)
 {
-	char* fn;
 	char url[128];
-	
+	char port[sizeof(VTSData.ServerData.Port1)];
+
 	if (!value) return;
-	
-	Ql_strncpy(url, value, sizeof(url) - 1);
-	url[sizeof(url) - 1] = '\0';
-	
-	fn = Ql_strchr(url,':');
-	if(fn)
-	{
-		*fn=0;
-		fn++;
-		Ql_strncpy(VTSData.ServerData.Port1, fn, sizeof(VTSData.ServerData.Port1) - 1);
-		VTSData.ServerData.Port1[sizeof(VTSData.ServerData.Port1) - 1] = '\0';
-	}
+
+	ServerCopyText(port, sizeof(port), VTSData.ServerData.Port1);
+	ServerNormalizeEndpoint(value, url, sizeof(url), port, sizeof(port));
+
+	Ql_strncpy(VTSData.ServerData.Port1, port, sizeof(VTSData.ServerData.Port1) - 1);
+	VTSData.ServerData.Port1[sizeof(VTSData.ServerData.Port1) - 1] = '\0';
 	Ql_strncpy(VTSData.ServerData.IP1, url, sizeof(VTSData.ServerData.IP1) - 1);
 	VTSData.ServerData.IP1[sizeof(VTSData.ServerData.IP1) - 1] = '\0';
+
     ServerSocket[0].SocketState = SOCKET_CLOSED;
     Ql_strncpy(ServerSocket[0].DNSorIP, VTSData.ServerData.IP1, sizeof(ServerSocket[0].DNSorIP) - 1);
     ServerSocket[0].DNSorIP[sizeof(ServerSocket[0].DNSorIP) - 1] = '\0';
     ServerSocket[0].Port = Ql_atoi(VTSData.ServerData.Port1);
+    LOGData(TAG_SERVER, "Primary URL updated: %s:%s", VTSData.ServerData.IP1, VTSData.ServerData.Port1);
 }
 
 void UpdateSecondaryURL(char* value)
 {
-	char* fn;
 	char url[128];
-	
+	char port[sizeof(VTSData.ServerData.Port3)];
+
 	if (!value) return;
-	
-	Ql_strncpy(url, value, sizeof(url) - 1);
-	url[sizeof(url) - 1] = '\0';
-	
-	fn = Ql_strchr(url,':');
-	if(fn)
-	{
-		*fn=0;
-		fn++;
-		Ql_strncpy(VTSData.ServerData.Port3, fn, sizeof(VTSData.ServerData.Port3) - 1);
-		VTSData.ServerData.Port3[sizeof(VTSData.ServerData.Port3) - 1] = '\0';
-	}
+
+	ServerCopyText(port, sizeof(port), VTSData.ServerData.Port3);
+	ServerNormalizeEndpoint(value, url, sizeof(url), port, sizeof(port));
+
+	Ql_strncpy(VTSData.ServerData.Port3, port, sizeof(VTSData.ServerData.Port3) - 1);
+	VTSData.ServerData.Port3[sizeof(VTSData.ServerData.Port3) - 1] = '\0';
 	Ql_strncpy(VTSData.ServerData.IP3, url, sizeof(VTSData.ServerData.IP3) - 1);
 	VTSData.ServerData.IP3[sizeof(VTSData.ServerData.IP3) - 1] = '\0';
+	ServerSocket[2].isEnabled = IsHttpUrl(VTSData.ServerData.IP3) ? 0 : 1;
 	ServerSocket[2].SocketState = SOCKET_CLOSED;
     Ql_strncpy(ServerSocket[2].DNSorIP, VTSData.ServerData.IP3, sizeof(ServerSocket[2].DNSorIP) - 1);
     ServerSocket[2].DNSorIP[sizeof(ServerSocket[2].DNSorIP) - 1] = '\0';
     ServerSocket[2].Port = Ql_atoi(VTSData.ServerData.Port3);
+    LOGData(TAG_SERVER, "Secondary URL updated: %s:%s (mode=%s)", VTSData.ServerData.IP3, VTSData.ServerData.Port3, ServerSocket[2].isEnabled ? "TCP" : "HTTP");
 }
+
+#ifdef EXTENDED_IPS
+void UpdateTertiaryURL(char* value)
+{
+	char url[128];
+	char port[sizeof(VTSData.ServerData.Port4)];
+
+	if (!value) return;
+
+	ServerCopyText(port, sizeof(port), VTSData.ServerData.Port4);
+	ServerNormalizeEndpoint(value, url, sizeof(url), port, sizeof(port));
+
+	Ql_strncpy(VTSData.ServerData.Port4, port, sizeof(VTSData.ServerData.Port4) - 1);
+	VTSData.ServerData.Port4[sizeof(VTSData.ServerData.Port4) - 1] = '\0';
+	Ql_strncpy(VTSData.ServerData.IP4, url, sizeof(VTSData.ServerData.IP4) - 1);
+	VTSData.ServerData.IP4[sizeof(VTSData.ServerData.IP4) - 1] = '\0';
+	ServerSocket[3].isEnabled = IsHttpUrl(VTSData.ServerData.IP4) ? 0 : 1;
+	ServerSocket[3].SocketState = SOCKET_CLOSED;
+    Ql_strncpy(ServerSocket[3].DNSorIP, VTSData.ServerData.IP4, sizeof(ServerSocket[3].DNSorIP) - 1);
+    ServerSocket[3].DNSorIP[sizeof(ServerSocket[3].DNSorIP) - 1] = '\0';
+    ServerSocket[3].Port = Ql_atoi(VTSData.ServerData.Port4);
+    LOGData(TAG_SERVER, "Tertiary URL updated: %s:%s (mode=%s)", VTSData.ServerData.IP4, VTSData.ServerData.Port4, ServerSocket[3].isEnabled ? "TCP" : "HTTP");
+}
+#endif
 
 void UpdateVehicleNumber(char* value)
 {
@@ -3118,43 +3519,29 @@ void UpdateMoblieNo(char* value, uint8_t num)
 {
 	if (!value) return;
 	
-	char formattedValue[25];
-	Ql_memset(formattedValue, 0, sizeof(formattedValue));
-
-	// If it is a 10-digit number, auto-prepend +91
-	if (Ql_strlen(value) == 10 && value[0] >= '0' && value[0] <= '9')
-	{
-		Ql_sprintf(formattedValue, "+91%s", value);
-	}
-	else
-	{
-		Ql_strncpy(formattedValue, value, sizeof(formattedValue) - 1);
-		formattedValue[sizeof(formattedValue) - 1] = '\0';
-	}
-	
-	uint16_t j=Ql_strlen(formattedValue);
+	uint16_t j=Ql_strlen(value);
 	if((j >3) && (j < 21))
 	{
 		switch(num)
 		{
 			case 1:
-				Ql_strncpy(VTSData.PhoneNumber.Mob0, formattedValue, sizeof(VTSData.PhoneNumber.Mob0) - 1);
+				Ql_strncpy(VTSData.PhoneNumber.Mob0, value, sizeof(VTSData.PhoneNumber.Mob0) - 1);
 				VTSData.PhoneNumber.Mob0[sizeof(VTSData.PhoneNumber.Mob0) - 1] = '\0';
 				break;
 			case 2:
-				Ql_strncpy(VTSData.PhoneNumber.Mob1, formattedValue, sizeof(VTSData.PhoneNumber.Mob1) - 1);
+				Ql_strncpy(VTSData.PhoneNumber.Mob1, value, sizeof(VTSData.PhoneNumber.Mob1) - 1);
 				VTSData.PhoneNumber.Mob1[sizeof(VTSData.PhoneNumber.Mob1) - 1] = '\0';
 				break;
 			case 3:
-				Ql_strncpy(VTSData.PhoneNumber.Mob2, formattedValue, sizeof(VTSData.PhoneNumber.Mob2) - 1);
+				Ql_strncpy(VTSData.PhoneNumber.Mob2, value, sizeof(VTSData.PhoneNumber.Mob2) - 1);
 				VTSData.PhoneNumber.Mob2[sizeof(VTSData.PhoneNumber.Mob2) - 1] = '\0';
 				break;
 			case 4:
-				Ql_strncpy(VTSData.PhoneNumber.Mob3, formattedValue, sizeof(VTSData.PhoneNumber.Mob3) - 1);
+				Ql_strncpy(VTSData.PhoneNumber.Mob3, value, sizeof(VTSData.PhoneNumber.Mob3) - 1);
 				VTSData.PhoneNumber.Mob3[sizeof(VTSData.PhoneNumber.Mob3) - 1] = '\0';
 				break;
 			case 5:
-				Ql_strncpy(VTSData.PhoneNumber.Mob4, formattedValue, sizeof(VTSData.PhoneNumber.Mob4) - 1);
+				Ql_strncpy(VTSData.PhoneNumber.Mob4, value, sizeof(VTSData.PhoneNumber.Mob4) - 1);
 				VTSData.PhoneNumber.Mob4[sizeof(VTSData.PhoneNumber.Mob4) - 1] = '\0';
 				break;
 			default:
@@ -3310,8 +3697,7 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 		return;
 	}
 
-	fn = Ql_strstr(buff,"ACTV");
-	if(fn)
+	if(Ql_strstr(buff,"ACTV"))
 	{
 		ls = strchr(buff,',');
 		if(!ls)
@@ -3347,21 +3733,15 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 					}
 					*fn = 0;
 					strncpy(ss,ls,14);
-					char formatted_ss[25];
-					if (strlen(ss) == 10 && ss[0] >= '0' && ss[0] <= '9')
-						sprintf(formatted_ss, "+91%s", ss);
-					else
-						strcpy(formatted_ss, ss);
-					LOGData(TAG_SERVER,"\r\nSending ACTV reply with Rc : %s to %s",rnd,formatted_ss);
+					LOGData(TAG_SERVER,"\r\nSending ACTV reply with Rc : %s to %s",rnd,ss);
 					MakeACTMessage(0,  rnd);
-					SendSMS(formatted_ss,SimData);
+					SendSMS(ss,SimData);
 					return;
 				}
 			}
 		}
 	}
-	fn = Ql_strstr(buff,"HCHK");
-	if(fn)
+	if(Ql_strstr(buff,"HCHK"))
 	{
 		fn=strchr(buff,',');
 		if(fn)
@@ -3381,19 +3761,14 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 				}
 				*fn = 0;
 				strncpy(ss,ls,14);
-				char formatted_ss[25];
-				if (strlen(ss) == 10 && ss[0] >= '0' && ss[0] <= '9')
-					sprintf(formatted_ss, "+91%s", ss);
-				else
-					strcpy(formatted_ss, ss);
-				LOGData(TAG_SERVER,"\r\nSending HCHK reply with Rc : %s to %s",rnd,formatted_ss);
+				LOGData(TAG_SERVER,"\r\nSending HCHK reply with Rc : %s to %s",rnd,ss);
 				MakeACTMessage(1,  rnd);
-				SendSMS(formatted_ss,SimData);
+				SendSMS(ss,SimData);
 				return;
 			}
 		}
 	}
-	Ql_memset(VAlert[CONF_CHANGE_ALERT].ACK,0x00,100);
+	Ql_memset(VAlert[CONF_CHANGE_ALERT].ACK,0x00,sizeof(VAlert[CONF_CHANGE_ALERT].ACK));
 	if(!isserver)
 	{
 		Ql_strcat(VAlert[CONF_CHANGE_ALERT].ACK,"OM");
@@ -3511,6 +3886,15 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 					UpdateOTAInterval(OTAValue.OTData[i].Value,6);
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"VID"))
 					UpdateVID(OTAValue.OTData[i].Value);
+				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"GFR"))
+				{
+					if(Ql_strstr(OTAValue.OTData[i].Value,"ON") || Ql_strcmp(OTAValue.OTData[i].Value,"1")==0)
+						VTSData.DisableGPSFaultReset = 0;
+					else
+						VTSData.DisableGPSFaultReset = 1;
+					UpdateConfigInFlash();
+					Ql_strcpy(OTAValue.OTData[i].Value, VTSData.DisableGPSFaultReset ? "OFF" : "ON");
+				}
 				else
 					strcpy(OTAValue.OTData[i].Value,"InvalidKey");
 
@@ -3525,6 +3909,11 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 			InsertChar(VAlert[CONF_CHANGE_ALERT].ACK,'*');
 			if(isserver==0)
 				SendSMS(SMSSender,VAlert[CONF_CHANGE_ALERT].ACK);
+			else if(isserver==OTA_SRC_RS232)
+				SendRS232Response(VAlert[CONF_CHANGE_ALERT].ACK);
+			else if(isserver==OTA_SRC_RS485)
+				SendRS485Response(VAlert[CONF_CHANGE_ALERT].ACK);
+			
 			AddAlert(CONF_CHANGE_ALERT);
 			UpdateConfigInFlash();
 			IsPacketReady.IsNormalPacket=1;
@@ -3552,7 +3941,7 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 				if(Ql_strstr(OTAValue.OTData[i].KeyVal,"PU"))
 					Ql_sprintf(cc,"%s:%s",VTSData.ServerData.IP1,VTSData.ServerData.Port1);
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"SU"))
-					Ql_sprintf(cc,"%s:%s",VTSData.ServerData.IP2,VTSData.ServerData.Port2);
+					Ql_sprintf(cc,"%s:%s",VTSData.ServerData.IP3,VTSData.ServerData.Port3);
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"VN"))
 					strcpy(cc,VTSData.VehicleData.VehicleRegNo);
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"M0"))
@@ -3561,15 +3950,17 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 					strcpy(cc,VTSData.PhoneNumber.Mob1);
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"M2"))
 					strcpy(cc,VTSData.PhoneNumber.Mob2);
-				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"M3")) 
+				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"M3"))
 					strcpy(cc,VTSData.PhoneNumber.Mob3);
+				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"OM"))
+					strcpy(cc,VTSData.PhoneNumber.Mob4);
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"ED")){
 					Ql_sprintf(cc,"%d",VTSData.IntervalData.SOSTimeOut);
 				}
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"ST"))
-					Ql_sprintf(cc,"%d",VTSData.IntervalData.SleepTime);
+					Ql_sprintf(cc,"%d",VTSData.IntervalData.SleepTime / 60);
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"HT"))
-					Ql_sprintf(cc,"%d",VTSData.IntervalData.HaltInterval);
+					Ql_sprintf(cc,"%d",VTSData.IntervalData.HaltInterval / 60);
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"DSL"))
 					Ql_sprintf(cc,"%2.0f",VTSData.VehicleData.DefaultSpeed);
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"SL"))
@@ -3600,6 +3991,8 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 					strcpy(cc,VTSData.VendorID);
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"FV"))
 					strcpy(cc,FirmVer);
+				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"GFR"))
+					Ql_strcpy(cc, VTSData.DisableGPSFaultReset ? "OFF" : "ON");
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"GF"))
 					GetActiveGeoID(cc);
 				else
@@ -3614,6 +4007,10 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 			InsertChar(VAlert[CONF_CHANGE_ALERT].ACK,'*');
 			if(isserver==0)
 				SendSMS(SMSSender,VAlert[CONF_CHANGE_ALERT].ACK);
+			else if(isserver==OTA_SRC_RS232)
+				SendRS232Response(VAlert[CONF_CHANGE_ALERT].ACK);
+			else if(isserver==OTA_SRC_RS485)
+				SendRS485Response(VAlert[CONF_CHANGE_ALERT].ACK);
 			else
 			{
 				AddAlert(CONF_CHANGE_ALERT);
@@ -3641,7 +4038,7 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 				if(Ql_strstr(OTAValue.OTData[i].KeyVal,"PU")){
 					UpdateURL(DEFAULT_IP1);Ql_sprintf(cc,"%s:%s",VTSData.ServerData.IP1,VTSData.ServerData.Port1);}
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"SU")){
-					UpdateSecondaryURL(DEFAULT_IP3);Ql_sprintf(cc,"%s:%s",VTSData.ServerData.IP2,VTSData.ServerData.Port2);}
+					UpdateSecondaryURL(DEFAULT_IP3);Ql_sprintf(cc,"%s:%s",VTSData.ServerData.IP3,VTSData.ServerData.Port3);}
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"VN")){
 					UpdateVehicleNumber(DEFAULT_VEHREG);strcpy(cc,VTSData.VehicleData.VehicleRegNo);}
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"M0")){
@@ -3657,9 +4054,9 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"ED")){
 					SetSOSTimeOutSeconds(DEFAULT_INV_STM);Ql_sprintf(cc,"%d",VTSData.IntervalData.SOSTimeOut);}
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"ST")){
-					VTSData.IntervalData.SleepTime=DEFAULT_SLEEP_TIME;Ql_sprintf(cc,"%d",VTSData.IntervalData.SleepTime);}
+					VTSData.IntervalData.SleepTime=DEFAULT_SLEEP_TIME;Ql_sprintf(cc,"%d",VTSData.IntervalData.SleepTime / 60);}
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"HT")){
-					VTSData.IntervalData.HaltInterval=DEFAULT_INV_HALT;Ql_sprintf(cc,"%d",VTSData.IntervalData.HaltInterval);}
+					VTSData.IntervalData.HaltInterval=DEFAULT_INV_HALT;Ql_sprintf(cc,"%d",VTSData.IntervalData.HaltInterval / 60);}
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"DSL")){
 					VTSData.VehicleData.DefaultSpeed=DEFAULT_SPEED;Ql_sprintf(cc,"%2.0f",VTSData.VehicleData.DefaultSpeed);}
 				else if(Ql_strstr(OTAValue.OTData[i].KeyVal,"SL")){
@@ -3700,6 +4097,10 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 			InsertChar(VAlert[CONF_CHANGE_ALERT].ACK,'*');
 			if(isserver==0)
 				SendSMS(SMSSender,VAlert[CONF_CHANGE_ALERT].ACK);
+			else if(isserver==OTA_SRC_RS232)
+				SendRS232Response(VAlert[CONF_CHANGE_ALERT].ACK);
+			else if(isserver==OTA_SRC_RS485)
+				SendRS485Response(VAlert[CONF_CHANGE_ALERT].ACK);
 			else
 			{
 				AddAlert(CONF_CHANGE_ALERT);
@@ -3712,9 +4113,14 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 }
 
 
-#elif defined(PROTO_NIC1)
+#endif
 
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_NIC1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void MakeParamChangeStringNIC(char* Sender, char* param, uint8_t IsServer)
+#else
 void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
+#endif
 {
 	// Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
 	// Ql_sprintf(dataBuffer,"$,PC,12,%s,%d,%s,",NetWork.IMEI,IsServer,Sender);
@@ -3866,11 +4272,17 @@ void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 	FrameNumber++;
 
 }
+#endif
 
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_ODISA1)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void MakeParamChangeStringOD(char* Sender, char* param, uint8_t IsServer)
 #else
-
-
+#if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG)
 void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
+#endif
+#endif
+#if defined(ENABLE_UNIFIED_FIRMWARE) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 {
 	// Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
 	// Ql_sprintf(dataBuffer,"$,PC,12,%s,%d,%s,",NetWork.IMEI,IsServer,Sender);
@@ -4030,10 +4442,146 @@ void MakeShortPCString(char* Sender, char* param, uint8_t IsServer)
 	Ql_strcat(dataBuffer,param);
 	Ql_strcat(dataBuffer,",*");
 }
-
 #endif
+#endif
+
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
+{
+	if (IS_PROTO_NIC()) {
+		MakeParamChangeStringNIC(Sender, param, IsServer);
+	} else if (IS_PROTO_MH()) {
+		MakeParamChangeStringMH(Sender, param, IsServer);
+	} else if (IS_PROTO_ODISHA()) {
+		MakeParamChangeStringOD(Sender, param, IsServer);
+	} else if (IS_PROTO_OG()) {
+		MakeParamChangeStringOG(Sender, param, IsServer);
+	}
+}
+#endif
+
 void SendResponce(char *Sender, char* Resp, uint8_t IsServer, uint8_t IsSET)
 {
+#if defined(ENABLE_UNIFIED_FIRMWARE)
+    // Handle SMS response
+    if(IsServer==OTA_SRC_SMS) {
+        if (IS_PROTO_MH() || IS_PROTO_OG() || IsSRCMD) {
+            char combinedResp[300];
+            if(CMD_Buff[0] != '\0')
+                Ql_sprintf(combinedResp,"%s-%s",Resp,CMD_Buff);
+            else
+                Ql_sprintf(combinedResp,"%s",Resp);
+            SendSMS(Sender,combinedResp);
+        } else {
+            SendSMS(Sender,Resp);
+        }
+    }
+
+    // Handle SET commands - send to all servers
+    if(IsSET) {
+        if(IsSMS) {
+            MakeParamChangeString(Sender,Resp,IsServer);
+        }
+        else if(IsServer==OTA_SRC_SCK_1) {
+            MakeParamChangeString(VTSData.ServerData.IP1,Resp,IsServer);
+        }
+        else if(IsServer==OTA_SRC_SCK_2) {
+            MakeParamChangeString(VTSData.ServerData.IP3,Resp,IsServer);
+        }
+        else if(IsServer==OTA_SRC_SCK_3) {
+            MakeParamChangeString(VTSData.ServerData.IP4,Resp,IsServer); 
+        }
+        else if(IsServer==OTA_SRC_RS232) {
+            SendRS232Response(Resp);  // Send response to RS232 source
+            MakeParamChangeString("RS232",Resp,IsServer);
+        }
+        else if(IsServer==OTA_SRC_RS485) {
+            SendRS485Response(Resp);  // Send response to RS485 source
+            MakeParamChangeString("RS485",Resp,IsServer);
+        }
+        else
+        {
+            BLE_SendReply((uint8_t*)Resp,strlen(Resp));
+            MakeParamChangeString("BLE",Resp,IsServer);	
+        }
+        
+        // Send to all connected servers
+        TCPSocket_SendString(&ServerSocket[0],dataBuffer);
+        TCPSocket_SendString(&ServerSocket[2],dataBuffer);
+        #ifdef EXTENDED_IPS
+        TCPSocket_SendString(&ServerSocket[3],dataBuffer);
+        #endif
+
+        if (IS_PROTO_ODISHA()) {
+            if(IsSMS) {
+                MakeShortPCString(Sender,Resp,IsServer);
+            }
+            else if(IsServer==OTA_SRC_SCK_1) {
+                MakeShortPCString(VTSData.ServerData.IP1,Resp,IsServer);
+            }
+            else if(IsServer==OTA_SRC_SCK_2) {
+                MakeShortPCString(VTSData.ServerData.IP3,Resp,IsServer);
+            }
+            else if(IsServer==OTA_SRC_SCK_3) {
+                MakeShortPCString(VTSData.ServerData.IP4,Resp,IsServer);
+            }
+            else if(IsServer==OTA_SRC_RS232) {
+                MakeShortPCString("RS232",Resp,IsServer);
+            }
+            else if(IsServer==OTA_SRC_RS485) {
+                MakeShortPCString("RS485",Resp,IsServer);
+            }
+            
+            // Send short PC string to all servers
+            TCPSocket_SendString(&ServerSocket[0],dataBuffer);
+            TCPSocket_SendString(&ServerSocket[2],dataBuffer);
+            #ifdef EXTENDED_IPS
+            TCPSocket_SendString(&ServerSocket[3],dataBuffer);
+            #endif
+        }
+        return;
+    }
+
+    // Handle non-SET commands - send only to source
+    if(IsServer==OTA_SRC_BLE) {
+        BLE_SendReply((uint8_t*)Resp,strlen(Resp));
+    }
+    else if(IsServer==OTA_SRC_SCK_1) {
+        MakeParamChangeString(VTSData.ServerData.IP1,Resp,IsServer);
+        TCPSocket_SendString(&ServerSocket[0],dataBuffer);
+        if (IS_PROTO_ODISHA()) {
+            MakeShortPCString(VTSData.ServerData.IP1,Resp,IsServer);
+            TCPSocket_SendString(&ServerSocket[0],dataBuffer);
+        }
+    }
+    else if(IsServer==OTA_SRC_SCK_2) {
+        MakeParamChangeString(VTSData.ServerData.IP3,Resp,IsServer);
+        TCPSocket_SendString(&ServerSocket[2],dataBuffer);
+        #ifdef EXTENDED_IPS
+        TCPSocket_SendString(&ServerSocket[3],dataBuffer);
+        #endif
+        if (IS_PROTO_ODISHA()) {
+            MakeShortPCString(VTSData.ServerData.IP3,Resp,IsServer);
+            TCPSocket_SendString(&ServerSocket[2],dataBuffer);
+        }
+    }
+    else if(IsServer==OTA_SRC_SCK_3) {
+        MakeParamChangeString(VTSData.ServerData.IP4,Resp,IsServer);
+        #ifdef EXTENDED_IPS
+        TCPSocket_SendString(&ServerSocket[3],dataBuffer);
+        #endif
+        if (IS_PROTO_ODISHA()) {
+            MakeShortPCString(VTSData.ServerData.IP4,Resp,IsServer);
+            TCPSocket_SendString(&ServerSocket[3],dataBuffer);
+        }
+    }
+    else if(IsServer==OTA_SRC_RS232) {
+        SendRS232Response(Resp);
+    }
+    else if(IsServer==OTA_SRC_RS485) {
+        SendRS485Response(Resp);
+    }
+#else
     #ifndef PROTO_CDAC
     // Handle SMS response
     if(IsServer==OTA_SRC_SMS) {
@@ -4156,22 +4704,18 @@ void SendResponce(char *Sender, char* Resp, uint8_t IsServer, uint8_t IsSET)
     }
 
     #else
-    // PROTO_CDAC mode - handle RS232/RS485 responses
-    if(IsServer == OTA_SRC_RS232) {
+    /* PROTO_CDAC response routing — must mirror every source that calls
+     * DecodeSMS() with a non-SMS origin so X-commands get a reply. */
+    if(IsServer==OTA_SRC_SMS)
+        SendSMS(Sender,Resp);
+    else if(IsServer==OTA_SRC_RS232)
         SendRS232Response(Resp);
-    }
-    else if(IsServer == OTA_SRC_RS485) {
+    else if(IsServer==OTA_SRC_RS485)
         SendRS485Response(Resp);
-    }
-    else if(IsServer == OTA_SRC_BLE) {
-        BLE_SendReply((uint8_t*)Resp, strlen(Resp));
-    }
-    else if(IsServer == 0) {
-        SendSMS(Sender, Resp);
-    }
     #endif
+#endif
 }
-#ifndef PROTO_CDAC
+#if defined(ENABLE_UNIFIED_FIRMWARE) || !defined(PROTO_CDAC)
 void GetCurrentInterval(void)
 {
 	if(ServerSocket[0].SocketState != SOCKET_CONNECTED)
@@ -4200,15 +4744,11 @@ void SendDatatoServer0(void)
 	if(!TCPSocket_SendString(&ServerSocket[0],dataBuffer))
 	{
 		#ifndef HISTORY_DISABLED
-		if(!VTSData.DisableHistory)
-		{
-			ChangeToHistoryPacket(dataBuffer);
-			#ifdef HISTORY_INTERNAL
-			SavePacket();
-			#else
-			WriteHistoryData(dataBuffer);
-			#endif
-		}
+		#ifdef HISTORY_INTERNAL
+		SavePacket();
+		#else
+		WriteHistoryData(dataBuffer);
+		#endif
 		#endif
 
 	}
@@ -4239,146 +4779,7 @@ void MakeSMSFallbackPacket(void)
 	InsertCurrentDateTime(dataBuffer,1);
 }
 
-#ifndef PROTO_CDAC
-void SaveOfflineAlerts(void)
-{
-	#ifndef HISTORY_DISABLED
-	if(VTSData.DisableHistory)
-		return;
 
-	if(VAlert[MAINS_FAIL_ALERT].Enable) // MAIN OFF 
-	{
-		InitBuffer(3);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[MAINS_FAIL_ALERT].Enable=0;
-		return;
-	}
-
-	if(VAlert[TILT_ALERT].Enable) // TILT 
-	{
-		InitBuffer(24);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[TILT_ALERT].Enable=0;	
-		return;
-	}
-
-	if(VAlert[TAMPER_ALERT].Enable)  // BOX TAMPER
-	{
-		InitBuffer(9);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[TAMPER_ALERT].Enable=0;	
-		return;
-	}
-
-	if(VAlert[OVER_SPEED_ALERT].Enable) //Over Speed
-	{
-		if(!IsOverSpeed)
-		{
-			InitBuffer(23);
-			ChangeToHistoryPacket(dataBuffer);
-			SavePacket();
-			IsOverSpeed=1;
-			return;
-		}
-	}
-	else if(IsOverSpeed)
-		IsOverSpeed=0;
-
-	if(VAlert[HARSH_BRK_ALERT].Enable) // Harsh Braking
-	{
-		InitBuffer(13);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[HARSH_BRK_ALERT].Enable=0;	
-		return;
-	}
-	
-	if(VAlert[HARSH_ACC_ALERT].Enable) // Harsh Accel
-	{
-		InitBuffer(14);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[HARSH_ACC_ALERT].Enable=0;	
-		return;
-	}
-
-	if(VAlert[RASH_TURN_ALERT].Enable) // Rash Turn
-	{
-		InitBuffer(15);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[RASH_TURN_ALERT].Enable=0;	
-		return;
-	}
-
-	if(VAlert[MAINS_RES_ALERT].Enable) // Mains Restore
-	{
-		InitBuffer(6);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[MAINS_RES_ALERT].Enable=0;	
-		return;
-	}
-
-	if(VAlert[BATT_LOW_ALERT].Enable) // Battery Low 
-	{
-		InitBuffer(4);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[BATT_LOW_ALERT].Enable=0;	
-		return;
-	}
-
-	if(VAlert[IGN_ON_ALERT].Enable) // IGNITION ON
-	{
-		InitBuffer(7);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[IGN_ON_ALERT].Enable=0;	
-		return;
-	}
-
-	if(VAlert[IGN_OFF_ALERT].Enable) // IGNITION OFF
-	{
-		InitBuffer(8);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[IGN_OFF_ALERT].Enable=0;	
-		return;
-	}
-
-	if(VAlert[BATT_LOW_RES_ALERT].Enable) // Battery Low Restore
-	{
-		InitBuffer(5);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[BATT_LOW_RES_ALERT].Enable=0;	
-		return;
-	}
-
-	if(VAlert[GFIN_ALERT].Enable) // GeoFence In
-	{
-		InitBuffer(17);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[GFIN_ALERT].Enable=0;
-		return;
-	}
-
-	if(VAlert[GFOUT_ALERT].Enable) // GeoFence Out
-	{
-		InitBuffer(18);
-		ChangeToHistoryPacket(dataBuffer);
-		SavePacket();
-		VAlert[GFOUT_ALERT].Enable=0;
-		return;
-	}
-	#endif
-}
-#endif
 
 void CheckAlerts(void)
 {
@@ -4631,7 +5032,7 @@ void CheckAlerts(void)
 		VAlert[BATT_LOW_RES_ALERT].Enable=0;	
 		return;
 	}
-	if(VAlert[GFIN_ALERT].Enable)
+	if(VAlert[GFIN_ALERT].IsSMS)
 	{
 		InitBuffer(17);
 		TCPSocket_SendString(&ServerSocket[0],dataBuffer);
@@ -4639,10 +5040,9 @@ void CheckAlerts(void)
 		#ifdef EXTENDED_IPS
 		TCPSocket_SendString(&ServerSocket[3],dataBuffer);
 		#endif
-		VAlert[GFIN_ALERT].Enable=0;
-		return;
+		VAlert[GFIN_ALERT].IsSMS=0;
 	}
-	if(VAlert[GFOUT_ALERT].Enable)
+	if(VAlert[GFOUT_ALERT].IsSMS)
 	{
 		InitBuffer(18);
 		TCPSocket_SendString(&ServerSocket[0],dataBuffer);
@@ -4650,8 +5050,7 @@ void CheckAlerts(void)
 		#ifdef EXTENDED_IPS
 		TCPSocket_SendString(&ServerSocket[3],dataBuffer);
 		#endif
-		VAlert[GFOUT_ALERT].Enable=0;
-		return;
+		VAlert[GFOUT_ALERT].IsSMS=0;
 	}
 
 }
@@ -4660,24 +5059,26 @@ void ChangeToHistoryPacket(char *buf)
 {
 	char *fn;
 	fn = Ql_strstr(buf,",NR,01");
-	if(fn)
+	if(!fn)
 	{
-		fn[5] = '2';
+		// Try alternate format with single digit
+		fn = Ql_strstr(buf,",NR,1");
+		if(!fn)
+			return;
+		// For ",NR,1", position is different (fn[4] instead of fn[5])
+		fn[4] = '2';
 	}
 	else
 	{
-		fn = Ql_strstr(buf,",NR,1");
-		if(fn)
-		{
-			fn[4] = '2';
-		}
+		// For ",NR,01"
+		fn[5] = '2';
 	}
 	
 	fn = Ql_strstr(buf,",L,");
-	if(fn)
-	{
-		fn[1] = 'H';
-	}
+	if(!fn)
+		return;
+	fn[1] = 'H';
+	LOGData(TAG_SERVER,"Changed to History Packet, Len :%d",Ql_strlen(buf));
 	return;
 }
 
@@ -4722,7 +5123,7 @@ uint16_t GetMemeryPercentage(void)
 void ProcessHistoryPacket(void)
 {
 	int size;
-	if(ServerSocket[0].SocketState != SOCKET_CONNECTED || VTSData.DisableHistory || IsMotaProcessing || IsFotaProcessing)
+	if(ServerSocket[0].SocketState != SOCKET_CONNECTED)
 		return;
 
 	#ifdef HISTORY_DISABLED
@@ -4793,6 +5194,7 @@ void ProcessHistoryPacket(void)
 	#ifndef PROTO_OG
 	if(Ql_strstr(dataBuffer,"$EPB"))
 	{
+		/* OLD CODE - COMMENTED OUT AS REQUESTED:
 		if(ServerSocket[1].SocketState >= SOCKET_CONNECTED)
 		{
 			LOGData(TAG_SERVER,"\r\nSending History EMG Packet...");
@@ -4811,11 +5213,31 @@ void ProcessHistoryPacket(void)
 		}
 		else
 			LOGData(TAG_SERVER,"\r\nEMG Server not Connected");
+		*/
+		// NEW CODE: Dynamic routing for history emergency packets based on Server 2 state
+		uint8_t isServer2Disabled = (VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A');
+		uint8_t socketToCheck = isServer2Disabled ? 0 : 1;
+		if(ServerSocket[socketToCheck].SocketState >= SOCKET_CONNECTED)
+		{
+			LOGData(TAG_SERVER,"\r\nSending History EMG Packet to Server %d...", socketToCheck + 1);
+			ChangeToHistoryEPB(dataBuffer);
+			if(TCPSocket_SendString(&ServerSocket[socketToCheck],dataBuffer))
+			{
+				#ifdef HISTORY_INTERNAL
+				DeleteLastPacket();
+				#else
+				DeleteHistoryData();
+				#endif
+			}
+		}
+		else
+			LOGData(TAG_SERVER,"\r\nHistory EMG Socket %d not Connected", socketToCheck + 1);
 		return;
 	}
 	#else
 	if(Ql_strstr(dataBuffer,"$,EPB"))
 	{
+		/* OLD CODE - COMMENTED OUT AS REQUESTED:
 		if(ServerSocket[1].SocketState >= SOCKET_CONNECTED)
 		{
 			LOGData(TAG_SERVER,"\r\nSending History EMG Packet...");
@@ -4834,6 +5256,25 @@ void ProcessHistoryPacket(void)
 		}
 		else
 			LOGData(TAG_SERVER,"\r\nEMG Server not Connected");
+		*/
+		// NEW CODE: Dynamic routing for history emergency packets based on Server 2 state
+		uint8_t isServer2Disabled = (VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A');
+		uint8_t socketToCheck = isServer2Disabled ? 0 : 1;
+		if(ServerSocket[socketToCheck].SocketState >= SOCKET_CONNECTED)
+		{
+			LOGData(TAG_SERVER,"\r\nSending History EMG Packet to Server %d...", socketToCheck + 1);
+			ChangeToHistoryEPB(dataBuffer);
+			if(TCPSocket_SendString(&ServerSocket[socketToCheck],dataBuffer))
+			{
+				#ifdef HISTORY_INTERNAL
+				DeleteLastPacket();
+				#else
+				DeleteHistoryData();
+				#endif
+			}
+		}
+		else
+			LOGData(TAG_SERVER,"\r\nHistory EMG Socket %d not Connected", socketToCheck + 1);
 		return;
 	}
 	#endif
@@ -4892,14 +5333,29 @@ void ProcessHistoryPacket(void)
 	#endif
 	#endif
 }
-#else
+#endif
+
+#if defined(PROTO_CDAC)
 
 uint8_t GetBatchData(void)
 {
 	uint16_t tf,resp;
 	uint8_t cc=0,nc=0;
+
+	/* Skip batch entirely while SOS/tamper emergency is pending.
+	 * Batch HTTP POST blocks the server thread for up to 50s (10s timeout ×
+	 * 5 retries after Fix C).  If SOS fires during that block the EPB10 cannot
+	 * be processed until the POST returns, and SOS may time out first.
+	 * Deferring batch until after the emergency clears costs at most one
+	 * normal-interval delay and guarantees the EPB gets through. */
+	if(SOS.IsSOS || SOS.IsSOSTamper || VAlert[SOS_OFF_ALERT].Enable) {
+		LOGData(TAG_SERVER, "GetBatchData: skipping batch — emergency state active (SOS=%d Tamp=%d SOSOff=%d)",
+			SOS.IsSOS, SOS.IsSOSTamper, VAlert[SOS_OFF_ALERT].Enable);
+		return 0;
+	}
+
 	tf=ReadFileTable();
-	char temp[120];
+	char temp[DATA_MAX_BUFF];
 	if((tf > 0 ) && (tf <= MAX_FILE))
 	{
 		if(tf > 2)
@@ -4914,17 +5370,16 @@ uint8_t GetBatchData(void)
 		if(resp)
 		{
 			int count;
-			for(count = 0; count < cc; count++)
+			for(count = 0; count < s_batchPacketsCount; count++)
 			{
-				ReadDataBatch(temp,ALERT,1,0,1);
+				if (s_batchPacketsSlots[count] >= 0)
+				{
+					DeleteDataBatchSlot(s_batchPacketsSlots[count]);
+				}
 			}
-
-
-			for(count = 0; count < nc; count++)
-			{
-				ReadDataBatch(temp,NORMAL,1,0,1);
-			}
-
+			s_batchPacketsCount = 0;
+			s_batchPacketsSlots[0] = -1;
+			s_batchPacketsSlots[1] = -1;
 
 			return 1;	
 		}
@@ -4934,7 +5389,15 @@ uint8_t GetBatchData(void)
 }
 
 
-#ifdef PROTO_CDAC
+#if defined(PROTO_CDAC)
+static uint8_t server1_offline = 0;
+static uint8_t server1_fail_count = 0;
+static uint32_t server1_offline_time = 0;
+#define SERVER1_COOLDOWN_MS 300000 // 5 minutes
+#define SERVER1_MAX_FAILURES 2
+#endif
+
+#if defined(PROTO_CDAC)
 uint8_t SendDataToServer(char* data, uint8_t KeepAlive, uint16_t currentIntervalSec)
 #else
 uint8_t SendDataToServer(char* data, uint8_t KeepAlive)
@@ -4942,10 +5405,14 @@ uint8_t SendDataToServer(char* data, uint8_t KeepAlive)
 {
 	int ret = 0;
 	uint8_t isGood=0;
+	uint8_t vlt_good=0;   /* set to 1 if VLT HTTP (Server 3) delivers the packet */
 	uint32_t connect_tmout = 3000;
 	uint32_t response_tmout = 3000;
 	if(GSM.GSMState != GPRS_ACTIVE)
+	{
+		LOGData(TAG_SERVER, "HTTP send deferred: GPRS not active (state=%d)", GSM.GSMState);
 		return ret;
+	}
 	#ifdef PROTO_CDAC
 	if(currentIntervalSec <= 5)
 	{
@@ -4967,182 +5434,267 @@ uint8_t SendDataToServer(char* data, uint8_t KeepAlive)
 		response_tmout = 30000;
 	}
 	#endif
-	static uint8_t https_initialized = 0;
-	uint8_t use_https = 0;
-	if(ServerSocket[0].DNSorIP != NULL &&
-	   Ql_strncmp(ServerSocket[0].DNSorIP, "https://", 8) == 0)
-	{
-		use_https = 1;
-		if(!https_initialized)
-		{
-			HTTPS_Initialize(0, HTTPS_SSL_VERSION_TLS12,
-			                 HTTPS_SECLEVEL_SERVER_AUTH,
-			                 "/mnt/ca.crt", NULL, NULL);
-			https_initialized = 1;
-		}
-	}
-
 	IsSendProcess=1;
 	if(HTTPConnectFlag==1)
-	{
 		LOGData(TAG_SERVER,"HTTP Send connect req flag already set!!!!");
-	}
-
 	HTTPConnectFlag=1;
-	for(int lp = 0; lp < 3;lp++)
+
+	uint8_t skip_server1 = 0;
+	#ifdef PROTO_CDAC
+	if(server1_offline)
 	{
-		uint32_t connect_wait_ms = connect_tmout;
-		LOGData(TAG_SERVER,"http post attempt %d/3",lp+1);
-		LOGData(TAG_SERVER,"[DBG_HTTP] HTTP_Setup to %s:%d, timeout=%ldms",
-		        ServerSocket[0].DNSorIP, ServerSocket[0].Port, connect_tmout);
-		if(use_https)
+		if(Ql_GetMsSincePwrOn() - server1_offline_time > SERVER1_COOLDOWN_MS)
 		{
-			if(!HTTPS_Setup(ServerSocket[0].DNSorIP, (uint16_t)ServerSocket[0].Port))
-			{
-				LOGData(TAG_SERVER,"[DBG_HTTP] HTTPS_Setup FAILED at attempt %d/3", lp+1);
-				HTTPConnectFlag = 1;
-				continue;
-			}
+			LOGData(TAG_SERVER, "Circuit Breaker: Cooldown elapsed. Probing Server 1 to check connectivity.");
 		}
 		else
 		{
+			LOGData(TAG_SERVER, "Circuit Breaker: Server 1 is OFFLINE. Skipping to prevent delay.");
+			skip_server1 = 1;
+		}
+	}
+	#endif
+
+	if(!skip_server1)
+	{
+		/* Single Server 1 attempt only. Retrying 3× would block VLT (Server 3)
+		 * for up to 3 × 30 s = 90 s on every send cycle when Server 1 is down.
+		 * The caller (HttpQueue_Process / handleCDACProtocol) already has its
+		 * own retry loop, so duplicate retries here compound the delay. */
+		for(int lp = 0; lp < 1;lp++)
+		{
+			uint32_t connect_wait_ms = connect_tmout;
+			LOGData(TAG_SERVER,"http post attempt %d/3",lp+1);
 			if(!HTTP_Setup(ServerSocket[0].DNSorIP, (uint16_t)ServerSocket[0].Port))
 			{
-				LOGData(TAG_SERVER,"[DBG_HTTP] HTTP_Setup FAILED at attempt %d/3", lp+1);
 				HTTPConnectFlag = 1;
 				continue;
 			}
-		}
-		LOGData(TAG_SERVER,"[DBG_HTTP] HTTP_Setup SUCCESS at attempt %d/3, waiting for socket connection", lp+1);
-		while(ServerSocket[0].SocketState != SOCKET_CONNECTED && connect_wait_ms > 0)
-		{
-			ThreadSleep(15);
-			if(connect_wait_ms > 15)
-				connect_wait_ms -= 15;
-			else
-				connect_wait_ms = 0;
-		}
-		if(ServerSocket[0].SocketState == SOCKET_CONNECTED)
-		{
-			uint32_t response_wait_ms = response_tmout;
-			isGood=1;
-			ThreadSleep(50);
-			HTTPConnectFlag=0;
-			LOGData(TAG_SERVER,"Device to Server [%d]: ",Ql_strlen(data));
-			// Prevent DBG_BUFFER overflow - truncate if data is too long
-			if (Ql_strlen(data) > 400) {
-				char log_sample[401];
-				Ql_memset(log_sample, 0, sizeof(log_sample));
-				Ql_strncpy(log_sample, data, 400);
-				LOGData(TAG_SERVER,"%s...(truncated)", log_sample);
-			} else {
-				LOGData(TAG_SERVER,"%s", data);
-			}
-			IsHTTPRes=0;
-			LOGData(TAG_SERVER,"[TRACE] Calling HTTP_Post, datalen=%d", Ql_strlen(data));
-			if(use_https)
-				ret = HTTPS_Post(KeepAlive, 0, data, Ql_strlen(data));
-			else
-				ret = HTTP_Post(KeepAlive, 0, data, Ql_strlen(data), 0);
-			LOGData(TAG_SERVER,"[TRACE] HTTP_Post returned: ret=%d, IsHTTPRes=%d", ret, IsHTTPRes);
-			if(!ret)
+			while(ServerSocket[0].SocketState != SOCKET_CONNECTED && connect_wait_ms > 0)
 			{
-				LOGData(TAG_SERVER,"[TRACE] HTTP_Post failed (ret=0), setting HTTPConnectFlag=1 for retry");
-				HTTPConnectFlag = 1;
-				continue;
+				ThreadSleep(15);
+				if(connect_wait_ms > 15)
+					connect_wait_ms -= 15;
+				else
+					connect_wait_ms = 0;
 			}
-			#ifdef HTTP_SIMULATE
-			while(!ServerSocket[0].isRXData)
+			if(ServerSocket[0].SocketState == SOCKET_CONNECTED)
 			{
-				if(ServerSocket[0].SocketState != SOCKET_CONNECTED)
-				{
-					LOGData(TAG_SERVER,"HTTP Server Premature Disconnection!");
-					response_wait_ms =0;
-					if(KeepAlive || lp < 2)
-						HTTPConnectFlag = 1;
-					break;
+				uint32_t response_wait_ms = response_tmout;
+				isGood=1;
+				ThreadSleep(50);
+				HTTPConnectFlag=0;
+				LOGData(TAG_SERVER,"Device to Server [%d]: ",Ql_strlen(data));
+				// Prevent DBG_BUFFER overflow - truncate if data is too long
+				if (Ql_strlen(data) > 400) {
+					char log_sample[401];
+					Ql_memset(log_sample, 0, sizeof(log_sample));
+					Ql_strncpy(log_sample, data, 400);
+					LOGData(TAG_SERVER,"%s...(truncated)", log_sample);
+				} else {
+					LOGData(TAG_SERVER,"%s", data);
 				}
-				if(response_wait_ms <= 30)
+				IsHTTPRes=0;
+				ret = HTTP_Post(KeepAlive,0,data,Ql_strlen(data),0);
+				if(!ret)
 				{
-					LOGData(TAG_SERVER,"No responce from HTTP Server !");
-					response_wait_ms = 0;
-					break;
+					HTTPConnectFlag = 1;
+					continue;
 				}
-				ThreadSleep(30);
-				response_wait_ms -= 30;
-			}
-			if(!ServerSocket[0].isRXData)
-			{
-				HTTP_Close(0);
-				HTTPConnectFlag=1;
-				continue;
-			}
-			if(response_wait_ms!=0)
-			{
-				LOGData(TAG_SERVER,"Parsing Server 1 Data...");
-				print_long_string((const char*)ServerSocket[0].rxBuffer);
-				DecodeOTAData(ServerSocket[0].rxBuffer,1);
-				LOGData(TAG_SERVER,"Parsing done");
-				Ql_memset(ServerSocket[0].rxBuffer,0,ServerSocket[0].rxSizeMAX);
-				ServerSocket[0].isRXData=0;
-				break; //all done , dont retry
-			}
-			#else
-			{
-				uint32_t response_start_ms = response_wait_ms;
-				while(use_https ? !IsHTTPSRes : !IsHTTPRes)
+				#ifdef HTTP_SIMULATE
+				while(!ServerSocket[0].isRXData)
 				{
+					if(ServerSocket[0].SocketState != SOCKET_CONNECTED)
+					{
+						LOGData(TAG_SERVER,"HTTP Server Premature Disconnection!");
+						response_wait_ms =0;
+						if(KeepAlive || lp < 2)
+							HTTPConnectFlag = 1;
+						break;
+					}
 					if(response_wait_ms <= 30)
 					{
-						uint32_t elapsed = response_start_ms - response_wait_ms;
-						LOGData(TAG_SERVER,"[TIMEOUT] No response from HTTP Server! Elapsed=%ldms", elapsed);
+						LOGData(TAG_SERVER,"No responce from HTTP Server !");
 						response_wait_ms = 0;
 						break;
 					}
 					ThreadSleep(30);
 					response_wait_ms -= 30;
 				}
-			}
-			if(response_wait_ms!=0)
-			{
-				LOGData(TAG_SERVER,"\r\nParsing Server 1 Data...");
-				print_long_string((const char*)ServerSocket[0].rxBuffer);
-				DecodeOTAData(ServerSocket[0].rxBuffer,1);
-				Ql_memset(ServerSocket[0].rxBuffer,0,ServerSocket[0].rxSizeMAX);
-				ServerSocket[0].isRXData=0;
-			}
-			if(!KeepAlive)
-			{
-				if(use_https)
-					HTTPS_Close();
-				else
+				if(!ServerSocket[0].isRXData)
+				{
 					HTTP_Close(0);
+					HTTPConnectFlag=1;
+					continue;
+				}
+				if(response_wait_ms!=0)
+				{
+					LOGData(TAG_SERVER,"Parsing Server 1 Data...");
+					print_long_string((const char*)ServerSocket[0].rxBuffer);
+					DecodeOTAData(ServerSocket[0].rxBuffer,1);
+					LOGData(TAG_SERVER,"Parsing done");
+					Ql_memset(ServerSocket[0].rxBuffer,0,ServerSocket[0].rxSizeMAX);
+					ServerSocket[0].isRXData=0;
+					break; //all done , dont retry
+				}
+				#else
+				while(!IsHTTPRes)
+				{
+					if(response_wait_ms <= 30)
+					{
+						LOGData(TAG_SERVER,"No responce from HTTP Server !");
+						response_wait_ms = 0;
+						break;
+					}
+					ThreadSleep(30);
+					response_wait_ms -= 30;
+					/* Service RS232/RS485 while waiting so commands are not dropped */
+					if(RS232_DataAvailable) ProcessRS232OTAData();
+					if(RS485_DataAvailable) ProcessRS485OTAData();
+				}
+				if(response_wait_ms!=0)
+				{
+					LOGData(TAG_SERVER,"\r\nParsing Server 1 Data...");
+					print_long_string((const char*)ServerSocket[0].rxBuffer);
+					DecodeOTAData(ServerSocket[0].rxBuffer,1);
+					Ql_memset(ServerSocket[0].rxBuffer,0,ServerSocket[0].rxSizeMAX);
+					ServerSocket[0].isRXData=0;
+					if(!KeepAlive)
+						HTTP_Close(0);
+					break; /* success — do not retry */
+				}
+				if(!KeepAlive)
+					HTTP_Close(0);
+				#endif
 			}
-				break;  // <-- ADD THIS: exit retry loop on any completed attempt
-			#endif
+			else
+			{
+				LOGData(TAG_SERVER,"HTTP not connected to send data !");
+			}
+		}
+
+		#ifdef PROTO_CDAC
+		if(isGood && ret)
+		{
+			if(server1_offline)
+			{
+				LOGData(TAG_SERVER, "Circuit Breaker: Server 1 is BACK ONLINE.");
+			}
+			server1_fail_count = 0;
+			server1_offline = 0;
 		}
 		else
 		{
-			LOGData(TAG_SERVER,"HTTP not connected to send data !");
+			server1_fail_count++;
+			if(server1_fail_count >= SERVER1_MAX_FAILURES)
+			{
+				server1_offline = 1;
+				server1_offline_time = Ql_GetMsSincePwrOn();
+				LOGData(TAG_SERVER, "Circuit Breaker: Server 1 connection failed consecutively %d times. Marking OFFLINE.", server1_fail_count);
+			}
 		}
+		#endif
 	}
-	if(!isGood){
+	/* Send the same packet to Server 3 via HTTP if it has an http(s):// URL.
+	 * This runs regardless of isGood so Server 3 receives data even when
+	 * Server 1 (CDAC) is unreachable. */
+	if(IsHttpUrl(ServerSocket[2].DNSorIP) && ServerSocket[2].Port > 0)
+	{
+		LOGData(TAG_SERVER, "VLT HTTP: Sending to %s:%d", ServerSocket[2].DNSorIP, ServerSocket[2].Port);
+		/* HTTP_Setup() reuses an existing connected session without switching the URL.
+		 * Close any live Server 1 session so HTTP_Setup() opens a fresh connection
+		 * to Server 3's URL instead of silently posting to Server 1 again. */
+		HTTP_Close(0);
+		ServerSocket[0].SocketState = SOCKET_IDLE;
+		ThreadSleep(500);
+		for(int lp3 = 0; lp3 < 3; lp3++)
+		{
+			LOGData(TAG_SERVER, "VLT HTTP: attempt %d/3", lp3 + 1);
+			if(!HTTP_Setup(ServerSocket[2].DNSorIP, (uint16_t)ServerSocket[2].Port))
+			{
+				HTTPConnectFlag = 1;
+				continue;
+			}
+			uint32_t vlt_connect_ms = 10000;
+			while(ServerSocket[0].SocketState != SOCKET_CONNECTED && vlt_connect_ms > 0)
+			{
+				ThreadSleep(15);
+				vlt_connect_ms = (vlt_connect_ms > 15) ? vlt_connect_ms - 15 : 0;
+			}
+			if(ServerSocket[0].SocketState == SOCKET_CONNECTED)
+			{
+				ThreadSleep(50);
+				HTTPConnectFlag = 0;
+				LOGData(TAG_SERVER, "VLT HTTP: Device to Server [%d]: %s", Ql_strlen(data), data);
+				IsHTTPRes = 0;
+				int vlt_ret = HTTP_Post(KeepAlive, 0, data, Ql_strlen(data), 0);
+				if(!vlt_ret)
+				{
+					HTTPConnectFlag = 1;
+					continue;
+				}
+				uint32_t vlt_resp_ms = 10000;
+				while(!IsHTTPRes)
+				{
+					if(vlt_resp_ms <= 30)
+					{
+						LOGData(TAG_SERVER, "VLT HTTP: No response from server!");
+						vlt_resp_ms = 0;
+						break;
+					}
+					ThreadSleep(30);
+					vlt_resp_ms -= 30;
+					/* Service RS232/RS485 while waiting */
+					if(RS232_DataAvailable) ProcessRS232OTAData();
+					if(RS485_DataAvailable) ProcessRS485OTAData();
+				}
+				if(vlt_resp_ms != 0)
+				{
+					vlt_good = 1;
+					LOGData(TAG_SERVER, "\r\nParsing Server 3 Data...");
+					print_long_string((const char*)ServerSocket[0].rxBuffer);
+					DecodeOTAData(ServerSocket[0].rxBuffer, OTA_SRC_SCK_3);
+					Ql_memset(ServerSocket[0].rxBuffer, 0, ServerSocket[0].rxSizeMAX);
+					ServerSocket[0].isRXData = 0;
+					if(!KeepAlive)
+						HTTP_Close(0);
+					break;
+				}
+				if(!KeepAlive)
+					HTTP_Close(0);
+			}
+			else
+			{
+				LOGData(TAG_SERVER, "VLT HTTP: not connected to send data!");
+			}
+		}
+		/* VLT HTTP_Setup() used the single shared M66 QHTTP session, which tears
+		 * down any active CDAC keepalive. Force CDAC to reconnect on next packet. */
+		HTTPConnectFlag = 1;
+		ServerSocket[0].SocketState = SOCKET_IDLE;
+	}
+	/* Mirror every CDAC packet to Server 3 via TCP when ServerSocket[2] is a raw
+	 * TCP endpoint (bare IP:port, no http:// prefix). The VLT HTTP block above
+	 * handles the http:// case; this handles the TCP case. */
+	else if(ServerSocket[2].isEnabled &&
+	        ServerSocket[2].Port > 0 &&
+	        ServerSocket[2].SocketState == SOCKET_CONNECTED)
+	{
+		LOGData(TAG_SERVER, "TCP Mirror: Sending to Server 3 (%s:%d)",
+		        ServerSocket[2].DNSorIP, ServerSocket[2].Port);
+		TCPSocket_SendString(&ServerSocket[2], data);
+	}
+
+	/* Return 1 if EITHER Server 1 (CDAC) OR Server 3 (VLT HTTP) delivered
+	 * the packet. Without vlt_good, the HTTP queue would see failure and
+	 * re-send a packet that VLT already accepted. */
+	if(!isGood && !vlt_good){
 		IsSendProcess=0;
 		return 0;
 	}
-	#ifdef HTTP_SIMULATE
-	#ifdef KEEP_ALIVE
-	if(!KeepAlive)
-		HTTP_Close(0);
-	#else
-	HTTP_CLose();
-	if(KeepAlive)
-		HTTPConnectFlag=1;
-	#endif
-	
-	#endif
+
 	IsSendProcess=0;
-	return ret;
+	return (isGood && ret) ? 1 : (uint8_t)vlt_good;
 }
 #endif
 uint8_t IsFTPReq;
@@ -5235,15 +5787,10 @@ static void handleLoginRequests(void) {
 }
 
 static void handlePackets(void) {
-    // Handle alerts if primary server (Server 1) is connected
-    if(ServerSocket[0].SocketState == SOCKET_CONNECTED) {
+    // Handle alerts if any server is connected
+    if(ServerSocket[0].SocketState == SOCKET_CONNECTED || ServerSocket[2].SocketState==SOCKET_CONNECTED) {
         CheckAlerts();
     }
-#ifndef PROTO_CDAC
-    else {
-        SaveOfflineAlerts();
-    }
-#endif
 
 #ifndef PROTO_CDAC
     // Handle history packets
@@ -5299,40 +5846,21 @@ static void handleNormalPackets(void) {
         // Handle SOS alerts
         if(VAlert[SOS_ON_ALERT].Enable) {
             EmergencyPacket(1); // SOS ON ALERT
-            // NEW CODE: Dynamic routing based on Server 2 state with history fallback
+            /* OLD CODE - COMMENTED OUT AS REQUESTED:
+            if(ServerSocket[1].SocketState == SOCKET_CONNECTED) {
+                TCPSocket_SendString(&ServerSocket[1], dataBuffer);
+            }
+            */
+            // NEW CODE: Dynamic routing based on Server 2 state
             if (VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A') {
                 // Server 2 is disabled, route EPB to Server 1
                 if (ServerSocket[0].SocketState == SOCKET_CONNECTED) {
                     TCPSocket_SendString(&ServerSocket[0], dataBuffer);
-                } else {
-                    #ifndef HISTORY_DISABLED
-                    if(!VTSData.DisableHistory)
-                    {
-                        ChangeToHistoryEPB(dataBuffer);
-                        #ifdef HISTORY_INTERNAL
-                        SavePacket();
-                        #else
-                        WriteHistoryData(dataBuffer);
-                        #endif
-                    }
-                    #endif
                 }
             } else {
                 // Server 2 is enabled, route EPB to Server 2
                 if (ServerSocket[1].SocketState == SOCKET_CONNECTED) {
                     TCPSocket_SendString(&ServerSocket[1], dataBuffer);
-                } else {
-                    #ifndef HISTORY_DISABLED
-                    if(!VTSData.DisableHistory)
-                    {
-                        ChangeToHistoryEPB(dataBuffer);
-                        #ifdef HISTORY_INTERNAL
-                        SavePacket();
-                        #else
-                        WriteHistoryData(dataBuffer);
-                        #endif
-                    }
-                    #endif
                 }
             }
         }
@@ -5363,15 +5891,11 @@ static void handleNormalPackets(void) {
         if(VAlert[SOS_ON_ALERT].Enable) {
             EmergencyPacket(1); //SOS Packet Save
 			#ifndef HISTORY_DISABLED
-			if(!VTSData.DisableHistory)
-			{
-				ChangeToHistoryEPB(dataBuffer);
-				#ifdef HISTORY_INTERNAL
-				SavePacket();
-				#else
-				WriteHistoryData(dataBuffer); 
-				#endif
-			}
+            #ifdef HISTORY_INTERNAL
+            SavePacket();
+            #else
+            WriteHistoryData(dataBuffer); 
+            #endif
 			#endif
         }
     }
@@ -5413,12 +5937,6 @@ static void handleHealthPackets(void) {
     #endif
 }
 
-static void handleSensorData(void) {
-    #ifndef PROTO_CDAC
-    ProcessSensors();
-    #endif
-}
-
 // Main server thread entry point
 void ServerThreadEntry(s32 taskId) {
     server_thread_init(taskId);
@@ -5429,6 +5947,16 @@ void ServerThreadEntry(s32 taskId) {
         // Handle profile update requests	
         handleProfileRequests();
 
+#ifdef ENABLE_UNIFIED_FIRMWARE
+        GetCurrentInterval();
+        ServerThreadTimeout=0;
+        handleFTPRequests();
+        handleIncomingMessages();
+        handleRFIDData();
+        handleLoginRequests();
+        handlePackets();
+        handleServerResponses();
+#else
         #ifndef PROTO_CDAC
         // Get current interval and reset timeout
         GetCurrentInterval();
@@ -5452,19 +5980,17 @@ void ServerThreadEntry(s32 taskId) {
         // Handle server responses
         handleServerResponses();
 
-        // Handle sensors
-        handleSensorData();
-
         #else
         // PROTO_CDAC specific handling
         handleCDACProtocol();
         #endif
+#endif
 
         ThreadSleep(100);
     }
 }
 
-#ifdef PROTO_CDAC
+#if defined(PROTO_CDAC)
 static void storeAlertsWhileInSOS(void) {
 	if(!IsPackeAlert) {
 		return;
@@ -5472,123 +5998,125 @@ static void storeAlertsWhileInSOS(void) {
 
 	for(int i = 0; i < IsPackeAlert; i++) {
 		StoreFileToFlash(CriticalString[i], ALERT);
+		RemoveNonRepeatAlert(CriticalAlertIdx[i]);
 	}
 }
-
-/*
- * ============================================================================
- * CDAC CRITICAL PACKET HANDLING (VLT State: Critical Alert State)
- * ============================================================================
- * 
- * Per CDAC Protocol Document - Section 1.VLT States:
- * 
- * CRITICAL ALERT STATE REQUIREMENTS:
- * 1. Send Critical Alert Packet (CRT) IMMEDIATELY when critical alert occurs
- * 2. Critical alerts: Alert IDs 16(wire-cut), 03(battery), 17(overspeed), 
- *                     22(tilt), 09(box open), 20(geofence overspeed), 23(impact)
- * 3. Alert Priority: Emergency > Wire-cut > Battery > TILT > BoxOpen > Overspeed...
- * 4. Multiple alerts at same time: Send ALL as separate CRT packets in priority order
- * 5. Continuous alerts (tilt, wire-cut, overspeed):
- *    - First packet: send immediately
- *    - Subsequent packets: send at next update interval (UR/URT/URS)
- * 6. All critical alerts sent as LIVE packets (status='L'), NOT batched
- * 7. Critical alert SMS to configured mobile numbers:
- *    - Send after packet (not before) - PACKET HAS PRIORITY
- *    - If GPRS unavailable: send SMS immediately instead of waiting
- *    - Format for M0 (Control Centre): ID,IMEI,VehNo,Date,Time,Lat,Dir,Lon,Dir
- *    - Format for M1-M3: Human readable (AlertName VehNo Date Time Lat Lon)
- *    - Continuous alerts: SMS every 30 minutes after first SMS
- * 8. HTTP Connection Management:
- *    - Keep connection OPEN between critical packets (for priority ordering)
- *    - KeepAlive=1 if more critical packets follow
- *    - KeepAlive=0 for last critical packet (can close connection)
- * 9. Failure Handling:
- *    - If SendDataToServer fails: store packet to flash for offline retry
- *    - Retry when GPRS/HTTP becomes available again
- * 10. Emergency State Override:
- *    - During emergency (SOS): send at URE interval (typically 5 seconds)
- *    - Use EmergencyInterval for timeout calculation
- * 
- * TIMEOUT RULES:
- * - Emergency/SOS state: Use EmergencyInterval (e.g., 5 seconds)
- * - Continuous alert (Tilt/Overspeed): Use CurrentInterval (e.g., 20 seconds)
- * - Standard critical: Use 30-second timeout
- * ============================================================================
- */
 
 static void handleCriticalPackets(void) {
 	uint16_t resp = 0;
 	uint16_t criticalTimeout;
 	uint8_t isEmergencyState;
-	uint8_t keepAliveNextPacket;
 
-	if(SendLogin1!=2)
-	{
-		return;
-	}
     IsCritical = MakeCriticalString(1);
     IsPacketReady.IsCriticalPacket = 0;
     
-    if(IsCritical) 
-	{
+    if(IsCritical) {
         VehicleState.PacketState = CRITICAL;
-        //LOGData(TAG_SERVER, "[CDAC] Critical packet ready: %d packets", IsCritical);
+        LOGData(TAG_SERVER, "%d critical packet ready", IsCritical);
 
-		isEmergencyState = SOS.IsSOS || SOS.IsSOSTamper;
+		/* SOS_OFF_ALERT must also bypass the queue — after timeout ResetSOS() clears
+		 * IsSOS, so the EPB11 packet would fall into the normal queue path and sit
+		 * behind NRM packets until evicted to flash.  Include it in emergency bypass. */
+		isEmergencyState = SOS.IsSOS || SOS.IsSOSTamper || VAlert[SOS_OFF_ALERT].Enable;
 		if(isEmergencyState) {
 			criticalTimeout = VTSData.IntervalData.EnergencyInterval;
-			//LOGData(TAG_SERVER, "[CDAC] Emergency state: timeout=%d sec", criticalTimeout);
 		}
 		else if((PeriPheralVal.IsTilt && VAlert[TILT_ALERT].Enable) ||
 				(IsOverSpeed && VAlert[OVER_SPEED_ALERT].Enable)) {
 			criticalTimeout = VTSData.IntervalData.CurrentInterval;
-			//LOGData(TAG_SERVER, "[CDAC] Continuous alert (Tilt/Speed): timeout=%d sec", criticalTimeout);
 		}
 		else {
 			criticalTimeout = 30;
-			//LOGData(TAG_SERVER, "[CDAC] Standard critical: timeout=%d sec", criticalTimeout);
 		}
         
         for(int i = 0; i < IsCritical; i++) {
-			// CDAC Requirement: Keep connection open between critical packets for priority ordering
-			// Send current packet, keep connection alive if more critical packets follow
-			keepAliveNextPacket = (IsCritical - i > 1) ? 1 : 0;
-			
-			//LOGData(TAG_SERVER, "[CDAC] Sending critical packet %d/%d, keepAlive=%d", 
-			//		i+1, IsCritical, keepAliveNextPacket);
-
 			#ifdef HTTP_QUEUE
-			if(HttpQueue_Add(CriticalString[i], criticalTimeout, HTTP_QUEUE_TYPE_ALERT)) {
-				//LOGData(TAG_SERVER, "[CDAC] Critical packet queued");
-				resp = 1;
-				if(SOS.IsSOSSMS) {
-					SMSAlert(SOS.IsSOSSMS);
-					SOS.IsSOSSMS = 0;
+			if(!isEmergencyState) {
+				/* Normal critical: use queue for ordered, rate-limited delivery */
+				if(HttpQueue_Add(CriticalString[i], criticalTimeout, HTTP_QUEUE_TYPE_ALERT)) {
+					resp = 1;
+					RemoveNonRepeatAlert(CriticalAlertIdx[i]);
+					if(SOS.IsSOSSMS) {
+						SMSAlert(SOS.IsSOSSMS);
+						SOS.IsSOSSMS = 0;
+					}
+					continue;
 				}
-				continue;
+				else {
+					LOGData(TAG_SERVER, "Critical packet queue failed, storing to flash");
+					StoreFileToFlash(CriticalString[i], ALERT);
+					RemoveNonRepeatAlert(CriticalAlertIdx[i]);
+					if(SOS.IsSOSSMS) {
+						SMSAlert(SOS.IsSOSSMS);
+						SOS.IsSOSSMS = 0;
+					}
+					continue;
+				}
+			} else {
+				/* Emergency SOS/tamper: bypass HttpQueue entirely.
+				 * Queue ordering delays SOS EPB by up to queue_size × per_send_time
+				 * (~100s) because the EPB lands at TAIL behind 10 existing items.
+				 * Pause the queue thread, then wait for BOTH IsSendProcess AND
+				 * httpQueue.sending — pausing stops new sends but an in-progress
+				 * HttpQueue_Process() call may already be inside SendDataToServer().
+				 * Waiting for both flags prevents a concurrent double-POST.
+				 *
+				 * If the wait times out (HTTP stuck — e.g. CDAC server taking 10s+
+				 * to reject): force-abort via HttpQueue_AbortSend().  Without this,
+				 * a single failing HTTP batch POST blocks the server thread for the
+				 * entire SOS timeout window and the EPB never gets a send attempt. */
+				HttpQueue_Pause();
+				{
+					uint8_t w = 0;
+					while((IsSendProcess || HttpQueue_IsSending()) && w < 30) {
+						ThreadSleep(100);
+						w++;
+					}
+					if(IsSendProcess || HttpQueue_IsSending()) {
+						LOGData(TAG_SERVER, "Emergency: HTTP still busy after 3s — aborting for SOS EPB");
+						HttpQueue_AbortSend();
+						ThreadSleep(200);
+					}
+				}
 			}
 			#endif
-			
-			// CDAC Requirement: Send critical packets IMMEDIATELY (highest priority)
-			// Mark as live packet (status='L' is already set in MakeCriticalString)
+
 			resp = SendDataToServer(CriticalString[i],
-                keepAliveNextPacket,
+                IsPacketReady.IsNormalPacket ||
+                IsPacketReady.IsHealthPacket ||
+                IsPacketReady.IsFullPacket ||
+				(IsCritical - i > 1),
 				criticalTimeout);
-                
-            if(!resp) {
-            	//LOGData(TAG_SERVER, "[CDAC] Critical packet send FAILED - storing to flash");
-                StoreFileToFlash(CriticalString[i], ALERT);
-            }
-			else {
-				LOGData(TAG_SERVER, "[CDAC] Critical packet sent successfully");
-				// CDAC Requirement: Send SMS after successful packet send
-				// Priority: Packet first, then SMS
-				if(SOS.IsSOSSMS) {
-					LOGData(TAG_SERVER, "[CDAC] Sending SMS alert");
-					SMSAlert(SOS.IsSOSSMS);
-					SOS.IsSOSSMS = 0;
-				}
+
+			#ifdef HTTP_QUEUE
+			if(isEmergencyState) {
+				HttpQueue_Resume();
 			}
+			#endif
+
+            if(!resp) {
+				/* Do NOT store EPB10 (SOS_ON) to flash while SOS is still active.
+				 * The Systic critical interval will re-set IsCriticalPacket every
+				 * EmergencyInterval seconds and retry the EPB automatically.
+				 * Storing it now would produce a duplicate: the retry sends it
+				 * directly, then after SOS clears the batch sends the flash copy.
+				 * Only write to flash if SOS has already timed out (IsSOS=0),
+				 * so the EPB can still reach the server via store-and-forward. */
+				if(CriticalAlertIdx[i] == SOS_ON_ALERT && SOS.IsSOS) {
+					LOGData(TAG_SERVER, "EPB10 not stored to flash — SOS active, critical interval will retry");
+				} else {
+					StoreFileToFlash(CriticalString[i], ALERT);
+				}
+            }
+			else if(SOS.IsSOSSMS) {
+				SMSAlert(SOS.IsSOSSMS);
+				SOS.IsSOSSMS = 0;
+			}
+			/* Deferred removal: alert is now either sent or stored for retry.
+			 * Only skip removal if both send and flash fallback failed (resp==0
+			 * and StoreFileToFlash had nowhere to write) — not detectable here,
+			 * so remove unconditionally to prevent stale re-pack. */
+			RemoveNonRepeatAlert(CriticalAlertIdx[i]);
         }
     }
     VehicleState.PacketState = NORMAL;
@@ -5597,67 +6125,50 @@ static void handleCriticalPackets(void) {
 static void handleRepeatingCriticalPackets(void) {
 	uint16_t resp = 0;
 	uint16_t critInterval;
-	uint8_t keepAliveNextPacket;
-	uint8_t isEmergencyState;
 
 	if(!IsCritical) {
 		return;
 	}
 
 	VehicleState.PacketState = CRITICAL;
-	isEmergencyState = SOS.IsSOS || SOS.IsSOSTamper;
-	if(isEmergencyState) {
-		critInterval = VTSData.IntervalData.EnergencyInterval;
-		//LOGData(TAG_SERVER, "[CDAC] Repeating critical in emergency mode: interval=%d sec", critInterval);
-	}
-	else {
-		critInterval = VTSData.IntervalData.CurrentInterval;
-		//LOGData(TAG_SERVER, "[CDAC] Repeating critical in normal mode: interval=%d sec", critInterval);
-	}
+	critInterval = (SOS.IsSOS || SOS.IsSOSTamper) ?
+		VTSData.IntervalData.EnergencyInterval :
+		VTSData.IntervalData.CurrentInterval;
 
-	//LOGData(TAG_SERVER, "[CDAC] Repeating critical packet: %d packets", IsCritical);
+	LOGData(TAG_SERVER, "%d Repeating critical packet ready", IsCritical);
 	for(int i = 0; i < IsCritical; i++) {
-		// CDAC Requirement: Keep connection open between critical packets for priority ordering
-		keepAliveNextPacket = (IsCritical - i > 1) ? 1 : 0;
-		
-		//LOGData(TAG_SERVER, "[CDAC] Sending repeating critical packet %d/%d, keepAlive=%d", 
-		//		i+1, IsCritical, keepAliveNextPacket);
-
 		#ifdef HTTP_QUEUE
 		if(HttpQueue_Add(CriticalString[i], critInterval, HTTP_QUEUE_TYPE_ALERT)) {
-			//LOGData(TAG_SERVER, "[CDAC] Repeating critical packet queued");
 			resp = 1;
+			RemoveNonRepeatAlert(CriticalAlertIdx[i]);
+			continue;
+		}
+		else {
+			LOGData(TAG_SERVER, "Repeating critical packet queue failed, storing to flash");
+			StoreFileToFlash(CriticalString[i], ALERT);
+			RemoveNonRepeatAlert(CriticalAlertIdx[i]);
 			continue;
 		}
 		#endif
-		
-		// CDAC Requirement: Send as live packet (not batch)
 		resp = SendDataToServer(CriticalString[i],
-			keepAliveNextPacket,
+			IsPacketReady.IsCriticalPacket ||
+			IsPacketReady.IsHealthPacket ||
+			IsPacketReady.IsFullPacket ||
+			(IsCritical - i > 1),
 			critInterval);
 
 		if(!resp) {
-			//LOGData(TAG_SERVER, "[CDAC] Repeating critical packet send FAILED - storing to flash");
 			StoreFileToFlash(CriticalString[i], ALERT);
 		}
-		else {
-			//LOGData(TAG_SERVER, "[CDAC] Repeating critical packet sent successfully");
-		}
+		RemoveNonRepeatAlert(CriticalAlertIdx[i]);
 	}
 
 	VehicleState.PacketState = NORMAL;
 }
 
-
 static void handleNormalCDACPackets(void) {
     IsPacketReady.IsNormalPacket = 0;
-    
-    // ENSURE LOGIN IS SENT FIRST - Only handle critical packets after login (SendLogin1 == 2)
-    if(SendLogin1 != 2) {
-        //LOGData(TAG_SERVER, "[CDAC_LOGIN_GUARD] Skipping critical packets until login sent. SendLogin1=%d", SendLogin1);
-        return;  // Skip all packet handling until login is sent
-    }
-    
+
     // Handle critical packets first
     IsCritical = MakeCriticalString(0);
     if(IsCritical) {
@@ -5687,6 +6198,13 @@ static void handleNonSOSAlerts(void) {
 
 	LOGData(TAG_SERVER, "%d alert packet ready", IsPackeAlert);
 	for(int i = 0; i < IsPackeAlert; i++) {
+		if(i > 0) {
+			LOGData(TAG_SERVER, "Logging lower-priority alert to flash: ID=%s", VAlert[CriticalAlertIdx[i]].ID);
+			StoreFileToFlash(CriticalString[i], ALERT);
+			RemoveNonRepeatAlert(CriticalAlertIdx[i]);
+			continue;
+		}
+
 		if((PeriPheralVal.IsTilt && VAlert[TILT_ALERT].Enable) ||
 		   (IsOverSpeed && VAlert[OVER_SPEED_ALERT].Enable)) {
 			alertTimeout = 5;
@@ -5696,8 +6214,15 @@ static void handleNonSOSAlerts(void) {
 		}
 
 		#ifdef HTTP_QUEUE
-		if(HttpQueue_Add(CriticalString[i], alertTimeout, HTTP_QUEUE_TYPE_NORMAL)) {
+		if(HttpQueue_Add(CriticalString[i], alertTimeout, HTTP_QUEUE_TYPE_ALERT)) {
 			resp = 1;
+			RemoveNonRepeatAlert(CriticalAlertIdx[i]);
+			continue;
+		}
+		else {
+			LOGData(TAG_SERVER, "Alert packet queue failed, storing to flash");
+			StoreFileToFlash(CriticalString[i], ALERT);
+			RemoveNonRepeatAlert(CriticalAlertIdx[i]);
 			continue;
 		}
 		#endif
@@ -5710,8 +6235,9 @@ static void handleNonSOSAlerts(void) {
 			alertTimeout);
 
 		if(!resp) {
-			StoreFileToFlash(CriticalString[i], NORMAL);
+			StoreFileToFlash(CriticalString[i], ALERT);
 		}
+		RemoveNonRepeatAlert(CriticalAlertIdx[i]);
 	}
 }
 
@@ -5719,34 +6245,40 @@ static void handleRegularPackets(void) {
 	uint16_t resp = 0;
 	uint8_t hasContinuousCritical;
 
-	if(GPS.Speed >= VTSData.VehicleData.OverSpeed) {
-		LOGData(TAG_SERVER, "[NRM_DEBUG] BLOCKED by Speed: %.1f >= %.1f", 
-				GPS.Speed, VTSData.VehicleData.OverSpeed);
-		return;
-	}
-
 	hasContinuousCritical = SOS.IsSOS || SOS.IsSOSTamper ||
 		(VAlert[TILT_ALERT].Enable && VAlert[TILT_ALERT].AlertSent) ||
 		VAlert[SOS_OFF_ALERT].Enable;
 
+	LOGData(TAG_SERVER, "NRM guard: OVS=%d IsSOS=%d IsTamp=%d TiltEnSnt=%d%d SOSOff=%d",
+		IsOverSpeed, SOS.IsSOS, SOS.IsSOSTamper,
+		VAlert[TILT_ALERT].Enable, VAlert[TILT_ALERT].AlertSent,
+		VAlert[SOS_OFF_ALERT].Enable);
+
 	if(IsOverSpeed || hasContinuousCritical) {
-		LOGData(TAG_SERVER, "[NRM_DEBUG] BLOCKED by ContinuousCrit: IsOvrSpd=%d SOS=%d SOSTemper=%d Tilt=%d SOS_OFF=%d",
-				IsOverSpeed, SOS.IsSOS, SOS.IsSOSTamper,
-				(VAlert[TILT_ALERT].Enable && VAlert[TILT_ALERT].AlertSent),
-				VAlert[SOS_OFF_ALERT].Enable);
 		return;
 	}
 
 	if(GetBatchData()) {
-		LOGData(TAG_SERVER, "[NRM_DEBUG] BLOCKED by GetBatchData (batch packets in storage)");
 		return;
 	}
 
-	LOGData(TAG_SERVER, "[NRM_DEBUG] PROCEEDING: Making normal packet");
-	MakeNormalPacket();  // This should be called
-	//LOGData(TAG_SERVER, "NRM Packet: %s", SendString);  // Add debug
+	MakeNormalPacket();
+	LOGData(TAG_SERVER, "Normal Packet ready");
 	#ifdef HTTP_QUEUE
+	/* Deduplication: if the queue already holds a pending normal packet, replace
+	 * its data with the current snapshot (fresh timestamp) instead of appending.
+	 * Without this, CDAC failures cause the queue to fill with NRM packets that
+	 * all share the same frozen GPS/RTC timestamp, producing duplicates on-server. */
+	if(HttpQueue_Count() > 0 && HttpQueue_HasNormalPending()) {
+		HttpQueue_ReplaceLatestNormal(SendString, VTSData.IntervalData.CurrentInterval);
+		return;
+	}
 	if(HttpQueue_Add(SendString, VTSData.IntervalData.CurrentInterval, HTTP_QUEUE_TYPE_NORMAL)) {
+		return;
+	}
+	else {
+		LOGData(TAG_SERVER, "Normal packet queue failed, storing to flash");
+		StoreFileToFlash(SendString, NORMAL);
 		return;
 	}
 	#endif
@@ -5809,9 +6341,19 @@ static void handleCDACProtocol(void) {
 	handleFTPRequests();
 
 	if(IsSMS) {
-		LOGData(TAG_SERVER, "\r\nParsing SMS Data...");
+		LOGData(TAG_SERVER, "\r\nParsing SNS Data...");
 		DecodeOTAData(SMSData, 0);
 		IsSMS = 0;
+	}
+
+	if(RS232_DataAvailable) {
+		LOGData(TAG_SERVER, "\r\nParsing RS232 OTA Data...");
+		ProcessRS232OTAData();
+	}
+
+	if(RS485_DataAvailable) {
+		LOGData(TAG_SERVER, "\r\nParsing RS485 OTA Data...");
+		ProcessRS485OTAData();
 	}
 
 	if(ServerSocket[0].isRXData) {
@@ -5825,55 +6367,40 @@ static void handleCDACProtocol(void) {
 	if(ServerSocket[2].isRXData) {
 		LOGData(TAG_SERVER, "\r\nParsing Server 2 Data...");
 		DecodeOTAData(ServerSocket[2].rxBuffer, 2);
+		Ql_memset(ServerSocket[2].rxBuffer, 0, ServerSocket[2].rxSizeMAX);
 		ServerSocket[2].isRXData = 0;
 	}
 
-	// Handle RS232 OTA data
-	if(RS232_DataAvailable) {
-		LOGData(TAG_SERVER, "\r\nParsing RS232 OTA Data...");
-		ProcessRS232OTAData();
-	}
-	
-	// Handle RS485 OTA data
-	if(RS485_DataAvailable) {
-		LOGData(TAG_SERVER, "\r\nParsing RS485 OTA Data...");
-		ProcessRS485OTAData();
-	}
-
-    if(GSM.GSMState >= SIM_DETECTED && GSM.IsTimeSet) 
-	{
-        LOGData(TAG_SERVER, "[DBG_CDAC] Ready: GSMState=%d, TimeSet=%d, SendLogin1=%d, Socket0.State=%d, Socket2.State=%d",
-                GSM.GSMState, GSM.IsTimeSet, SendLogin1, ServerSocket[0].SocketState, ServerSocket[2].SocketState);
-        
-		// Handle login
-		if(SendLogin1==1) 
-		{
-			LoginPacket();
-			SendLogin1 = 2;  // Mark as completed BEFORE sending    // Clear FIRST before any send attempt
+    if(GSM.GSMState >= SIM_DETECTED && GSM.IsTimeSet) {
+        // Handle login
+        if(SendLogin1) {
+            LoginPacket();
+            LOGData(TAG_SERVER, "login packet ready");
 			#ifdef HTTP_QUEUE
 			if(HttpQueue_Add(SendString, VTSData.IntervalData.CurrentInterval, HTTP_QUEUE_TYPE_NORMAL)) {
+				SendLogin1 = 0;
 				return;
 			}
 			#endif
-			SendDataToServer(SendString, 0, VTSData.IntervalData.CurrentInterval);
-		}
-
-
-
+			resp = SendDataToServer(SendString, 0, VTSData.IntervalData.CurrentInterval);
+            if(resp) {
+                SendLogin1 = 0;
+            }
+        }
         // Handle other packets
         else {
             // Handle critical packets
             if(IsPacketReady.IsCriticalPacket) {
-               handleCriticalPackets();
+                handleCriticalPackets();
 				criticalHandled = 1;
+				/* Reset IsCritical so the same cycle's HEALTH/FULL packets
+				 * are not suppressed by a stale non-zero count. */
+				IsCritical = 0;
             }
 
             // Handle normal packets
             if(IsPacketReady.IsNormalPacket) {
                 handleNormalCDACPackets();
-				if(criticalHandled) {
-					IsCritical = 0;
-				}
             }
 
             // Handle health packets
@@ -5882,7 +6409,7 @@ static void handleCDACProtocol(void) {
             }
 			// Handle full packets
 			if(IsPacketReady.IsFullPacket) {
-                handleFullCDACPackets(); 
+                handleFullCDACPackets();
             }
         }
     }

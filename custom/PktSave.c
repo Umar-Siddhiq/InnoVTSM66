@@ -441,10 +441,7 @@ void FTK_ApplyVariation(FTKConfigtypedef *config)
     config->Noofsats += delta;
     if (config->Noofsats < 4) config->Noofsats = 4;
     if (config->Noofsats > 8) config->Noofsats = 8;
-
-    LOGData(TAG_BACKUP, "IndoorGPS: Lat=%.6f, Long=%.6f, Spd=%.2f, Alt=%.2f, HDOP=%.2f, PDOP=%.2f, Heading=%.2f, Sats=%d",
-            config->Lat, config->Long, config->Speed, config->Altitude,
-            config->HDOP, config->PDOP, config->Heading, config->Noofsats);
+    LOGData(TAG_BACKUP, "IndoorGPS: Sats=%d", config->Noofsats);
 }
 
 
@@ -489,8 +486,7 @@ uint8_t EnableFTKLogs(uint16_t interval)
         FTKConfig.Heading = FTK_LOG_HEADING;
         FTKConfig.Noofsats = FTK_LOG_SATS;
 
-        LOGData(TAG_BACKUP,"FTK Enabling with Default Values: Lat=%f, Long=%f, Speed=%f, Altitude=%f, HDOP=%f, PDOP=%f, Heading=%f, Noofsats=%d",
-                FTKConfig.Lat, FTKConfig.Long, FTKConfig.Speed, FTKConfig.Altitude, FTKConfig.HDOP, FTKConfig.PDOP, FTKConfig.Heading, FTKConfig.Noofsats);
+        LOGData(TAG_BACKUP,"FTK Enabling with Default Values: Sats=%d", FTKConfig.Noofsats);
     }
     else
     {
@@ -502,8 +498,7 @@ uint8_t EnableFTKLogs(uint16_t interval)
         FTKConfig.PDOP = GPS.PDOP;
         FTKConfig.Heading = GPS.Heading;
         FTKConfig.Noofsats = GPS.NoOfSatalite;
-        LOGData(TAG_BACKUP,"FTK Enabled with GPS Values: Lat=%f, Long=%f, Speed=%f, Altitude=%f, HDOP=%f, PDOP=%f, Heading=%f, Noofsats=%d",
-            FTKConfig.Lat, FTKConfig.Long, FTKConfig.Speed, FTKConfig.Altitude, FTKConfig.HDOP, FTKConfig.PDOP, FTKConfig.Heading, FTKConfig.Noofsats);
+        LOGData(TAG_BACKUP,"FTK Enabled with GPS Values: Sats=%d", FTKConfig.Noofsats);
     }
     
     FTKConfig.FTK_LastPacketTime = FTK_DeductTime(FTKConfig.FTK_LastPacketTime, 60 * 60); // Deduct 1 hour for initial time

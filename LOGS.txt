@@ -1,0 +1,2722 @@
+M66_QuecOpen_GS3_SDK_V2.6
+HYPER: Thread GPRS Thread initialized. TaskId: 1, taskIndex: 0
+GPRS: thread initialized successfully
+HYPER: Thread Systic Thread initialized. TaskId: 2, taskIndex: 1
+HYPER: Thread MCU Rcv Thread initialized. TaskId: 3, taskIndex: 2
+MCU: UART port opened successfully
+
+HYPER: Thread GPS Thread initialized. TaskId: 4, taskIndex: 3
+GPS: GPS thread initialized successfully
+HYPER: Thread HTTP initialized. TaskId: 5, taskIndex: 4
+SERVER: HTTP thread started
+SERVER: HTTP queue merged into HTTP thread
+HYPER: Thread Server Thread initialized. TaskId: 6, taskIndex: 5
+SERVER: Server thread initialized successfully
+HYPER: Thread Hardware Thread initialized. TaskId: 7, taskIndex: 6
+HARDWARE: Hardware thread initialized successfully
+MAIN: <-- RIL is ready -->
+
+SMS: <-- SMS context reset -->
+
+MAIN: OpenCPU: APM AIS140 Firware Version 1.5.8, State/Proto: CD1
+
+SYSTIC: Heartbeat timer started successfully.
+HARDWARE: GPIO 1 initialized for LED 0
+HARDWARE: GPIO 2 initialized for LED 1
+HARDWARE: GPIO 3 initialized for LED 2
+HARDWARE: GPIO 5 initialized for LED 3
+LED: LED Manager Initialized with 18 patterns
+FILE: File not found: UFSConfig.bin. Loading default.
+
+FILE: IP1:http://surakshamitr.org/CDC
+FILE: File saved: UFSConfig.bin (2336 bytes)
+
+SERVER: Primary URL updated: http://surakshamitr.org/CDC:443
+SERVER: Secondary URL updated: http://78.46.190.117/vlt:50024 (mode=HTTP)
+SERVER: Tertiary URL updated: NA:0 (mode=TCP)
+FILE: File not found: State.bin. Loading default.
+
+FILE: File saved: State.bin (56 bytes)
+
+FILE: File not found: ActiveProfile.bin. Loading default.
+
+FILE: File saved: ActiveProfile.bin (12 bytes)
+
+FILE: ActiveProfile.bin missing; last active SIM profile unset
+FILE: File not found: FotaConfig.bin. Loading default.
+
+FILE: File not found: Diag.bin. Loading default.
+
+DIAG: Loading diagnostic defaults (Diag.bin missing or corrupted)
+FILE: File saved: Diag.bin (1440 bytes)
+
+DIAG: Diag.bin not found â€” defaults initialised
+BOOT: === BOOT COMPLETE === FW:1.5.8 SIM:ID3P Profile:0 BootCount:0 ===
+EMG: SOS Input Pin Init Success
+EMG: SOS NC: pin idle at boot (button connected and at rest)
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:2 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:0 -->
+
+SYSTIC: NTick: 1/60  CTick: 0/5  HTick: 1/3600  FTick: 1/7200  Vehicle Mode: H
+LED: GSM LED State: 0 -> 1
+LED: Battery LED State: 21 -> 20
+MAIN: <-- Received URC: type: 5, -->
+
+MAIN: <-- CFUN Status:1 -->
+
+GPS: gpstmpdata allocated at: 0x1a7cc (size: 4096)
+GPS: last_nmea_data allocated at: 0x1b7d4 (size: 4096)
+GPS: UART port opened successfully
+
+GPS: GPS UART sent: $PAIR864,0,0,115200*1B
+
+
+GPRS: Device IMEI: 868329088549211
+GPRS: STK enabled successfully
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=0
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MAIN: <-- Received URC: type: 2, -->
+
+MAIN: <-- SIM Card Status:1 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:2 -->
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SYSTIC: NTick: 2/60  CTick: 0/5  HTick: 2/3600  FTick: 2/7200  Vehicle Mode: H
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=99
+GPS: Command timeout
+
+GPS: Failed to set GPS baudrate.maybe already set
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404438011257901
+
+GPRS: SIM No: 8991430008112579011
+
+GPRS: TimeSync: starting QNITZ+CTZU configuration
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: !!! AT+CFUN=1,1 IMMINENT â€” reason: TimeSync (QNITZ/CTZU config change commit) !!!
+GPRS: TimeSync: setup OK (reset_applied=1)
+GPRS: Auto Time Sync Set
+
+PROFILE: BSNL ICCID cache is empty or contains dirty bootstrap prefix, forcing switch to BSNL profile to read actual ICCID
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Profile switch requested to 2
+PROFILE: REG_DENIED flow: checking SMS/STK readiness before switch, reason=profile-switch-request
+PROFILE: SMS not ready for profile switch, reinit attempt at 0/30000 ms
+SMS: <-- SMS context reset -->
+
+LED: GSM LED State: 1 -> 5
+LED: Battery LED State: 20 -> 21
+GPS: Successfully switched GPS baudrate to 115200
+
+GPS: NO GGA Packet!
+GPS: GPS Not Fixed
+
+LED: GPS LED State: 12 -> 10
+GPS: GPS Not Fixed
+
+M66_QuecOpen_GS3_SDK_V2.6
+HYPER: Thread GPRS Thread initialized. TaskId: 1, taskIndex: 0
+GPRS: thread initialized successfully
+HYPER: Thread Systic Thread initialized. TaskId: 2, taskIndex: 1
+HYPER: Thread MCU Rcv Thread initialized. TaskId: 3, taskIndex: 2
+MCU: UART port opened successfully
+
+HYPER: Thread GPS Thread initialized. TaskId: 4, taskIndex: 3
+GPS: GPS thread initialized successfully
+HYPER: Thread HTTP initialized. TaskId: 5, taskIndex: 4
+SERVER: HTTP thread started
+SERVER: HTTP queue merged into HTTP thread
+HYPER: Thread Server Thread initialized. TaskId: 6, taskIndex: 5
+SERVER: Server thread initialized successfully
+HYPER: Thread Hardware Thread initialized. TaskId: 7, taskIndex: 6
+HARDWARE: Hardware thread initialized successfully
+MAIN: <-- RIL is ready -->
+
+SMS: <-- SMS context reset -->
+
+MAIN: OpenCPU: APM AIS140 Firware Version 1.5.8, State/Proto: CD1
+
+SYSTIC: Heartbeat timer started successfully.
+HARDWARE: GPIO 1 initialized for LED 0
+HARDWARE: GPIO 2 initialized for LED 1
+HARDWARE: GPIO 3 initialized for LED 2
+HARDWARE: GPIO 5 initialized for LED 3
+LED: LED Manager Initialized with 18 patterns
+FILE: File loaded: UFSConfig.bin (2336 bytes)
+
+GEOFENCE: GeoState reset - waiting for first GPS fix
+SERVER: Primary URL updated: http://surakshamitr.org/CDC:443
+SERVER: Secondary URL updated: http://78.46.190.117/vlt:50024 (mode=HTTP)
+SERVER: Tertiary URL updated: NA:0 (mode=TCP)
+FILE: File loaded: State.bin (56 bytes)
+
+FILE: File loaded: ActiveProfile.bin (12 bytes)
+
+FILE: ActiveProfile.bin loaded: profile=0 reason=0 uptime=0 timeout=0
+BOOT: Restored profile connection timeout: 0 s for profile 0
+FILE: File not found: FotaConfig.bin. Loading default.
+
+FILE: File loaded: Diag.bin (1440 bytes)
+
+DIAG: Diag.bin loaded: boots=0, wdt_resets=0, prf_switches=0, gsm_hangs=0
+DIAG:               reg_denied=0, csq99=0, gprs_fails=0, gsm_resets=0
+DIAG:               last_boot_reason=0, last_profile=0, ring_entries=0/50
+DIAG: --- Last events (newest first) ---
+DIAG: ----------------------------------
+BOOT: === BOOT COMPLETE === FW:1.5.8 SIM:ID3P Profile:0 BootCount:0 ===
+EMG: SOS Input Pin Init Success
+EMG: SOS NC: pin idle at boot (button connected and at rest)
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:2 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:0 -->
+
+SYSTIC: NTick: 1/60  CTick: 0/5  HTick: 1/3600  FTick: 1/7200  Vehicle Mode: H
+MAIN: <-- Received URC: type: 5, -->
+
+MAIN: <-- CFUN Status:1 -->
+
+LED: GSM LED State: 0 -> 1
+LED: Battery LED State: 21 -> 20
+GPS: gpstmpdata allocated at: 0x1a7cc (size: 4096)
+GPS: last_nmea_data allocated at: 0x1b7d4 (size: 4096)
+GPS: UART port opened successfully
+
+GPS: GPS UART sent: $PAIR864,0,0,115200*1B
+
+
+GPRS: Device IMEI: 868329088549211
+GPRS: STK already enabled
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=0
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MAIN: <-- Received URC: type: 2, -->
+
+MAIN: <-- SIM Card Status:1 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:2 -->
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SYSTIC: NTick: 2/60  CTick: 0/5  HTick: 2/3600  FTick: 2/7200  Vehicle Mode: H
+GPS: Command timeout
+
+GPS: Failed to set GPS baudrate.maybe already set
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=99
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404438011257901
+
+LED: Battery LED State: 20 -> 21
+GPRS: SIM No: 8991430008112579011
+
+GPRS: TimeSync: starting QNITZ+CTZU configuration
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: TimeSync: setup OK (reset_applied=0)
+GPRS: Auto Time Sync Set
+
+PROFILE: BSNL ICCID cache is empty or contains dirty bootstrap prefix, forcing switch to BSNL profile to read actual ICCID
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Profile switch requested to 2
+PROFILE: REG_DENIED flow: checking SMS/STK readiness before switch, reason=profile-switch-request
+PROFILE: SMS not ready for profile switch, reinit attempt at 0/30000 ms
+SMS: <-- SMS context reset -->
+
+SMS: Fail to set SMS storage, cause:-1
+
+GPS: Successfully switched GPS baudrate to 115200
+
+GPS: NO GGA Packet!
+GPS: GPS Not Fixed
+
+LED: GSM LED State: 1 -> 5
+LED: GPS LED State: 12 -> 10
+SYSTIC: Profile connection timeout in  1/600
+SYSTIC: NTick: 3/60  CTick: 0/5  HTick: 3/3600  FTick: 3/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+PROFILE: SMS not ready for profile switch, reinit attempt at 1000/30000 ms
+SMS: <-- SMS context reset -->
+
+SMS: Fail to set SMS storage, cause:-1
+
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 2 -->
+
+SYSTIC: Profile connection timeout in  2/600
+SYSTIC: NTick: 4/60  CTick: 0/5  HTick: 4/3600  FTick: 4/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 3F 02 82 08 
+MCU: 70 00 F9 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 3F 02 82 08 
+MCU: 70 00 F9 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 575, final:14.24
+BLE: Bluetooth name set from device VendorID: APMG-868329088549211
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 3 -->
+
+MAIN: 
+<-- SMS module is ready -->
+
+MAIN: 
+<-- Initialize SMS-related options -->
+
+GPS: GPS Rcv While Processing Data
+
+GPS: Data sample(200): $GNRMC,235949.012,V,,,,,,,050180,,,N,V*26
+$GNGGA,235949.012,,,,,0,0,,,M,,M,,*55
+$GNVTG,,T,,M,,N,,K,N*32
+$GNGSA,A,1,,,,,,,,,,,,,,,,1*1D
+$GNGSA,A,1,,,,,,,,,,,,,,,,3*1F
+$GNGSA,A,1,,,,,,,,,,,,,,,,6*1
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_SET_CMD,used:0,total:25
+SMS: <-- Set SMS storage to SM, nUsed:0,nTotal:25 -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: <-- Check SMS storage: curMem=0, used=0, total=25 -->
+
+SMS: <-- Enable new SMS indication -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: Delete all existed messages
+
+SMS: <-- SMS environment initialization OK -->
+
+SYSTIC: Profile connection timeout in  3/600
+SYSTIC: NTick: 5/60  CTick: 0/5  HTick: 5/3600  FTick: 5/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+GPRS: STK already enabled
+PROFILE: SMS/STK ready for profile switch after 2000 ms
+PROFILE: REG_DENIED flow: executing profile switch attempt 1/2 target=2(BSNL) reason=profile-switch-request
+PROFILE: [before-profile-switch] cur=0(NONE) req=2(BSNL) fails=[0,0,0,0,0] CSQ=18 creg=2 cgatt=2
+GPRS: STK Setup TR  [0]: 810301250082028281830100
+GPRS: Setup command Success
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+BLE: Bluetooth initialized successfully
+BLE: Bluetooth visibility set successfully.
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SYSTIC: Profile connection timeout in  4/600
+SYSTIC: NTick: 6/60  CTick: 0/5  HTick: 6/3600  FTick: 6/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: HttpQueue Status: count=0, sending=0, IsSendProcess=0
+GPRS: STK Setup ENV [1]: D30782020181900101
+GPRS: Setup command Success
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPS: GPS Not Fixed
+
+SYSTIC: Profile connection timeout in  5/600
+SYSTIC: NTick: 7/60  CTick: 0/5  HTick: 7/3600  FTick: 7/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SYSTIC: Profile connection timeout in  6/600
+SYSTIC: NTick: 8/60  CTick: 0/5  HTick: 8/3600  FTick: 8/7200  Vehicle Mode: H
+GPRS: STK Profile TR  [2]: 810301240082028281830100900102
+GPRS: Profile command sent, waiting for IMSI change
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:5 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:0 -->
+
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SYSTIC: Profile connection timeout in  7/600
+SYSTIC: NTick: 9/60  CTick: 0/5  HTick: 9/3600  FTick: 9/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Entry!!
+
+SERVER: 
+Server Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:0 -->
+
+MAIN: <-- Received URC: type: 2, -->
+
+MAIN: <-- SIM Card Status:1 -->
+
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:2 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:2 -->
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  8/600
+SYSTIC: NTick: 10/60  CTick: 0/5  HTick: 10/3600  FTick: 10/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  9/600
+SYSTIC: NTick: 11/60  CTick: 0/5  HTick: 11/3600  FTick: 11/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SYSTIC: Profile connection timeout in  10/600
+SYSTIC: NTick: 12/60  CTick: 0/5  HTick: 12/3600  FTick: 12/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  11/600
+SYSTIC: NTick: 13/60  CTick: 0/5  HTick: 13/3600  FTick: 13/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+GPRS: Profile Successfully Changed
+GPRS: Prev IMSI: 404438011257901
+GPRS: New IMSI: 404720210685209
+PROFILE: SWITCH VERIFIED: 0(NONE)->2(BSNL) IMSI_before=404438011257901 IMSI_after=404720210685209
+DIAG: EVENT type=1(PRF_SWITCH) p1=0 p2=2 detail=[imsi-changed] uptime=16
+FILE: File saved: Diag.bin (1440 bytes)
+
+GPRS: Profile 2 switch successful, resetting fail count
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+FILE: File saved: State.bin (56 bytes)
+
+GPRS: Saved BSNL ICCID to Flash during switch: 8991430008112579011
+GPRS: SwitchProfile updated SIMNo: 8991430008112579011
+PROFILE: REG_DENIED flow: IMSI changed, profile switch verified on attempt 1/2
+GPRS: Profile switch to 2 successful
+FILE: File saved: State.bin (56 bytes)
+
+FILE: File saved: ActiveProfile.bin (12 bytes)
+
+FILE: ActiveProfile saved: profile=2 reason=0 uptime=17
+GPRS: Profile switch successful, initiating reset
+LED: GSM LED State: 5 -> 1
+GPS: GPS Not Fixed
+
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 2 -->
+
+SYSTIC: Profile connection timeout in  12/120
+SYSTIC: NTick: 14/60  CTick: 0/5  HTick: 14/3600  FTick: 14/7200  Vehicle Mode: H
+GPRÓM66_QuecOpen_GS3_SDK_V2.6
+HYPER: Thread GPRS Thread initialized. TaskId: 1, taskIndex: 0
+GPRS: thread initialized successfully
+HYPER: Thread Systic Thread initialized. TaskId: 2, taskIndex: 1
+HYPER: Thread MCU Rcv Thread initialized. TaskId: 3, taskIndex: 2
+MCU: UART port opened successfully
+
+HYPER: Thread GPS Thread initialized. TaskId: 4, taskIndex: 3
+GPS: GPS thread initialized successfully
+HYPER: Thread HTTP initialized. TaskId: 5, taskIndex: 4
+SERVER: HTTP thread started
+SERVER: HTTP queue merged into HTTP thread
+HYPER: Thread Server Thread initialized. TaskId: 6, taskIndex: 5
+SERVER: Server thread initialized successfully
+HYPER: Thread Hardware Thread initialized. TaskId: 7, taskIndex: 6
+HARDWARE: Hardware thread initialized successfully
+MAIN: <-- RIL is ready -->
+
+SMS: <-- SMS context reset -->
+
+MAIN: OpenCPU: APM AIS140 Firware Version 1.5.8, State/Proto: CD1
+
+SYSTIC: Heartbeat timer started successfully.
+HARDWARE: GPIO 1 initialized for LED 0
+HARDWARE: GPIO 2 initialized for LED 1
+HARDWARE: GPIO 3 initialized for LED 2
+HARDWARE: GPIO 5 initialized for LED 3
+LED: LED Manager Initialized with 18 patterns
+FILE: File loaded: UFSConfig.bin (2336 bytes)
+
+GEOFENCE: GeoState reset - waiting for first GPS fix
+SERVER: Primary URL updated: http://surakshamitr.org/CDC:443
+SERVER: Secondary URL updated: http://78.46.190.117/vlt:50024 (mode=HTTP)
+SERVER: Tertiary URL updated: NA:0 (mode=TCP)
+FILE: File loaded: State.bin (56 bytes)
+
+FILE: File loaded: ActiveProfile.bin (12 bytes)
+
+FILE: ActiveProfile.bin loaded: profile=2 reason=0 uptime=17 timeout=0
+BOOT: Restored profile connection timeout: 0 s for profile 2
+FILE: File not found: FotaConfig.bin. Loading default.
+
+FILE: File loaded: Diag.bin (1440 bytes)
+
+DIAG: Diag.bin loaded: boots=0, wdt_resets=0, prf_switches=1, gsm_hangs=0
+DIAG:               reg_denied=0, csq99=0, gprs_fails=0, gsm_resets=0
+DIAG:               last_boot_reason=0, last_profile=0, ring_entries=1/50
+DIAG: --- Last events (newest first) ---
+DIAG:   EVT[0] uptime=16 type=1 p1=0 p2=2 detail=[imsi-changed]
+DIAG: ----------------------------------
+BOOT: === BOOT COMPLETE === FW:1.5.8 SIM:ID3P Profile:2 BootCount:0 ===
+EMG: SOS Input Pin Init Success
+EMG: SOS NC: pin idle at boot (button connected and at rest)
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:2 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:0 -->
+
+SYSTIC: NTick: 1/60  CTick: 0/5  HTick: 1/3600  FTick: 1/7200  Vehicle Mode: H
+MAIN: <-- Received URC: type: 5, -->
+
+MAIN: <-- CFUN Status:1 -->
+
+LED: GSM LED State: 0 -> 1
+LED: Battery LED State: 21 -> 20
+GPS: gpstmpdata allocated at: 0x1a7cc (size: 4096)
+GPS: last_nmea_data allocated at: 0x1b7d4 (size: 4096)
+GPS: UART port opened successfully
+
+GPS: GPS UART sent: $PAIR864,0,0,115200*1B
+
+
+GPRS: Device IMEI: 868329088549211
+GPRS: STK already enabled
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=2(BSNL) CSQ=0
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MAIN: <-- Received URC: type: 2, -->
+
+MAIN: <-- SIM Card Status:1 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:2 -->
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SYSTIC: NTick: 2/60  CTick: 0/5  HTick: 2/3600  FTick: 2/7200  Vehicle Mode: H
+GPS: GPS Rcv While Processing Data
+
+GPS: Data sample(200): ‘C‘äJ¡CÁa5sá£bl8ÐÙJ/='ÿ
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=2(BSNL) CSQ=99
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+GPRS: TimeSync: starting QNITZ+CTZU configuration
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPS: Command timeout
+
+GPS: Failed to set GPS baudrate.maybe already set
+
+GPRS: TimeSync: setup OK (reset_applied=0)
+GPRS: Auto Time Sync Set
+
+PROFILE: BSNL ICCID cache is empty or contains dirty bootstrap prefix, forcing switch to BSNL profile to read actual ICCID
+FILE: File saved: State.bin (56 bytes)
+
+GPRS: Profile switch requested to 2
+PROFILE: REG_DENIED flow: checking SMS/STK readiness before switch, reason=profile-switch-request
+PROFILE: SMS not ready for profile switch, reinit attempt at 0/30000 ms
+SMS: <-- SMS context reset -->
+
+LED: GSM LED State: 1 -> 5
+SMS: Fail to set SMS storage, cause:-1
+
+LED: Battery LED State: 20 -> 21
+GPS: Successfully switched GPS baudrate to 115200
+
+GPS: NO GGA Packet!
+GPS: GPS Not Fixed
+
+LED: GPS LED State: 12 -> 10
+SYSTIC: Profile connection timeout in  1/120
+SYSTIC: NTick: 3/60  CTick: 0/5  HTick: 3/3600  FTick: 3/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+PROFILE: SMS not ready for profile switch, reinit attempt at 1000/30000 ms
+SMS: <-- SMS context reset -->
+
+SMS: Fail to set SMS storage, cause:-1
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 3F 02 8D 08 
+MCU: 71 00 FA 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 3F 02 8D 08 
+MCU: 71 00 FA 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 575, final:14.24
+BLE: Bluetooth name set from device VendorID: APMG-868329088549211
+SYSTIC: Profile connection timeout in  2/120
+SYSTIC: NTick: 4/60  CTick: 0/5  HTick: 4/3600  FTick: 4/7200  Vehicle Mode: H
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 2 -->
+
+GPS: GPS Not Fixed
+
+PROFILE: SMS not ready for profile switch, reinit attempt at 2000/30000 ms
+SMS: <-- SMS context reset -->
+
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 3 -->
+
+MAIN: 
+<-- SMS module is ready -->
+
+MAIN: 
+<-- Initialize SMS-related options -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_SET_CMD,used:0,total:25
+SMS: <-- Set SMS storage to SM, nUsed:0,nTotal:25 -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_SET_CMD,used:0,total:25
+SMS: <-- Set SMS storage to SM, nUsed:0,nTotal:25 -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: <-- Check SMS storage: curMem=0, used=0, total=25 -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: <-- Check SMS storage: curMem=0, used=0, total=25 -->
+
+SMS: <-- Enable new SMS indication -->
+
+SMS: <-- Enable new SMS indication -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: Delete all existed messages
+
+SMS: <-- SMS environment initialization OK -->
+
+PROFILE: SMS reinit OK for profile switch
+SMS: Delete all existed messages
+
+SMS: <-- SMS environment initialization OK -->
+
+GPS: GPS Not Fixed
+
+GPRS: STK already enabled
+PROFILE: SMS/STK ready for profile switch after 2000 ms
+PROFILE: REG_DENIED flow: executing profile switch attempt 1/2 target=2(BSNL) reason=profile-switch-request
+SYSTIC: Profile connection timeout in  3/120
+SYSTIC: NTick: 5/60  CTick: 0/5  HTick: 5/3600  FTick: 5/7200  Vehicle Mode: H
+PROFILE: [before-profile-switch] cur=2(BSNL) req=2(BSNL) fails=[0,0,0,0,0] CSQ=99 creg=2 cgatt=2
+GPRS: STK Setup TR  [0]: 810301250082028281830100
+GPRS: Setup command Success
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+BLE: Bluetooth initialized successfully
+BLE: Bluetooth visibility set successfully.
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  4/120
+SYSTIC: NTick: 6/60  CTick: 0/5  HTick: 6/3600  FTick: 6/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+GPRS: STK Setup ENV [1]: D30782020181900101
+GPRS: Setup command Success
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: HttpQueue Status: count=0, sending=0, IsSendProcess=0
+SYSTIC: Profile connection timeout in  5/120
+SYSTIC: NTick: 7/60  CTick: 0/5  HTick: 7/3600  FTick: 7/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+GPRS: STK Profile TR  [2]: 810301240082028281830100900102
+GPRS: Profile command sent, waiting for IMSI change
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SYSTIC: Profile connection timeout in  6/120
+SYSTIC: NTick: 8/60  CTick: 0/5  HTick: 8/3600  FTick: 8/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Entry!!
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  7/120
+SYSTIC: NTick: 9/60  CTick: 0/5  HTick: 9/3600  FTick: 9/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  8/120
+SYSTIC: NTick: 10/60  CTick: 0/5  HTick: 10/3600  FTick: 10/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  9/120
+SYSTIC: NTick: 11/60  CTick: 0/5  HTick: 11/3600  FTick: 11/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  10/120
+SYSTIC: NTick: 12/60  CTick: 0/5  HTick: 12/3600  FTick: 12/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+GPRS: !!!!!!!!!!!! Unable to change profile (IMSI same - profile likely doesn't exist)
+GPRS: Prev IMSI: 404720210685209
+GPRS: New IMSI: 404720210685209
+GPRS: Profile 2 switch failed (non-existent profile), fail count: 1
+FILE: File saved: State.bin (56 bytes)
+
+PROFILE: REG_DENIED flow: profile switch attempt 1/2 failed; IMSI unchanged or STK command failed
+DIAG: EVENT type=2(PRF_FAIL) p1=2 p2=1 detail=[switch-retry] uptime=15
+FILE: File saved: Diag.bin (1440 bytes)
+
+PROFILE: REG_DENIED flow: retrying once after SMS/STK reinit
+PROFILE: REG_DENIED flow: checking SMS/STK readiness before switch, reason=profile-switch-retry
+GPRS: STK already enabled
+PROFILE: SMS/STK ready for profile switch after 0 ms
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  11/120
+SYSTIC: NTick: 13/60  CTick: 0/5  HTick: 13/3600  FTick: 13/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+PROFILE: REG_DENIED flow: executing profile switch attempt 2/2 target=2(BSNL) reason=profile-switch-request
+SERVER: Hardware Thread Paused For Profile Update
+PROFILE: [before-profile-switch-retry] cur=2(BSNL) req=2(BSNL) fails=[0,0,1,0,0] CSQ=99 creg=2 cgatt=2
+GPRS: STK Setup TR  [0]: 810301250082028281830100
+GPRS: Setup command Success
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  12/120
+SYSTIC: NTick: 14/60  CTick: 0/5  HTick: 14/3600  FTick: 14/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPRS: STK Setup ENV [1]: D30782020181900101
+GPRS: Setup command Success
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SYSTIC: Profile connection timeout in  13/120
+SYSTIC: NTick: 15/60  CTick: 0/5  HTick: 15/3600  FTick: 15/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  14/120
+SYSTIC: NTick: 16/60  CTick: 0/5  HTick: 16/3600  FTick: 16/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPRS: STK Profile TR  [2]: 810301240082028281830100900102
+GPRS: Profile command sent, waiting for IMSI change
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: HttpQueue Status: count=0, sending=0, IsSendProcess=0
+SYSTIC: Profile connection timeout in  15/120
+SYSTIC: NTick: 17/60  CTick: 0/5  HTick: 17/3600  FTick: 17/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  16/120
+SYSTIC: NTick: 18/60  CTick: 0/5  HTick: 18/3600  FTick: 18/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  17/120
+SYSTIC: NTick: 19/60  CTick: 0/5  HTick: 19/3600  FTick: 19/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  18/120
+SYSTIC: NTick: 20/60  CTick: 0/5  HTick: 20/3600  FTick: 20/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPRS: !!!!!!!!!!!! Unable to change profile (IMSI same - profile likely doesn't exist)
+GPRS: Prev IMSI: 404720210685209
+GPRS: New IMSI: 404720210685209
+GPRS: Profile 2 switch failed (non-existent profile), fail count: 2
+FILE: File saved: State.bin (56 bytes)
+
+PROFILE: REG_DENIED flow: profile switch attempt 2/2 failed; IMSI unchanged or STK command failed
+DIAG: EVENT type=2(PRF_FAIL) p1=2 p2=2 detail=[switch-failed] uptime=23
+FILE: File saved: Diag.bin (1440 bytes)
+
+PROFILE: REG_DENIED flow: switch failed after retry; recovery disabled, no modem reset or full device reset
+PROFILE: Profile switch request cleared: target=2(BSNL) reason=switch-failed-after-retry current=2(BSNL)
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+LED: GSM LED State: 5 -> 1
+SYSTIC: Profile connection timeout in  19/120
+SYSTIC: NTick: 21/60  CTick: 0/5  HTick: 21/3600  FTick: 21/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: File saved: State.bin (56 bytes)
+
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  20/120
+SYSTIC: NTick: 22/60  CTick: 0/5  HTick: 22/3600  FTick: 22/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+HARDWARE: $INF,868329088549211,FQ_CD1_1.5.8,1,99,ID3P,2,2,3,,8991430008112579011,404720210685209,http://surakshamitr.org/CDC:443,:,http://78.46.190.117/vlt:50024,NA:0
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  21/120
+SYSTIC: NTick: 23/60  CTick: 0/5  HTick: 23/3600  FTick: 23/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 3A 02 3A 08 
+MCU: 71 00 F5 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 3A 02 3A 08 
+MCU: 71 00 F5 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 570, final:14.12
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $CEL,868329088549211,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 99
+SYSTIC: Profile connection timeout in  22/120
+SYSTIC: NTick: 24/60  CTick: 0/5  HTick: 24/3600  FTick: 24/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $PER,868329088549211,1,0,000000,000000,1,1,0,1,0,0,1,14.1,4.1
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  23/120
+SYSTIC: NTick: 25/60  CTick: 0/5  HTick: 25/3600  FTick: 25/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 40 02 87 08 
+MCU: 72 00 FB 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 40 02 87 08 
+MCU: 72 00 FB 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 576, final:14.27
+SYSTIC: Profile connection timeout in  24/120
+SYSTIC: NTick: 26/60  CTick: 0/5  HTick: 26/3600  FTick: 26/7200  Vehicle Mode: H
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $GPD,868329088549211,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+SERVER: HttpQueue Status: count=0, sending=0, IsSendProcess=0
+SYSTIC: Profile connection timeout in  25/120
+SYSTIC: NTick: 27/60  CTick: 0/5  HTick: 27/3600  FTick: 27/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  26/120
+SYSTIC: NTick: 28/60  CTick: 0/5  HTick: 28/3600  FTick: 28/7200  Vehicle Mode: H
+HARDWARE: $INF,868329088549211,FQ_CD1_1.5.8,1,17,ID3P,2,2,3,,8991430008112579011,404720210685209,http://surakshamitr.org/CDC:443,:,http://78.46.190.117/vlt:50024,NA:0
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=17 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 40 02 A0 08 
+MCU: 71 00 FB 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 40 02 A0 08 
+MCU: 71 00 FB 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 576, final:14.27
+SYSTIC: Profile connection timeout in  27/120
+SYSTIC: NTick: 29/60  CTick: 0/5  HTick: 29/3600  FTick: 29/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $CEL,868329088549211,0,0,,,17,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=17 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 17
+SYSTIC: Profile connection timeout in  28/120
+SYSTIC: NTick: 30/60  CTick: 0/5  HTick: 30/3600  FTick: 30/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $PER,868329088549211,1,0,000000,000000,1,1,0,1,0,0,1,14.3,4.1
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=17 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  29/120
+SYSTIC: NTick: 31/60  CTick: 0/5  HTick: 31/3600  FTick: 31/7200  Vehicle Mode: H
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 3C 02 9B 08 
+MCU: 71 00 FD 0E 00 00 00 00 
+MCU: 7E 
+GPS: GPS Not Fixed
+
+MCU: Rx[17]:
+MCU: 26 02 01 01 3C 02 9B 08 
+MCU: 71 00 FD 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 572, final:14.17
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:3 -->
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=20 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  30/120
+SYSTIC: NTick: 32/60  CTick: 0/5  HTick: 32/3600  FTick: 32/7200  Vehicle Mode: H
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $GPD,868329088549211,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:3 -->
+
+GPS: GPS Not Fixed
+
+SYSTIC: Profile connection timeout in  31/120
+SYSTIC: NTick: 33/60  CTick: 0/5  HTick: 33/3600  FTick: 33/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=20 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 3
+GPRS: Current Selected Network: 
+GPRS: *********************
+OTA: Queueing RS232 response: $RES,****REGISTRATION DENIED, Switching Profile ****
+
+
+HARDWARE: RS232 Response Queued: $RES,****REGISTRATION DENIED, Switching Profile ****
+
+
+PROFILE: REG_DENIED detected: profile=2(BSNL) CSQ=20; selecting next profile
+PROFILE: FAIL reason=REG_DENIED profile=2(BSNL) CSQ=20 creg=3 fail_count=2 total_denied=1
+DIAG: EVENT type=7(REG_DENIED) p1=2 p2=20 detail=[CS=3] uptime=36
+FILE: File saved: Diag.bin (1440 bytes)
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+LED: GSM LED State: 1 -> 6
+PROFILE: [before-reg-denied-switch] cur=2(BSNL) req=0(NONE) fails=[0,0,2,0,0] CSQ=20 creg=3 cgatt=3
+GPRS: Selected profile 3 (fail count: 0)
+PROFILE: REG_DENIED flow: selected next profile 3(AIRTEL); checking SMS/STK readiness
+PROFILE: SWITCH requested: 2(BSNL)->3(AIRTEL) reason=reg-denied
+GPRS: Profile switch requested to 3
+PROFILE: REG_DENIED flow: checking SMS/STK readiness before switch, reason=profile-switch-request
+GPRS: STK already enabled
+PROFILE: SMS/STK ready for profile switch after 0 ms
+PROFILE: REG_DENIED flow: executing profile switch attempt 1/2 target=3(AIRTEL) reason=profile-switch-request
+SERVER: 
+Server Thread Paused For Profile Update
+PROFILE: [before-profile-switch] cur=2(BSNL) req=3(AIRTEL) fails=[0,0,2,0,0] CSQ=20 creg=3 cgatt=3
+GPRS: STK Setup TR  [0]: 810301250082028281830100
+GPRS: Setup command Success
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  32/120
+SYSTIC: NTick: 34/60  CTick: 0/5  HTick: 34/3600  FTick: 34/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+GPRS: STK Setup ENV [1]: D30782020181900101
+GPRS: Setup command Success
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SYSTIC: Profile connection timeout in  33/120
+SYSTIC: NTick: 35/60  CTick: 0/5  HTick: 35/3600  FTick: 35/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  34/120
+SYSTIC: NTick: 36/60  CTick: 0/5  HTick: 36/3600  FTick: 36/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+GPRS: STK Profile TR  [3]: 810301240082028281830100900103
+GPRS: Profile command sent, waiting for IMSI change
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:0 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:0 -->
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: HttpQueue Status: count=0, sending=0, IsSendProcess=0
+SYSTIC: Profile connection timeout in  35/120
+SYSTIC: NTick: 37/60  CTick: 0/5  HTick: 37/3600  FTick: 37/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 2, -->
+
+MAIN: <-- SIM Card Status:1 -->
+
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:2 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:2 -->
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SERVER: 
+Server Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  36/120
+SYSTIC: NTick: 38/60  CTick: 0/5  HTick: 38/3600  FTick: 38/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  37/120
+SYSTIC: NTick: 39/60  CTick: 0/5  HTick: 39/3600  FTick: 39/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  38/120
+SYSTIC: NTick: 40/60  CTick: 0/5  HTick: 40/3600  FTick: 40/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  39/120
+SYSTIC: NTick: 41/60  CTick: 0/5  HTick: 41/3600  FTick: 41/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+GPRS: Profile Successfully Changed
+GPRS: Prev IMSI: 404720210685209
+GPRS: New IMSI: 404940946756005
+PROFILE: SWITCH VERIFIED: 2(BSNL)->3(AIRTEL) IMSI_before=404720210685209 IMSI_after=404940946756005
+DIAG: EVENT type=1(PRF_SWITCH) p1=2 p2=3 detail=[imsi-changed] uptime=44
+FILE: File saved: Diag.bin (1440 bytes)
+
+GPRS: Profile 3 switch successful, resetting fail count
+GPRS: Profile 2 fail count decayed to 1
+FILE: File saved: State.bin (56 bytes)
+
+GPRS: SwitchProfile updated SIMNo: 8991430008112579011
+PROFILE: REG_DENIED flow: IMSI changed, profile switch verified on attempt 1/2
+GPRS: Profile switch to 3 successful
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+FILE: File saved: State.bin (56 bytes)
+
+FILE: File saved: ActiveProfile.bin (12 bytes)
+
+FILE: ActiveProfile saved: profile=3 reason=0 uptime=44
+GPRS: Profile switch successful, initiating reset
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: RS232 Response Sent: $RES,****REGISTRATION DENIED, Switching Profile ****
+
+
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 2 -->
+
+SYSTIC: Profile connection timeout in  40/300
+SYSTIC: NTick: 42/60  CTick: 0/5  HTick: 42/3600  FTick: 42/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 3A 02 AD 08 
+MCU: 70 00 F1 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 3A 02 AD 08 
+MCU: 70 00 F1 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 570, final:14.12
+GPRÓM66_QuecOpen_GS3_SDK_V2.6
+HYPER: Thread GPRS Thread initialized. TaskId: 1, taskIndex: 0
+GPRS: thread initialized successfully
+HYPER: Thread Systic Thread initialized. TaskId: 2, taskIndex: 1
+HYPER: Thread MCU Rcv Thread initialized. TaskId: 3, taskIndex: 2
+MCU: UART port opened successfully
+
+HYPER: Thread GPS Thread initialized. TaskId: 4, taskIndex: 3
+GPS: GPS thread initialized successfully
+HYPER: Thread HTTP initialized. TaskId: 5, taskIndex: 4
+SERVER: HTTP thread started
+SERVER: HTTP queue merged into HTTP thread
+HYPER: Thread Server Thread initialized. TaskId: 6, taskIndex: 5
+SERVER: Server thread initialized successfully
+HYPER: Thread Hardware Thread initialized. TaskId: 7, taskIndex: 6
+HARDWARE: Hardware thread initialized successfully
+MAIN: <-- RIL is ready -->
+
+SMS: <-- SMS context reset -->
+
+MAIN: OpenCPU: APM AIS140 Firware Version 1.5.8, State/Proto: CD1
+
+SYSTIC: Heartbeat timer started successfully.
+HARDWARE: GPIO 1 initialized for LED 0
+HARDWARE: GPIO 2 initialized for LED 1
+HARDWARE: GPIO 3 initialized for LED 2
+HARDWARE: GPIO 5 initialized for LED 3
+LED: LED Manager Initialized with 18 patterns
+FILE: File loaded: UFSConfig.bin (2336 bytes)
+
+GEOFENCE: GeoState reset - waiting for first GPS fix
+SERVER: Primary URL updated: http://surakshamitr.org/CDC:443
+SERVER: Secondary URL updated: http://78.46.190.117/vlt:50024 (mode=HTTP)
+SERVER: Tertiary URL updated: NA:0 (mode=TCP)
+FILE: File loaded: State.bin (56 bytes)
+
+FILE: File loaded: ActiveProfile.bin (12 bytes)
+
+FILE: ActiveProfile.bin loaded: profile=3 reason=0 uptime=44 timeout=0
+BOOT: Restored profile connection timeout: 0 s for profile 3
+FILE: File not found: FotaConfig.bin. Loading default.
+
+FILE: File loaded: Diag.bin (1440 bytes)
+
+DIAG: Diag.bin loaded: boots=0, wdt_resets=0, prf_switches=2, gsm_hangs=0
+DIAG:               reg_denied=1, csq99=0, gprs_fails=0, gsm_resets=0
+DIAG:               last_boot_reason=0, last_profile=0, ring_entries=5/50
+DIAG: --- Last events (newest first) ---
+DIAG:   EVT[4] uptime=44 type=1 p1=2 p2=3 detail=[imsi-changed]
+DIAG:   EVT[3] uptime=36 type=7 p1=2 p2=20 detail=[CS=3]
+DIAG:   EVT[2] uptime=23 type=2 p1=2 p2=2 detail=[switch-failed]
+DIAG:   EVT[1] uptime=15 type=2 p1=2 p2=1 detail=[switch-retry]
+DIAG:   EVT[0] uptime=16 type=1 p1=0 p2=2 detail=[imsi-changed]
+DIAG: ----------------------------------
+BOOT: === BOOT COMPLETE === FW:1.5.8 SIM:ID3P Profile:3 BootCount:0 ===
+EMG: SOS Input Pin Init Success
+EMG: SOS NC: pin idle at boot (button connected and at rest)
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:2 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:0 -->
+
+SYSTIC: NTick: 1/60  CTick: 0/5  HTick: 1/3600  FTick: 1/7200  Vehicle Mode: H
+MAIN: <-- Received URC: type: 5, -->
+
+MAIN: <-- CFUN Status:1 -->
+
+LED: GSM LED State: 0 -> 1
+LED: Battery LED State: 21 -> 20
+GPS: gpstmpdata allocated at: 0x1a7cc (size: 4096)
+GPS: last_nmea_data allocated at: 0x1b7d4 (size: 4096)
+GPS: UART port opened successfully
+
+GPS: GPS UART sent: $PAIR864,0,0,115200*1B
+
+
+GPRS: Device IMEI: 868329088549211
+GPRS: STK already enabled
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=3(AIRTEL) CSQ=0
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MAIN: <-- Received URC: type: 2, -->
+
+MAIN: <-- SIM Card Status:1 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:2 -->
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SYSTIC: NTick: 2/60  CTick: 0/5  HTick: 2/3600  FTick: 2/7200  Vehicle Mode: H
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=3(AIRTEL) CSQ=99
+GPS: GPS Rcv While Processing Data
+
+GPS: Data sample(200): Bb£°1aƒÂ‘DÂ#Áa``:({Ðÿ
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404940946756005
+
+GPRS: SIM No: 8991430008112579011
+
+GPRS: TimeSync: starting QNITZ+CTZU configuration
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: TimeSync: setup OK (reset_applied=0)
+GPRS: Auto Time Sync Set
+
+PROFILE: BSNL ICCID cache is empty or contains dirty bootstrap prefix, forcing switch to BSNL profile to read actual ICCID
+FILE: File saved: State.bin (56 bytes)
+
+GPRS: Profile switch requested to 2
+PROFILE: REG_DENIED flow: checking SMS/STK readiness before switch, reason=profile-switch-request
+PROFILE: SMS not ready for profile switch, reinit attempt at 0/30000 ms
+SMS: <-- SMS context reset -->
+
+GPS: Command timeout
+
+GPS: Failed to set GPS baudrate.maybe already set
+
+SMS: Fail to set SMS storage, cause:-1
+
+LED: GSM LED State: 1 -> 5
+LED: Battery LED State: 20 -> 21
+GPS: Successfully switched GPS baudrate to 115200
+
+GPS: NO GGA Packet!
+GPS: GPS Not Fixed
+
+LED: GPS LED State: 12 -> 10
+SYSTIC: Profile connection timeout in  1/300
+SYSTIC: NTick: 3/60  CTick: 0/5  HTick: 3/3600  FTick: 3/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+PROFILE: SMS not ready for profile switch, reinit attempt at 1000/30000 ms
+SMS: <-- SMS context reset -->
+
+SMS: Fail to set SMS storage, cause:-1
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 40 02 AB 08 
+MCU: 70 00 EF 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 40 02 AB 08 
+MCU: 70 00 EF 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 576, final:14.27
+BLE: Bluetooth name set from device VendorID: APMG-868329088549211
+SYSTIC: Profile connection timeout in  2/300
+SYSTIC: NTick: 4/60  CTick: 0/5  HTick: 4/3600  FTick: 4/7200  Vehicle Mode: H
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 2 -->
+
+GPS: GPS Not Fixed
+
+PROFILE: SMS not ready for profile switch, reinit attempt at 2000/30000 ms
+SMS: <-- SMS context reset -->
+
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 3 -->
+
+MAIN: 
+<-- SMS module is ready -->
+
+MAIN: 
+<-- Initialize SMS-related options -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_SET_CMD,used:0,total:25
+SMS: <-- Set SMS storage to SM, nUsed:0,nTotal:25 -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_SET_CMD,used:0,total:25
+SMS: <-- Set SMS storage to SM, nUsed:0,nTotal:25 -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: <-- Check SMS storage: curMem=0, used=0, total=25 -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: <-- Check SMS storage: curMem=0, used=0, total=25 -->
+
+SMS: <-- Enable new SMS indication -->
+
+SMS: <-- Enable new SMS indication -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: Delete all existed messages
+
+SMS: <-- SMS environment initialization OK -->
+
+PROFILE: SMS reinit OK for profile switch
+SMS: Delete all existed messages
+
+SMS: <-- SMS environment initialization OK -->
+
+GPRS: STK already enabled
+PROFILE: SMS/STK ready for profile switch after 2000 ms
+PROFILE: REG_DENIED flow: executing profile switch attempt 1/2 target=2(BSNL) reason=profile-switch-request
+SYSTIC: Profile connection timeout in  3/300
+SYSTIC: NTick: 5/60  CTick: 0/5  HTick: 5/3600  FTick: 5/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+PROFILE: [before-profile-switch] cur=3(AIRTEL) req=2(BSNL) fails=[0,0,1,0,0] CSQ=99 creg=2 cgatt=2
+GPRS: STK Setup TR  [0]: 810301250082028281830100
+GPRS: Setup command Success
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+BLE: Bluetooth initialized successfully
+BLE: Bluetooth visibility set successfully.
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  4/300
+SYSTIC: NTick: 6/60  CTick: 0/5  HTick: 6/3600  FTick: 6/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+GPRS: STK Setup ENV [1]: D30782020181900101
+GPRS: Setup command Success
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  5/300
+SYSTIC: NTick: 7/60  CTick: 0/5  HTick: 7/3600  FTick: 7/7200  Vehicle Mode: H
+SERVER: HttpQueue Status: count=0, sending=0, IsSendProcess=0
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+GPRS: STK Profile TR  [2]: 810301240082028281830100900102
+GPRS: Profile command sent, waiting for IMSI change
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  6/300
+SYSTIC: NTick: 8/60  CTick: 0/5  HTick: 8/3600  FTick: 8/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Entry!!
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  7/300
+SYSTIC: NTick: 9/60  CTick: 0/5  HTick: 9/3600  FTick: 9/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 2, -->
+
+MAIN: <-- SIM Card Status:1 -->
+
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPS: GPS Not Fixed
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  8/300
+SYSTIC: NTick: 10/60  CTick: 0/5  HTick: 10/3600  FTick: 10/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  9/300
+SYSTIC: NTick: 11/60  CTick: 0/5  HTick: 11/3600  FTick: 11/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  10/300
+SYSTIC: NTick: 12/60  CTick: 0/5  HTick: 12/3600  FTick: 12/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+GPRS: Profile Successfully Changed
+GPRS: Prev IMSI: 404940946756005
+GPRS: New IMSI: 404720210685209
+PROFILE: SWITCH VERIFIED: 3(AIRTEL)->2(BSNL) IMSI_before=404940946756005 IMSI_after=404720210685209
+DIAG: EVENT type=1(PRF_SWITCH) p1=3 p2=2 detail=[imsi-changed] uptime=15
+FILE: File saved: Diag.bin (1440 bytes)
+
+GPRS: Profile 2 switch successful, resetting fail count
+FILE: File saved: State.bin (56 bytes)
+
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+FILE: File saved: State.bin (56 bytes)
+
+GPRS: Saved BSNL ICCID to Flash during switch: 8991430008112579011
+GPRS: SwitchProfile updated SIMNo: 8991430008112579011
+PROFILE: REG_DENIED flow: IMSI changed, profile switch verified on attempt 1/2
+GPRS: Profile switch to 2 successful
+FILE: File saved: State.bin (56 bytes)
+
+FILE: File saved: ActiveProfile.bin (12 bytes)
+
+FILE: ActiveProfile saved: profile=2 reason=0 uptime=15
+GPRS: Profile switch successful, initiating reset
+LED: GSM LED State: 5 -> 1
+SYSTIC: Profile connection timeout in  11/120
+SYSTIC: NTick: 13/60  CTick: 0/5  HTick: 13/3600  FTick: 13/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 2 -->
+
+GPRÓM66_QuecOpen_GS3_SDK_V2.6
+HYPER: Thread GPRS Thread initialized. TaskId: 1, taskIndex: 0
+GPRS: thread initialized successfully
+HYPER: Thread Systic Thread initialized. TaskId: 2, taskIndex: 1
+HYPER: Thread MCU Rcv Thread initialized. TaskId: 3, taskIndex: 2
+MCU: UART port opened successfully
+
+HYPER: Thread GPS Thread initialized. TaskId: 4, taskIndex: 3
+GPS: GPS thread initialized successfully
+HYPER: Thread HTTP initialized. TaskId: 5, taskIndex: 4
+SERVER: HTTP thread started
+SERVER: HTTP queue merged into HTTP thread
+HYPER: Thread Server Thread initialized. TaskId: 6, taskIndex: 5
+SERVER: Server thread initialized successfully
+HYPER: Thread Hardware Thread initialized. TaskId: 7, taskIndex: 6
+HARDWARE: Hardware thread initialized successfully
+MAIN: <-- RIL is ready -->
+
+SMS: <-- SMS context reset -->
+
+MAIN: OpenCPU: APM AIS140 Firware Version 1.5.8, State/Proto: CD1
+
+SYSTIC: Heartbeat timer started successfully.
+HARDWARE: GPIO 1 initialized for LED 0
+HARDWARE: GPIO 2 initialized for LED 1
+HARDWARE: GPIO 3 initialized for LED 2
+HARDWARE: GPIO 5 initialized for LED 3
+LED: LED Manager Initialized with 18 patterns
+FILE: File loaded: UFSConfig.bin (2336 bytes)
+
+GEOFENCE: GeoState reset - waiting for first GPS fix
+SERVER: Primary URL updated: http://surakshamitr.org/CDC:443
+SERVER: Secondary URL updated: http://78.46.190.117/vlt:50024 (mode=HTTP)
+SERVER: Tertiary URL updated: NA:0 (mode=TCP)
+FILE: File loaded: State.bin (56 bytes)
+
+FILE: File loaded: ActiveProfile.bin (12 bytes)
+
+FILE: ActiveProfile.bin loaded: profile=2 reason=0 uptime=15 timeout=0
+BOOT: Restored profile connection timeout: 0 s for profile 2
+FILE: File not found: FotaConfig.bin. Loading default.
+
+FILE: File loaded: Diag.bin (1440 bytes)
+
+DIAG: Diag.bin loaded: boots=0, wdt_resets=0, prf_switches=3, gsm_hangs=0
+DIAG:               reg_denied=1, csq99=0, gprs_fails=0, gsm_resets=0
+DIAG:               last_boot_reason=0, last_profile=0, ring_entries=6/50
+DIAG: --- Last events (newest first) ---
+DIAG:   EVT[5] uptime=15 type=1 p1=3 p2=2 detail=[imsi-changed]
+DIAG:   EVT[4] uptime=44 type=1 p1=2 p2=3 detail=[imsi-changed]
+DIAG:   EVT[3] uptime=36 type=7 p1=2 p2=20 detail=[CS=3]
+DIAG:   EVT[2] uptime=23 type=2 p1=2 p2=2 detail=[switch-failed]
+DIAG:   EVT[1] uptime=15 type=2 p1=2 p2=1 detail=[switch-retry]
+DIAG:   EVT[0] uptime=16 type=1 p1=0 p2=2 detail=[imsi-changed]
+DIAG: ----------------------------------
+BOOT: === BOOT COMPLETE === FW:1.5.8 SIM:ID3P Profile:2 BootCount:0 ===
+EMG: SOS Input Pin Init Success
+EMG: SOS NC: pin idle at boot (button connected and at rest)
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:2 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:0 -->
+
+SYSTIC: NTick: 1/60  CTick: 0/5  HTick: 1/3600  FTick: 1/7200  Vehicle Mode: H
+MAIN: <-- Received URC: type: 5, -->
+
+MAIN: <-- CFUN Status:1 -->
+
+LED: GSM LED State: 0 -> 1
+LED: Battery LED State: 21 -> 20
+GPS: gpstmpdata allocated at: 0x1a7cc (size: 4096)
+GPS: last_nmea_data allocated at: 0x1b7d4 (size: 4096)
+GPS: UART port opened successfully
+
+GPS: GPS UART sent: $PAIR864,0,0,115200*1B
+
+
+GPRS: Device IMEI: 868329088549211
+GPRS: STK already enabled
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=2(BSNL) CSQ=0
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MAIN: <-- Received URC: type: 2, -->
+
+MAIN: <-- SIM Card Status:1 -->
+
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:2 -->
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SYSTIC: NTick: 2/60  CTick: 0/5  HTick: 2/3600  FTick: 2/7200  Vehicle Mode: H
+GPS: GPS Rcv While Processing Data
+
+GPS: Data sample(200): Bb£ð±a£Â‘DÂ#	Áa``:‡({
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=2(BSNL) CSQ=99
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+GPRS: TimeSync: starting QNITZ+CTZU configuration
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPS: Command timeout
+
+GPS: Failed to set GPS baudrate.maybe already set
+
+GPRS: TimeSync: setup OK (reset_applied=0)
+GPRS: Auto Time Sync Set
+
+PROFILE: BSNL ICCID cache is empty or contains dirty bootstrap prefix, forcing switch to BSNL profile to read actual ICCID
+FILE: File saved: State.bin (56 bytes)
+
+GPRS: Profile switch requested to 2
+PROFILE: REG_DENIED flow: checking SMS/STK readiness before switch, reason=profile-switch-request
+PROFILE: SMS not ready for profile switch, reinit attempt at 0/30000 ms
+SMS: <-- SMS context reset -->
+
+LED: GSM LED State: 1 -> 5
+SMS: Fail to set SMS storage, cause:-1
+
+LED: Battery LED State: 20 -> 21
+GPS: Successfully switched GPS baudrate to 115200
+
+GPS: NO GGA Packet!
+GPS: GPS Not Fixed
+
+LED: GPS LED State: 12 -> 10
+SYSTIC: Profile connection timeout in  1/120
+SYSTIC: NTick: 3/60  CTick: 0/5  HTick: 3/3600  FTick: 3/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+PROFILE: SMS not ready for profile switch, reinit attempt at 1000/30000 ms
+SMS: <-- SMS context reset -->
+
+SMS: Fail to set SMS storage, cause:-1
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 3E 02 AB 08 
+MCU: 6F 00 EA 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 3E 02 AB 08 
+MCU: 6F 00 EA 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 574, final:14.22
+BLE: Bluetooth name set from device VendorID: APMG-868329088549211
+SYSTIC: Profile connection timeout in  2/120
+SYSTIC: NTick: 4/60  CTick: 0/5  HTick: 4/3600  FTick: 4/7200  Vehicle Mode: H
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 2 -->
+
+GPS: GPS Not Fixed
+
+PROFILE: SMS not ready for profile switch, reinit attempt at 2000/30000 ms
+SMS: <-- SMS context reset -->
+
+MAIN: <-- Received URC: type: 1, -->
+
+MAIN: <-- Sys Init Status 3 -->
+
+MAIN: 
+<-- SMS module is ready -->
+
+MAIN: 
+<-- Initialize SMS-related options -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_SET_CMD,used:0,total:25
+SMS: <-- Set SMS storage to SM, nUsed:0,nTotal:25 -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_SET_CMD,used:0,total:25
+SMS: <-- Set SMS storage to SM, nUsed:0,nTotal:25 -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: <-- Check SMS storage: curMem=0, used=0, total=25 -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: <-- Check SMS storage: curMem=0, used=0, total=25 -->
+
+SMS: <-- Enable new SMS indication -->
+
+SMS: <-- Enable new SMS indication -->
+
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS_HND: Enter SMS_CMD_GeneralHandler,SUCCESS. uType:HDLR_TYPE_CPMS_READ_CMD,storage:0,used:0,total:25
+SMS: Delete all existed messages
+
+SMS: <-- SMS environment initialization OK -->
+
+PROFILE: SMS reinit OK for profile switch
+SMS: Delete all existed messages
+
+SMS: <-- SMS environment initialization OK -->
+
+SYSTIC: Profile connection timeout in  3/120
+SYSTIC: NTick: 5/60  CTick: 0/5  HTick: 5/3600  FTick: 5/7200  Vehicle Mode: H
+GPRS: STK already enabled
+PROFILE: SMS/STK ready for profile switch after 2000 ms
+PROFILE: REG_DENIED flow: executing profile switch attempt 1/2 target=2(BSNL) reason=profile-switch-request
+GPS: GPS Not Fixed
+
+PROFILE: [before-profile-switch] cur=2(BSNL) req=2(BSNL) fails=[0,0,0,0,0] CSQ=99 creg=2 cgatt=2
+GPRS: STK Setup TR  [0]: 810301250082028281830100
+GPRS: Setup command Success
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+BLE: Bluetooth initialized successfully
+BLE: Bluetooth visibility set successfully.
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  4/120
+SYSTIC: NTick: 6/60  CTick: 0/5  HTick: 6/3600  FTick: 6/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+GPRS: STK Setup ENV [1]: D30782020181900101
+GPRS: Setup command Success
+SERVER: Hardware Thread Paused For Profile Update
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: HttpQueue Status: count=0, sending=0, IsSendProcess=0
+SYSTIC: Profile connection timeout in  5/120
+SYSTIC: NTick: 7/60  CTick: 0/5  HTick: 7/3600  FTick: 7/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+GPRS: STK Profile TR  [2]: 810301240082028281830100900102
+GPRS: Profile command sent, waiting for IMSI change
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  6/120
+SYSTIC: NTick: 8/60  CTick: 0/5  HTick: 8/3600  FTick: 8/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Entry!!
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  7/120
+SYSTIC: NTick: 9/60  CTick: 0/5  HTick: 9/3600  FTick: 9/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  8/120
+SYSTIC: NTick: 10/60  CTick: 0/5  HTick: 10/3600  FTick: 10/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  9/120
+SYSTIC: NTick: 11/60  CTick: 0/5  HTick: 11/3600  FTick: 11/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  10/120
+SYSTIC: NTick: 12/60  CTick: 0/5  HTick: 12/3600  FTick: 12/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+GPRS: !!!!!!!!!!!! Unable to change profile (IMSI same - profile likely doesn't exist)
+GPRS: Prev IMSI: 404720210685209
+GPRS: New IMSI: 404720210685209
+GPRS: Profile 2 switch failed (non-existent profile), fail count: 1
+FILE: File saved: State.bin (56 bytes)
+
+PROFILE: REG_DENIED flow: profile switch attempt 1/2 failed; IMSI unchanged or STK command failed
+DIAG: EVENT type=2(PRF_FAIL) p1=2 p2=1 detail=[switch-retry] uptime=15
+FILE: File saved: Diag.bin (1440 bytes)
+
+PROFILE: REG_DENIED flow: retrying once after SMS/STK reinit
+PROFILE: REG_DENIED flow: checking SMS/STK readiness before switch, reason=profile-switch-retry
+GPRS: STK already enabled
+PROFILE: SMS/STK ready for profile switch after 0 ms
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  11/120
+SYSTIC: NTick: 13/60  CTick: 0/5  HTick: 13/3600  FTick: 13/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+PROFILE: REG_DENIED flow: executing profile switch attempt 2/2 target=2(BSNL) reason=profile-switch-request
+SERVER: Hardware Thread Paused For Profile Update
+PROFILE: [before-profile-switch-retry] cur=2(BSNL) req=2(BSNL) fails=[0,0,1,0,0] CSQ=99 creg=2 cgatt=2
+GPRS: STK Setup TR  [0]: 810301250082028281830100
+GPRS: Setup command Success
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  12/120
+SYSTIC: NTick: 14/60  CTick: 0/5  HTick: 14/3600  FTick: 14/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPRS: STK Setup ENV [1]: D30782020181900101
+GPRS: Setup command Success
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SYSTIC: Profile connection timeout in  13/120
+SYSTIC: NTick: 15/60  CTick: 0/5  HTick: 15/3600  FTick: 15/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  14/120
+SYSTIC: NTick: 16/60  CTick: 0/5  HTick: 16/3600  FTick: 16/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPRS: STK Profile TR  [2]: 810301240082028281830100900102
+GPRS: Profile command sent, waiting for IMSI change
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: HttpQueue Status: count=0, sending=0, IsSendProcess=0
+SYSTIC: Profile connection timeout in  15/120
+SYSTIC: NTick: 17/60  CTick: 0/5  HTick: 17/3600  FTick: 17/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  16/120
+SYSTIC: NTick: 18/60  CTick: 0/5  HTick: 18/3600  FTick: 18/7200  Vehicle Mode: H
+SERVER: Hardware Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  17/120
+SYSTIC: NTick: 19/60  CTick: 0/5  HTick: 19/3600  FTick: 19/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+SYSTIC: Profile connection timeout in  18/120
+SYSTIC: NTick: 20/60  CTick: 0/5  HTick: 20/3600  FTick: 20/7200  Vehicle Mode: H
+SERVER: 
+Server Thread Paused For Profile Update
+GPS: GPS Not Fixed
+
+SERVER: Hardware Thread Paused For Profile Update
+SERVER: 
+Server Thread Paused For Profile Update
+SERVER: Hardware Thread Paused For Profile Update
+GPRS: !!!!!!!!!!!! Unable to change profile (IMSI same - profile likely doesn't exist)
+GPRS: Prev IMSI: 404720210685209
+GPRS: New IMSI: 404720210685209
+GPRS: Profile 2 switch failed (non-existent profile), fail count: 2
+FILE: File saved: State.bin (56 bytes)
+
+PROFILE: REG_DENIED flow: profile switch attempt 2/2 failed; IMSI unchanged or STK command failed
+DIAG: EVENT type=2(PRF_FAIL) p1=2 p2=2 detail=[switch-failed] uptime=23
+FILE: File saved: Diag.bin (1440 bytes)
+
+PROFILE: REG_DENIED flow: switch failed after retry; recovery disabled, no modem reset or full device reset
+PROFILE: Profile switch request cleared: target=2(BSNL) reason=switch-failed-after-retry current=2(BSNL)
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+LED: GSM LED State: 5 -> 1
+SYSTIC: Profile connection timeout in  19/120
+SYSTIC: NTick: 21/60  CTick: 0/5  HTick: 21/3600  FTick: 21/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: File saved: State.bin (56 bytes)
+
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  20/120
+SYSTIC: NTick: 22/60  CTick: 0/5  HTick: 22/3600  FTick: 22/7200  Vehicle Mode: H
+HARDWARE: $INF,868329088549211,FQ_CD1_1.5.8,1,99,ID3P,2,2,3,,8991430008112579011,404720210685209,http://surakshamitr.org/CDC:443,:,http://78.46.190.117/vlt:50024,NA:0
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  21/120
+SYSTIC: NTick: 23/60  CTick: 0/5  HTick: 23/3600  FTick: 23/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 3A 02 A0 08 
+MCU: 70 00 E2 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 3A 02 A0 08 
+MCU: 70 00 E2 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 570, final:14.12
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $CEL,868329088549211,0,0,,,99,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 99
+SYSTIC: Profile connection timeout in  22/120
+SYSTIC: NTick: 24/60  CTick: 0/5  HTick: 24/3600  FTick: 24/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $PER,868329088549211,1,0,000000,000000,1,1,0,1,0,0,1,14.1,4.1
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  23/120
+SYSTIC: NTick: 25/60  CTick: 0/5  HTick: 25/3600  FTick: 25/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 3E 02 40 08 
+MCU: 70 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 3E 02 40 08 
+MCU: 70 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 574, final:14.22
+SYSTIC: Profile connection timeout in  24/120
+SYSTIC: NTick: 26/60  CTick: 0/5  HTick: 26/3600  FTick: 26/7200  Vehicle Mode: H
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=99 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $GPD,868329088549211,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+SERVER: HttpQueue Status: count=0, sending=0, IsSendProcess=0
+SYSTIC: Profile connection timeout in  25/120
+SYSTIC: NTick: 27/60  CTick: 0/5  HTick: 27/3600  FTick: 27/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=15 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: $INF,868329088549211,FQ_CD1_1.5.8,1,15,ID3P,2,2,3,,8991430008112579011,404720210685209,http://surakshamitr.org/CDC:443,:,http://78.46.190.117/vlt:50024,NA:0
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+SYSTIC: Profile connection timeout in  26/120
+SYSTIC: NTick: 28/60  CTick: 0/5  HTick: 28/3600  FTick: 28/7200  Vehicle Mode: H
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=15 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 40 02 B1 08 
+MCU: 6F 00 E4 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 40 02 B1 08 
+MCU: 6F 00 E4 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 576, final:14.27
+SYSTIC: Profile connection timeout in  27/120
+SYSTIC: NTick: 29/60  CTick: 0/5  HTick: 29/3600  FTick: 29/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $CEL,868329088549211,0,0,,,15,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=15 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 21
+SYSTIC: Profile connection timeout in  28/120
+SYSTIC: NTick: 30/60  CTick: 0/5  HTick: 30/3600  FTick: 30/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MAIN: <-- Received URC: type: 3, -->
+
+MAIN: <-- GSM Network Status:3 -->
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $PER,868329088549211,1,0,000000,000000,1,1,0,1,0,0,1,14.3,4.1
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=21 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 2
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  29/120
+SYSTIC: NTick: 31/60  CTick: 0/5  HTick: 31/3600  FTick: 31/7200  Vehicle Mode: H
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MAIN: <-- Received URC: type: 4, -->
+
+MAIN: <-- GPRS Network Status:3 -->
+
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 40 02 B2 08 
+MCU: 6F 00 E4 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 40 02 B2 08 
+MCU: 6F 00 E4 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 576, final:14.27
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=21 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 3
+GPRS: Current Selected Network: 
+GPRS: Network Showing Reg Denied, waiting for resolve...
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $GPD,868329088549211,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+SYSTIC: Profile connection timeout in  30/120
+SYSTIC: NTick: 32/60  CTick: 0/5  HTick: 32/3600  FTick: 32/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  31/120
+SYSTIC: NTick: 33/60  CTick: 0/5  HTick: 33/3600  FTick: 33/7200  Vehicle Mode: H
+HARDWARE: $INF,868329088549211,FQ_CD1_1.5.8,1,21,ID3P,2,2,3,,8991430008112579011,404720210685209,http://surakshamitr.org/CDC:443,:,http://78.46.190.117/vlt:50024,NA:0
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 40 02 3A 08 
+MCU: 6E 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 40 02 3A 08 
+MCU: 6E 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 576, final:14.27
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=21 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 3
+GPRS: Current Selected Network: 
+GPRS: Network Showing Reg Denied, waiting for resolve...
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+SYSTIC: Profile connection timeout in  32/120
+SYSTIC: NTick: 34/60  CTick: 0/5  HTick: 34/3600  FTick: 34/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $CEL,868329088549211,0,0,,,21,N1,,,,,,N2,,,,,,N3,,,,,,N4,,,,,
+
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Profile connection timeout in  33/120
+SYSTIC: NTick: 35/60  CTick: 0/5  HTick: 35/3600  FTick: 35/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=1000
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 40 02 6C 08 
+MCU: 6E 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 40 02 6C 08 
+MCU: 6E 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC Value: 576, final:14.27
+MCU: Sending data: len=505, isWait=1, waitFlag=1, timeout=1000
+STATE: CURRENT: SIM_DETECTED(1) profile=2(BSNL) CSQ=21 prfReq=0
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: IMEI: 868329088549211,IMSI: 404720210685209
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+FILE: Flash write skipped (unchanged): State.bin (56 bytes)
+GPRS: Saved BSNL ICCID to Flash: 8991430008112579011
+GPRS: SIM No: 8991430008112579011
+
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+GPRS: Network CS State: 3
+GPRS: Current Selected Network: 
+GPRS: Network Showing Reg Denied, waiting for resolve...
+MAIN: <-- Received URC: type: 101, -->
+
+MAIN: <-- Other URC: type=101
+
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: $PER,868329088549211,1,0,000000,000000,1,1,0,1,0,0,1,14.3,4.1
+
+SYSTIC: Profile connection timeout in  34/120
+SYSTIC: NTick: 36/60  CTick: 0/5  HTick: 36/3600  FTick: 36/7200  Vehicle Mode: H
+GPS: GPS Not Fixed
+

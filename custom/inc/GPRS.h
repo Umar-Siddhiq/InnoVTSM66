@@ -4,8 +4,6 @@
 #include "VTS.h"
 
 
-
-
 #define  DEF_SIM_SLOT   0
 
 #define STK_TAISYS_SETUP_COUNT		2
@@ -45,16 +43,15 @@
 #define STK_COLORPLAST_ITEM               "D30782020181900180"
 
 // Step 3: Account Selection with ID (XX = 01/02/03)
-// DO NOT use NETWORK - profiles include full command with account ID
 #define STK_COLORPLAST_PRIMARY            "810301240082028281830100900101"   // AIRTEL (01)
 #define STK_COLORPLAST_SECONDARY          "810301240082028281830100900102"   // BSNL (02)
 #define STK_COLORPLAST_THIRD              "810301240082028281830100900103"   // VIL (03)
 
 // Step 4: Confirmation command (same for all profiles)
 #define STK_COLORPLAST_CONFIRM            "810301010482028281830100"	
+
 #define STK_SETUP_CMD_MAX	4
 #define STK_PROFILE_CMD_MAX	3
-
 typedef struct 
 {
 	uint8_t type;
@@ -156,7 +153,7 @@ extern NET_Typedef NetWork;
  * GPRS Main Thread
  * @note Independent task, dont return;
  * @param none
-*/
+ */
 void GprsThreadEntry(void *param);
 
 /**
@@ -175,7 +172,22 @@ extern Providertypedef prfReq;
 extern uint8_t PrfChanged;
 s32 SetupAutoTimesync(void);
 
-void GetDeviceIMEI(void);
+/**
+ * GSM Reset and Recovery Functions
+ * @note Added for GSM hang detection and recovery
+*/
+void ResetGSMModule(void);
+uint8_t IsGSMUnresponsive(void);
+uint8_t CheckGSMSignalQuality(void);
+void HandleGSMHang(void);
+void LogGSMStatus(void);
+
+/* TEST ONLY: controlled recovery fault injection via SET WDTTEST commands. */
+void GPRS_ArmGsmHangTest(void);
+void GPRS_TriggerBadProfileSwitchTest(void);
+void GPRS_ClearRecoveryTests(void);
+void GPRS_GetRecoveryTestStatus(char *out, u32 outLen);
+
 void InitGPRSThread(u32 taskId);
 void GPRSThreadEntry(s32 taskId);
 #endif

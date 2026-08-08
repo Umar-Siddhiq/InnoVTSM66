@@ -14,6 +14,7 @@
 #include "MOTA.h"
 #include "ql_common.h"
 #include "PktSave.h"
+#include "Batch.h"
 
 extern ST_ExtWatchdogCfg* Ql_WTD_GetWDIPinCfg(void);
 
@@ -254,7 +255,7 @@ uint8_t FLS_DeleteExistingFile(char* Filename)
     return 1;
 }
 
-void FTP_CleanupDiskSpace(uint32_t requiredSize)
+uint8_t FTP_CleanupDiskSpace(uint32_t requiredSize)
 {
     uint32_t freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
     LOGData(TAG_FTP, "UFS Free Space before cleanup: %lu bytes. Required: %lu bytes", freeSpace, requiredSize);
@@ -279,17 +280,30 @@ void FTP_CleanupDiskSpace(uint32_t requiredSize)
         // 3. Purge history packets if space is still insufficient for download
         if (requiredSize > 0 && freeSpace < (requiredSize + 51200))
         {
+            #if defined(PROTO_CDAC)
+            LOGData(TAG_FTP, "UFS space still low (%lu bytes), clearing CDAC batch storage...", freeSpace);
+            ClearFileTable();
+            #else
             uint32_t neededSpace = (requiredSize + 51200) - freeSpace;
             // Each history packet is 512 bytes on disk
             uint16_t packetsToDelete = (neededSpace + 511) / 512;
             LOGData(TAG_FTP, "UFS space still low (%lu bytes), purging oldest %u history packets...", freeSpace, packetsToDelete);
             DeleteFirstPacketsBulk(packetsToDelete);
+            #endif
             freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
         }
 #endif
         
         LOGData(TAG_FTP, "UFS Free Space after cleanup: %lu bytes", freeSpace);
     }
+
+    if (requiredSize > 0 && freeSpace < (requiredSize + 51200))
+    {
+        LOGData(TAG_FTP, "UFS still insufficient after cleanup: %lu bytes available, %lu needed",
+                freeSpace, requiredSize + 51200);
+        return 0;
+    }
+    return 1;
 }
 
 static void FTP_DeleteCleanupFile(const char *filename, DiskCleanupResult *result)
@@ -405,7 +419,11 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
         return 0;
     }
     LOGData(TAG_FTP,"Got File Size: %d",FileSize);
-    FTP_CleanupDiskSpace(FileSize);
+    if(!FTP_CleanupDiskSpace(FileSize))
+    {
+        LOGData(TAG_FTP, "Aborting download: UFS disk full, cannot store %d bytes", FileSize);
+        return 0;
+    }
     // if(!FLS_DeleteExistingFile(InternalFilePath))
     // {
     //     LOGData(TAG_FTP,"Cant Delete Existing File!");
@@ -654,9 +672,9 @@ uint8_t FOTAUpdate(char *firmwareFileName)
         totalBytesWritten += bytesRead;
         if((totalBytesWritten % (CHUNK_SIZE * 10)) == 0)  // Log every 10 chunks
         {
-            LOGData(TAG_FTP, "Progress: %d/%d bytes (%.1f%%)", 
+            LOGData(TAG_FTP, "Progress: %d/%d bytes (%d%%)", 
                    totalBytesWritten, firmwareFileSize, 
-                   (totalBytesWritten * 100.0) / firmwareFileSize);
+                   (totalBytesWritten * 100) / firmwareFileSize);
         }
     }
     

@@ -149,6 +149,11 @@ typedef struct
 extern AlertTypedef VAlert[];
 
 
+static inline uint8_t IsValidAlertIndex(uint8_t index)
+{
+	return (index < ALERT_COUNT);
+}
+
 void AlertInitStruct(void);
 void AddAlert(uint8_t alert);
 void RemoveAlert(uint8_t alert);

@@ -8,17 +8,13 @@
 #include "Systic.h"
 #include "Batch.h"
 #include "MCU.h"
-#include "Server.h"
-#include "Utilities.h"
-#include "SOS.h"
-//#include "Hardware.h"
 #include "SOS.h"
 #include "SMS.h"
 #include "BLE.h"
 #include "FTP.h"
 #include "Alert.h"
 #include "PktSave.h"
-#ifdef PROTO_CDAC
+#if defined(PROTO_CDAC)
 #include "HTTP.h"
 #endif
 #include <string.h>
@@ -30,17 +26,17 @@ extern int lastcrc;
 extern double fGPSLat,fGPSLong,fGPSAlt,fGPSpdop,fGPShdop,fGPSSats,fGPSSpeed, fGPSHeading, fGPSForce;
 
 
-#ifdef PROTO_CDAC
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_CDAC)
 #define				SERVER_MAX_BUFF						512
 #define				DATA_MAX_BUFF						1024
-#define				CRITICAL_MAX_BUFF					128
+#define				CRITICAL_MAX_BUFF					512
 
 
 
 typedef struct
 {
 	char KeyVal[5];
-	char Value[30];
+	char Value[80];
 }ParamOTATypedef;
 #define MAX_OTA_SIZE		30
 typedef struct
@@ -132,26 +128,40 @@ static const unsigned short crc16tab[256]= {
 	0x6e17,0x7e36,0x4e55,0x5e74,0x2e93,0x3eb2,0x0ed1,0x1ef0
 };
 
-extern volatile uint8_t SendLogin1;  // Primary server (Socket[0]) - 0=not sent, 1=ready, 2=sent
-extern volatile uint8_t SendLogin2;  // Secondary server (Socket[2])
-extern volatile uint8_t SendLogin3;  // Tertiary server (Socket[3])
+extern volatile uint8_t SendLogin1,SendLogin2,SendLogin3	;
 #ifndef PROTO_CDAC
 extern uint16_t StoredHistoryDataCount;
 #endif
 void ServerThreadEntry(s32 taskId);
 void server_thread_init(u32 taskId);
 void SendResponce(char *Sender, char* Resp, uint8_t IsServer, uint8_t IsSET); 
+void DecodeOTAData(char* buff, uint8_t isserver);
+uint8_t GetXORChecksum(const char* data, int len);
 uint32_t checksum32(const uint8_t *data, size_t length);
 extern volatile uint8_t IsSendProcess;
-double calculateDistanceFast(double lat1, double lon1, double lat2, double lon2);
-#ifdef PROTO_CDAC
+
+#if defined(PROTO_CDAC)
 uint8_t SendDataToServer(char *data, uint8_t KeepAlive, uint16_t currentIntervalSec);
 #else
 uint8_t SendDataToServer(char *data, uint8_t KeepAlive);
 #endif
 
+#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_CDAC)
+#ifdef ENABLE_UNIFIED_FIRMWARE
+void InsertIntValueCDAC(uint16_t value, uint16_t position, uint16_t length);
+void InsertFloatValueCDAC(double value, uint16_t position, uint16_t length, const char* decimal);
+#else
+void InsertIntValue(uint16_t value, uint16_t position, uint16_t length);
+void InsertFloatValue(double value, uint16_t position, uint16_t length, const char* decimal);
+#define InsertIntValueCDAC InsertIntValue
+#define InsertFloatValueCDAC InsertFloatValue
+#endif
+#endif
+
 
 void InitSockets(void);
+void UpdateURL(char* value);
+void UpdateSecondaryURL(char* value);
 
 extern char Server1RxData[];
 extern char Server2RxData[];

@@ -35,6 +35,8 @@ extern FTableTypedef FTable;
 
 void StoreFileToFlash(char *data, uint8_t paket);
 uint16_t ReadDataBatch(char *data, uint8_t type, uint8_t istypemasked, uint8_t lifocount, uint8_t isDelete);
+uint16_t ReadDataBatchExt(char *data, uint8_t type, uint8_t istypemasked, uint8_t lifocount, uint8_t isDelete, int16_t *outSlot);
+uint8_t DeleteDataBatchSlot(uint16_t pos);
 uint16_t ReadFileTable(void);
 void ClearFileTable(void);
 // Clears the batch queue files without formatting UFS.

@@ -19,7 +19,7 @@ static LEDPatternTypedef LED_PATTERNS[20];  // Increased from 16 to 20
 extern GSM_Typedef GSM;
 extern GPS_Typedef GPS;
 extern PepheralTypedef PeriPheralVal;
-extern SOSTypeDefStruct SOS;
+extern volatile SOSTypeDefStruct SOS;
 extern SleepConfigTypedef SleepConfig;
 extern VTSTypedef VTSData;
 extern Providertypedef prfReq;
@@ -145,17 +145,26 @@ void LEDManager_Init(void)
     LED_PATTERNS[idx].TotalTime = 10;
     LED_PATTERNS[idx].Priority = 21;
     idx++;
-    
+
+    // Battery not connected / faulty → solid ON
+    LED_PATTERNS[idx].StateID = LEDSTATE_BATT_FAULT;
+    LED_PATTERNS[idx].LEDID = BATTERYLED;
+    LED_PATTERNS[idx].State = 1;
+    LED_PATTERNS[idx].ONTime = 10;
+    LED_PATTERNS[idx].TotalTime = 10;
+    LED_PATTERNS[idx].Priority = 19;
+    idx++;
+
     // SOS LED Patterns
     LED_PATTERNS[idx].StateID = LEDSTATE_SOS_ACTIVE;
     LED_PATTERNS[idx].LEDID = SOSLED;
     LED_PATTERNS[idx].State = 1;
-    LED_PATTERNS[idx].ONTime = 2;
-    LED_PATTERNS[idx].TotalTime = 5;
+    LED_PATTERNS[idx].ONTime = 1;        // SOS ON: fast blink (100ms on / 100ms off = 5Hz)
+    LED_PATTERNS[idx].TotalTime = 2;
     LED_PATTERNS[idx].Priority = 30;
     idx++;
-    
-    #ifdef PROTO_OG // For OG protocol, SOS_OFF is solid ON
+
+    // SOS_OFF is solid ON for ALL protocols (default)
     LED_PATTERNS[idx].StateID = LEDSTATE_SOS_OFF;
     LED_PATTERNS[idx].LEDID = SOSLED;
     LED_PATTERNS[idx].State = 1;
@@ -163,15 +172,7 @@ void LEDManager_Init(void)
     LED_PATTERNS[idx].TotalTime = 10;
     LED_PATTERNS[idx].Priority = 31;
     idx++;
-    #else // For other protocols, SOS_OFF is Slow Blink
-    LED_PATTERNS[idx].StateID = LEDSTATE_SOS_OFF;
-    LED_PATTERNS[idx].LEDID = SOSLED;
-    LED_PATTERNS[idx].State = 1;
-    LED_PATTERNS[idx].ONTime = 2;
-    LED_PATTERNS[idx].TotalTime = 10;
-    LED_PATTERNS[idx].Priority = 31;
-    #endif
-    
+
     LED_PATTERNS[idx].StateID = LEDSTATE_SOS_SLEEP;
     LED_PATTERNS[idx].LEDID = SOSLED;
     LED_PATTERNS[idx].State = 0;  // Completely off
@@ -303,6 +304,9 @@ static LEDStateID DetermineGPSState(void)
 // Determine Battery LED state based on battery voltage
 static LEDStateID DetermineBatteryState(void)
 {
+    /* Battery not connected or faulty → solid ON (takes priority over low/normal). */
+    if (!hw_battery_connected())
+        return LEDSTATE_BATT_FAULT;
     if (PeriPheralVal.BattVolt < VTSData.BattThrs)
         return LEDSTATE_BATT_LOW;
     else
@@ -381,6 +385,6 @@ void LEDManager_PrintStatus(void)
     LOGData(TAG_LED, "LED Manager Status:");
     LOGData(TAG_LED, "  GSM: %d (Module State: %d)", LEDManager.GSMState, GSM.GSMState);
     LOGData(TAG_LED, "  GPS: %d (Fix: %d, State: %d)", LEDManager.GPSState, GPS.GPSFix, GPS.State);
-    LOGData(TAG_LED, "  Battery: %d (Volt: %.2f)", LEDManager.BatteryState, PeriPheralVal.BattVolt);
+    LOGData(TAG_LED, "  Battery: %d (Volt: %d.%02d)", LEDManager.BatteryState, (int)PeriPheralVal.BattVolt, (int)(PeriPheralVal.BattVolt * 100) % 100);
     LOGData(TAG_LED, "  SOS: %d (Active: %d)", LEDManager.SOSState, SOS.IsSOS);
 }

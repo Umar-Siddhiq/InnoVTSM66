@@ -7,12 +7,16 @@
 
 //***********SOS************************************
 #define							INPUT_SOS_PIN					PINNAME_PCM_SYNC
-#define            				INPUT_SOS_INIT					Ql_GPIO_Init(INPUT_SOS_PIN,PINDIRECTION_IN,PINLEVEL_LOW,PINPULLSEL_DISABLE);
+#define            				INPUT_SOS_INIT					Ql_GPIO_Init(INPUT_SOS_PIN,PINDIRECTION_IN,PINLEVEL_HIGH,PINPULLSEL_PULLUP);
 #define							INPUT_SOS_VAL					Ql_GPIO_GetLevel(INPUT_SOS_PIN)
 
-
-
-
+#ifdef SOS_NC_CIRCUIT
+#define SOS_ACTIVE_LEVEL   1
+#define SOS_IDLE_LEVEL     0
+#else
+#define SOS_ACTIVE_LEVEL   0
+#define SOS_IDLE_LEVEL     1
+#endif
 
 //in unit of 100ms
 #define	SOS_OFF_LED_ON_TIME					2
@@ -33,12 +37,14 @@ typedef struct
 	uint8_t IsSOSSMS;
 	uint16_t SOSTimeOut;
 	uint16_t SOSTimeLasped;
-	
+	uint16_t SOSTamperTimeLapsed;
+	uint8_t RequireRelease;   /* require the pin to return to idle before the next ON trigger */
+
 }SOSTypeDefStruct;
 
 
 
-extern  SOSTypeDefStruct SOS;
+extern volatile SOSTypeDefStruct SOS;
 
 
 void SOSInit(uint16_t timeOut);

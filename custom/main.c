@@ -40,12 +40,38 @@
 #include "GPS.h"
 #include "Systic.h"
 #include "File.h"
+#include "FTP.h"
 #include "SMS.h"
 #include "SMSlib.h"
-#include "Sensors.h"
+#include "Alert.h"
+#include "SystemRecovery.h"
+#include "fota_main.h"
 
 #if VTS_DEBUG_LOG_ENABLE
 char DBG_BUFFER[DBG_BUF_LEN]={0};
+static u32 s_logMutex = 0;
+
+/* Ql_Debug_Trace is limited to 512 bytes and treats its first argument as a
+ * printf format string.  All application tasks used to share DBG_BUFFER and
+ * pass that mutable buffer as the format argument, so concurrent logs (or a
+ * '%' in a payload) could make the trace engine read arbitrary memory. */
+void LogData_Init(void)
+{
+    if (s_logMutex == 0)
+        s_logMutex = Ql_OS_CreateMutex("VTS_LOG");
+}
+
+void LogData_Lock(void)
+{
+    if (s_logMutex != 0)
+        Ql_OS_TakeMutex(s_logMutex);
+}
+
+void LogData_Unlock(void)
+{
+    if (s_logMutex != 0)
+        Ql_OS_GiveMutex(s_logMutex);
+}
 #endif
 char FirmVer[15]={0};
 
@@ -66,9 +92,16 @@ void print_long_string(const char* long_string) {
 
         // Create the chunk and the header
         char chunk[chunk_size + 50]; // Extra space for header
-        Ql_snprintf(chunk, sizeof(chunk), "[%zu/%zu] %.*s\n", start_index + 1, len, (int)(end_index - start_index), long_string + start_index);
-        
-        // Print the chunk using nwy_dbg_log
+        /* LOG CLEANUP 2026-05-16: %zu not supported by Ql_vsnprintf on M66
+         * → triggers "Ql_vsnprintf() is not supported" log spam every chunk.
+         * Cast to int and use %d. OLD CODE:
+         *   Ql_snprintf(chunk, sizeof(chunk), "[%zu/%zu] %.*s\n", start_index + 1, len, ...);
+         */
+        Ql_snprintf(chunk, sizeof(chunk), "[%d/%d] %.*s\n",
+                    (int)(start_index + 1), (int)len,
+                    (int)(end_index - start_index), long_string + start_index);
+
+        // Print the chunk via the SDK debug trace
         Ql_Debug_Trace(chunk);
     }
 }
@@ -92,31 +125,62 @@ void debug_uart_init(void)
 void system_init(void)
 {
     //debug_uart_init();
+    AlertInitStruct();
+#ifdef ENABLE_UNIFIED_FIRMWARE
+    if (IS_PROTO_OG()) {
+        Ql_sprintf(FirmVer,"V%s",FIRMWAREVERSION);
+    } else {
+        strcpy(FirmVer,FIRMWAREVERSION);
+    }
+#else
     #ifndef PROTO_OG
     strcpy(FirmVer,FIRMWAREVERSION);
     #else
-    strcpy(FirmVer,"V1.5.2");
+    Ql_sprintf(FirmVer,"V%s",FIRMWAREVERSION);
     #endif
+#endif
     LOGData(TAG_MAIN,"OpenCPU: APM %s Firware Version %s, State/Proto: %s\r\n", PROTOVER, FirmVer, PROTO_TAG);
     InitSystic();
     hw_init();
     LoadConfig();
     LoadState();
-    #ifndef PROTO_CDAC
-    InitSensors();
-    LoadSensorConfigFromFlash();
-    #endif
+    LoadActiveProfile();
+    
+    extern uint8_t IsFTPReq;
+    LoadFTPConfig(&DownloadReq);
+    if (DownloadReq.IsValid == FOTA_REQ_VALID_CODE)
+    {
+        IsFTPReq = 1;
+        LOGData(TAG_MAIN, "Pending FOTA/MOTA request detected at boot, auto-resume scheduled");
+    }
+    /* ------------------------------------------------------------------
+     * DIAGNOSTIC LOGGING SYSTEM — Load persistent counters at boot
+     * Added : 2026-05-13
+     *
+     * LoadDiag() reads Diag.bin from flash. On first boot after firmware
+     * update (or if Diag.bin is missing/corrupted), LoadDefaultDiag()
+     * is called automatically which zeros all counters and creates the file.
+     * This call MUST come after LoadState() so VTSState.CurrentProfile
+     * is valid when PushDiagEvent(BOOT) is called inside SystemRecovery_Init().
+     *
+     * OLD CODE: (LoadDiag did not exist)
+     * ------------------------------------------------------------------ */
+    LoadDiag();
+    LOGData(TAG_BOOT, "=== BOOT COMPLETE === FW:%s SIM:%s Profile:%d BootCount:%lu ===",
+            FirmVer, SIM_MAKE_STR, VTSState.CurrentProfile, DiagCounters.BootCount);
     SOSInit(VTSData.IntervalData.SOSTimeOut);
+#ifdef ENABLE_UNIFIED_FIRMWARE
+    VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.DataInterval;
+#else
     #ifdef PROTO_CDAC
     VehicleState.PacketState = NORMAL;
     VehicleState.VehicleMode = HALT;
     VehicleMovingMode = 'H';
     VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.HaltInterval;
-    AlertInitStruct();
     #else
     VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.DataInterval;
-    AlertInitStruct();
     #endif
+#endif
 }
 
 typedef struct {
@@ -182,23 +246,80 @@ void proc_main_task(s32 taskId)
     ST_MSG msg;
 
     g_nEventGrpId = Ql_OS_CreateEvent(BT_EVTGRP_NAME);
-   
-    LOGData(TAG_MAIN,"OpenCPU: APM Open CPU VTS M66\r\n");
-    
-   // LOGData("MAIN", "OpenCPU: Customer Application %s\r\n","V0.1.0");
+
+#if VTS_DEBUG_LOG_ENABLE
+    LogData_Init();
+#endif
+
+    /* LOG CLEANUP 2026-05-16: Duplicate of line ~101 banner which already
+     * shows FW version + protocol + tag. This line carried no extra info.
+     * OLD CODE:
+     *   LOGData(TAG_MAIN,"OpenCPU: APM Open CPU VTS M66\r\n");
+     */
+
+    /* ------------------------------------------------------------------
+     * FIX: Start watchdog HERE — before Ql_OS_GetMessage is first called
+     * DATE  : 2026-05-16
+     *
+     * ROOT CAUSE OF PREVIOUS FAILURE:
+     *   Ql_WTD_Start() was called inside SystemRecovery_Init() which runs
+     *   from case MSG_ID_RIL_READY: inside the message loop below. On the
+     *   M66, Ql_WTD_Start() returns QL_RET_ERR_PARAM (-1) when invoked
+     *   from inside a message handler — regardless of the interval value.
+     *   Even Ql_WTD_Start(1000) failed with ret=-1 in that context.
+     *   The retry-from-FeedWatchdog also ran in the wrong context (Systic
+     *   thread after the loop started) and failed the same way.
+     *
+     * THE RULE (from Quectel example_watchdog.c):
+     *   Ql_WTD_Start() MUST be called BEFORE the while(TRUE) message loop.
+     *   After Ql_OS_GetMessage() is first called, the OS is in "message
+     *   processing" state and WDT registration is no longer allowed.
+     *
+     * HOW THIS WORKS:
+     *   SystemRecovery_EarlyWatchdogStart() calls Ql_WTD_Start() here,
+     *   in the correct pre-loop context. It tries the full fallback table
+     *   before Ql_OS_GetMessage() is entered and stores the returned ID in
+     *   s_watchdogId inside SystemRecovery.c. SystemRecovery_Init() later
+     *   only logs/persists status; FeedWatchdog() just feeds the active WDT.
+     *
+     * REVERT:
+     *   Remove the SystemRecovery_EarlyWatchdogStart() call below.
+     *   Restore SystemRecovery_StartWatchdog() call inside Init() (old code
+     *   comment is preserved in SystemRecovery.c).
+     *
+     * OLD CODE: (no pre-loop WDT call — WDT was started from MSG_ID_RIL_READY)
+     * ------------------------------------------------------------------ */
+#if SYSTEM_RECOVERY_ENABLE && SYSTEM_WATCHDOG_ENABLE
+    SystemRecovery_EarlyWatchdogStart();
+#endif
+
     // START MESSAGE LOOP OF THIS TASK
     while(TRUE)
     {
         Ql_memset(&msg, 0x0, sizeof(ST_MSG));
         Ql_OS_GetMessage(&msg);
-        LOGData(TAG_MAIN, "Message: %d, param1: %d,  param2: %d\r\n", msg.message, msg.param1, msg.param2);
+        /* LOG CLEANUP 2026-05-16: This printed on EVERY OS message —
+         * URC indications, RIL responses, timer ticks, heartbeats — tens
+         * of thousands per minute. Each handler below has its own
+         * meaningful log already. OLD CODE:
+         *   LOGData(TAG_MAIN, "Message: %d, param1: %d,  param2: %d\r\n",
+         *           msg.message, msg.param1, msg.param2);
+         */
         switch(msg.message)
         {
         case MSG_ID_RIL_READY:
             LOGData(TAG_MAIN,"<-- RIL is ready -->\r\n");
             Ql_RIL_Initialize();
             ResetSMSContext();
+#ifdef SYSTEM_MINIMAL_FOTA_FORMATTER_BUILD
+            LOGData(TAG_MAIN,"MINIMAL BUILD: Formatting UFS partition...");
+            Ql_FS_Format(Ql_FS_UFS);
+            LOGData(TAG_MAIN,"UFS partition formatted successfully!");
+#endif
             system_init();
+#if SYSTEM_RECOVERY_ENABLE
+            SystemRecovery_Init();
+#endif
             break;
         case MSG_ID_URC_INDICATION:
             LOGData(TAG_MAIN,"<-- Received URC: type: %d, -->\r\n", msg.param1);
@@ -264,11 +385,24 @@ void proc_main_task(s32 taskId)
                 break;
             case URC_MODULE_VOLTAGE_IND:
                 LOGData(TAG_MAIN,"<-- VBatt Voltage Ind: type=%d\r\n", msg.param2);
+#if SYSTEM_RECOVERY_ENABLE && SYSTEM_VOLTAGE_RECOVERY_ENABLE
+                SystemRecovery_OnVoltageInd(msg.param2);
+#endif
                 break;
             default:
                 LOGData(TAG_MAIN,"<-- Other URC: type=%d\r\n", msg.param1);
                 break;
             }
+            break;
+        case MSG_ID_RESET_MODULE_REQ:
+            LOGData(TAG_MAIN, "<-- Reset request received: attempts=%d, ret=%d -->\r\n", msg.param1, msg.param2);
+#if SYSTEM_RECOVERY_ENABLE
+            SystemRecovery_RequestReset("FOTA FTP reset request");
+#else
+            LOGData(TAG_MAIN, "!!! Ql_Reset(0) IMMINENT - reason: FOTA FTP reset request !!!");
+            Ql_Reset(0);
+            ThreadSleep(2000);
+#endif
             break;
         default:
             break;

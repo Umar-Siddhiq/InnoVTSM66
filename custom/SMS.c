@@ -8,6 +8,10 @@
 #include "BLE.h"
 #include "ql_fs.h"
 #include "Batch.h"
+#include "Sensors.h"
+
+/* Defined in Server.c — routes SET/GET/CLR OTA commands from RS232/RS485. */
+extern void DecodeOTAData(char* buff, uint8_t isserver);
 
 // Forward declaration for RS232 response queueing (from Hardware.c)
 extern void QueueRS232Response(const char* response);
@@ -39,75 +43,155 @@ uint16_t IsSMS=0;
 extern uint32_t FrameNumber;
 
 #ifdef PROTO_CDAC
-extern char VehicleMovingMode;
+extern volatile char VehicleMovingMode;
 #endif
 
 // ZigTestMode: Manufacturing test mode flag (0=disabled, 1=enabled)
 uint8_t ZigTestMode = 0;
 
-
-#ifndef PROTO_CDAC
-void SendSOSSMS(uint8_t isFall)
+int GetValueFromData(char* data, char* cmd,char delim1, int delimPos, char delim2, char* value)
 {
-	LOGData(TAG_OTA,"SOS SMS Fallback triggered !!!!!!!!!!!!!");
-	// char Link[200];
-	// memset(SimData,0x00,MSGSIZE);
-	// Ql_strcpy(SimData,"SOS Triggered\n");
-
-	// Ql_sprintf(Link,"%s%s,%s",MAPSLINK,sLastitude,sLongitude);
-	// Ql_strcat(SimData,Link);
-
-	// SendSMS(VTSData.PhoneNumber.Mob0,SimData);
-	// SendSMS(VTSData.PhoneNumber.Mob1,SimData);
-	if(isFall)
-		Ql_sprintf(SimData,"SOSFB,");
-	else
-		Ql_sprintf(SimData,"SOS,");
-
-	StringAdd(SimData,"%s\nLat:%s,%c\nLng:%s,%c,fix:%d, Speed:%s\nCID:%s,LAC:%s\n",NetWork.IMEI,sLatitude,GPS.LatDir,sLongitude,GPS.LngDir,GPS.GPSFix,sSpeed,GSM.CellID,GSM.LAC);
-	InsertCurrentDateTime(SimData,0);
-	InsertChar(SimData,',');
-	InsertCurrentDateTime(SimData,1);
-
-	SendSMS(VTSData.PhoneNumber.Mob0,SimData);
-	SendSMS(VTSData.PhoneNumber.Mob1,SimData);
-
-}
-
-void SendGeoData(uint8_t index ,uint8_t IsServer)
-{
-	memset(dataBuffer,0x00,DATA_MAX_BUFF);
-	Ql_sprintf(dataBuffer,"$GFR,");
-
-	if(VTSData.GeoLatLng[index].InOut!=0)
+	char* fn;
+	char* ls;
+	int ln;
+	if (!data || !cmd || !value)
+		return 0;
+	ln=Ql_strlen(cmd);
+	fn=Ql_strstr(data,cmd);
+	if(fn)
 	{
-		StringAdd(dataBuffer,"Geo[%d]: ",index);
-		StringAdd(dataBuffer,"ID : %d,",VTSData.GeoLatLng[index].ID);
-		StringAdd(dataBuffer,"Mask: %d,",VTSData.GeoLatLng[index].InOut);
-		for(int j=0; j < 10;j++)
+		fn=fn+ln;
+		fn++;
+		if(delimPos==0)
 		{
-			if(VTSData.GeoLatLng[index].Latitude[j] != 0)
+			ls=Ql_strchr(fn,delim2);
+			if(ls)
 			{
-				StringAdd(dataBuffer,"LAT[%d]:%.6f,",j,VTSData.GeoLatLng[index].Latitude[j]);
-				StringAdd(dataBuffer,"LNG[%d]:%.6f,",j,VTSData.GeoLatLng[index].Longitude[j]);
+				ln=ls-fn;
+				if (ln <= 0 || ln >= 60) return 0;
+				Ql_strncpy(value,fn,ln);
+				value[ln]=0;
+				while(ln > 0 && (value[ln-1] == '\r' || value[ln-1] == '\n')) {
+					value[ln-1] = '\0';
+					ln--;
+				}
+				return 1;
 			}
 		}
-		dataBuffer[Ql_strlen(dataBuffer)-1] = '*';
+		while(delimPos)
+		{
+			delimPos--;
+			ls=Ql_strchr(fn,delim1);
+			if (!ls) return 0;
+			fn=ls+1;
+		}
+		if(ls)
+		{
+			ls++;
+			fn=Ql_strchr(ls,delim2);
+			if (!fn) return 0;
+			ln=fn-ls;
+			if((ln > 0) && (ln < 60))
+			{
+				Ql_memset(value,0x00,ln+1);
+				Ql_strncpy(value,ls,ln);
+				while(ln > 0 && (value[ln-1] == '\r' || value[ln-1] == '\n')) {
+					value[ln-1] = '\0';
+					ln--;
+				}
+				return 1;
+			}
+		}
 	}
-	else
-		Ql_strcat(dataBuffer,"NC*");
-
-	
-	LOGData(TAG_OTA,"geo res : %s",dataBuffer);
-	if(IsServer==OTA_SRC_BLE)
-		BLE_SendReply((u8*)dataBuffer,strlen(dataBuffer));
-	else if(IsServer==OTA_SRC_SCK_1)
-		TCPSocket_SendString(&ServerSocket[0],dataBuffer);
-	else
-		TCPSocket_SendString(&ServerSocket[2],dataBuffer);
-	
+	return 0;
 }
-#endif
+
+static uint8_t ParseEpoFtpArgs(const char* tokenStart, char* ip, uint16_t* port, char* user, char* pass, char* filename)
+{
+	if (!tokenStart || !ip || !port || !user || !pass || !filename) {
+		return 0;
+	}
+
+	const char* p = tokenStart;
+	while (*p && *p != 'E') p++;
+	if (Ql_strncmp(p, "EPO ", 4) != 0) {
+		return 0;
+	}
+	p += 4;
+
+	const char* fields[5] = {0};
+	uint16_t lens[5] = {0};
+	int field = 0;
+
+	while (*p && field < 5) {
+		while (*p == ' ' || *p == '\t') p++;
+		fields[field] = p;
+		while (*p && *p != ',' && *p != '\r' && *p != '\n') p++;
+		lens[field] = (uint16_t)(p - fields[field]);
+		if (*p == ',') p++;
+		field++;
+	}
+	if (field < 5) {
+		return 0;
+	}
+
+	if (lens[0] == 0 || lens[0] >= 50) return 0;
+	Ql_memset(ip, 0, 50);
+	Ql_strncpy(ip, fields[0], lens[0]);
+	ip[lens[0]] = '\0';
+
+	char tmp[64];
+	if (lens[1] == 0 || lens[1] >= sizeof(tmp)) return 0;
+	Ql_memset(tmp, 0, sizeof(tmp));
+	Ql_strncpy(tmp, fields[1], lens[1]);
+	tmp[lens[1]] = '\0';
+	int pnum = atoi(tmp);
+	if (pnum <= 0 || pnum > 65535) return 0;
+	*port = (uint16_t)pnum;
+
+	if (lens[2] == 0 || lens[2] >= 50) return 0;
+	Ql_memset(user, 0, 50);
+	Ql_strncpy(user, fields[2], lens[2]);
+	user[lens[2]] = '\0';
+
+	if (lens[3] == 0 || lens[3] >= 50) return 0;
+	Ql_memset(pass, 0, 50);
+	Ql_strncpy(pass, fields[3], lens[3]);
+	pass[lens[3]] = '\0';
+
+	if (lens[4] == 0 || lens[4] >= 80) return 0;
+	Ql_memset(filename, 0, 80);
+	Ql_strncpy(filename, fields[4], lens[4]);
+	filename[lens[4]] = '\0';
+	return 1;
+}
+
+extern void FOTAStart(void);
+void LoadDefaultFOTAParams(char *Sender, uint8_t IsServer)
+{
+	memset((void*)&DownloadReq,0x00,sizeof(download_req_info_s));
+	Ql_strncpy(DownloadReq.IP, "124.123.18.16", sizeof(DownloadReq.IP) - 1);
+	DownloadReq.IP[sizeof(DownloadReq.IP) - 1] = '\0';
+	Ql_strncpy(DownloadReq.User, "CCMSV1", sizeof(DownloadReq.User) - 1);
+	DownloadReq.User[sizeof(DownloadReq.User) - 1] = '\0';
+	Ql_strncpy(DownloadReq.Pass, "CCMS@123", sizeof(DownloadReq.Pass) - 1);
+	DownloadReq.Pass[sizeof(DownloadReq.Pass) - 1] = '\0';
+	Ql_strncpy(DownloadReq.Sender, Sender, sizeof(DownloadReq.Sender) - 1);
+	DownloadReq.Sender[sizeof(DownloadReq.Sender) - 1] = '\0';
+	Ql_strncpy(DownloadReq.FilePath, "RAM:app_fota.bin", sizeof(DownloadReq.FilePath) - 1);
+	DownloadReq.FilePath[sizeof(DownloadReq.FilePath) - 1] = '\0';
+	Ql_strncpy(DownloadReq.InternalFilePath, SERVER_FOTA_FILEPATH, sizeof(DownloadReq.InternalFilePath) - 1);
+	DownloadReq.InternalFilePath[sizeof(DownloadReq.InternalFilePath) - 1] = '\0';
+	DownloadReq.Port = 21;
+	DownloadReq.IsServer = IsServer;
+	DownloadReq.AttemptCount=3;
+	DownloadReq.RequestType=FTP_REQ_TYPE_FOTA;
+	DownloadReq.IsValid = FOTA_REQ_VALID_CODE;
+	UpdateFTPConfigInFlash(&DownloadReq);
+	SendResponce(Sender,"Attemping FTP for FOTA...",IsServer,1);
+	FTPStart(&DownloadReq);
+	ThreadSleep(3000);
+}
 
 static uint8_t IsValidSOSMobileNumber(const char *number)
 {
@@ -121,12 +205,12 @@ static void GetSOSISTDateTime(_RTC *ist)
 	ist->Year = CurrentDateTime.Year;
 	ist->Month = CurrentDateTime.Month;
 	ist->Date = CurrentDateTime.Date;
-	ist->Hour = CurrentDateTime.Hour;
+	ist->Hour = CurrentDateTime.Hour + 5;
 	ist->Min = CurrentDateTime.Min + 30;
 	ist->Sec = CurrentDateTime.Sec;
 	if (ist->Min >= 60) { ist->Min -= 60; ist->Hour++; }
 	if (ist->Hour < 24) return;
-	ist->Hour = 0;
+	ist->Hour -= 24;
 	ist->Date++;
 	daysInMonth = (ist->Month == 4 || ist->Month == 6 || ist->Month == 9 || ist->Month == 11) ? 30 :
 		(ist->Month == 2 ? (((ist->Year % 4) == 0) ? 29 : 28) : 31);
@@ -165,186 +249,56 @@ void SendSOSAlertSMS(uint8_t AlertNum)
 	Ql_sprintf(message, "ID:%d %s\nIMEI:%s\nLAT:%s%c LON:%s%c\nhttp://maps.google.com/?q=%s,%s\nT:%02d-%02d-20%02d %02d:%02d:%02d IST",
 		AlertNum, alertName, NetWork.IMEI, sLatitude, GPS.LatDir, sLongitude, GPS.LngDir,
 		sLatitude, sLongitude, ist.Date, ist.Month, ist.Year, ist.Hour, ist.Min, ist.Sec);
+	/* Notify all configured emergency numbers (Mob0–Mob4), matching the
+	 * reference. Each is validated so unset/placeholder slots are skipped. */
 	if (IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob0))
 		SendSMS(VTSData.PhoneNumber.Mob0, message);
 	if (IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob1))
 		SendSMS(VTSData.PhoneNumber.Mob1, message);
+	if (IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob2))
+		SendSMS(VTSData.PhoneNumber.Mob2, message);
+	if (IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob3))
+		SendSMS(VTSData.PhoneNumber.Mob3, message);
+	if (IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob4))
+		SendSMS(VTSData.PhoneNumber.Mob4, message);
 }
 
 void SendSMS(char* ph, char* msg)
 {
-    LOGData(TAG_OTA,"SMS Sending!\n");
+    char cleanPh[25] = {0};
+    uint16_t len = 0;
+    uint16_t idx = 0;
 
-    // Optional: sanitize or trim input
     if (ph == NULL || msg == NULL || Ql_strlen(ph) == 0 || Ql_strlen(msg) == 0)
     {
-        LOGData(TAG_OTA,"Invalid phone number or message.\n");
+        LOGData(TAG_OTA, "Invalid phone number or message.\n");
         return;
     }
 
-    // If your message is UCS2 encoded (e.g., for Unicode support), set this to true
-    bool isUCS2 = false;  // Set to true if message is in UCS2 encoding
+    len = Ql_strlen(ph);
+    for (uint16_t i = 0; i < len && idx < sizeof(cleanPh) - 1; i++)
+    {
+        char c = ph[i];
+        if (c != '"' && c != '\'' && c != ' ' && c != '\r' && c != '\n')
+        {
+            cleanPh[idx++] = c;
+        }
+    }
+    cleanPh[idx] = '\0';
 
-    // Use your custom SMS send function
-    SMS_SendTextMessage(ph, msg, isUCS2);
-}
+    char formattedPh[25] = {0};
+    if (Ql_strlen(cleanPh) == 10 && cleanPh[0] >= '0' && cleanPh[0] <= '9')
+    {
+        Ql_sprintf(formattedPh, "+91%s", cleanPh);
+    }
+    else
+    {
+        Ql_strcpy(formattedPh, cleanPh);
+    }
 
-
-
-
-int GetValueFromData(char* data, char* cmd,char delim1, int delimPos, char delim2, char* value)
-{
-	char* fn;
-	char* ls;
-	int ln;
-	
-	if (!data || !cmd || !value)
-		return 0;
-	
-	ln=strlen(cmd);
-	fn=strstr(data,cmd);
-	if(fn)
-	{
-		fn=fn+ln;
-		fn++;
-		if(delimPos==0)
-		{
-			ls=strchr(fn,delim2);
-			if(ls)
-			{
-				ln=ls-fn;
-				if (ln <= 0 || ln >= 60)  // Bounds check
-					return 0;
-				strncpy(value,fn,ln);
-				value[ln]=0;
-				// Strip trailing \r and \n characters
-				while(ln > 0 && (value[ln-1] == '\r' || value[ln-1] == '\n')) {
-					value[ln-1] = '\0';
-					ln--;
-				}
-				return 1;
-			}
-		}
-		while(delimPos)
-		{
-			delimPos--;
-			ls=strchr(fn,delim1);
-			if (!ls)  // Safety check
-				return 0;
-			fn=ls+1;
-		}
-		if(ls)
-		{
-			ls++;
-			fn=strchr(ls,delim2);
-			if (!fn)  // Safety check
-				return 0;
-			ln=fn-ls;
-			if((ln > 0) && (ln < 60))
-			{
-				memset(value,0x00,ln+1);
-				strncpy(value,ls,ln);
-				// Strip trailing \r and \n characters
-				while(ln > 0 && (value[ln-1] == '\r' || value[ln-1] == '\n')) {
-					value[ln-1] = '\0';
-					ln--;
-				}
-				return 1;
-			}
-		}
-	}
-	return 0;
-}
-
-static uint8_t ParseEpoFtpArgs(const char* tokenStart, char* ip, uint16_t* port, char* user, char* pass, char* filename)
-{
-	if (!tokenStart || !ip || !port || !user || !pass || !filename) {
-		return 0;
-	}
-
-	// tokenStart points to "EPO " within the SET payload
-	const char* p = tokenStart;
-	while (*p && *p != 'E') p++;
-	if (Ql_strncmp(p, "EPO ", 4) != 0) {
-		return 0;
-	}
-	p += 4;
-
-	// Parse 5 comma-separated fields: ip,port,user,pass,filename
-	const char* fields[5] = {0};
-	uint16_t lens[5] = {0};
-	int field = 0;
-
-	while (*p && field < 5) {
-		// Skip spaces
-		while (*p == ' ' || *p == '\t') p++;
-		fields[field] = p;
-		while (*p && *p != ',' && *p != '\r' && *p != '\n') p++;
-		lens[field] = (uint16_t)(p - fields[field]);
-		if (*p == ',') p++;
-		field++;
-	}
-	if (field < 5) {
-		return 0;
-	}
-
-	// Copy with bounds
-	if (lens[0] == 0 || lens[0] >= 50) return 0;
-	Ql_memset(ip, 0, 50);
-	Ql_strncpy(ip, fields[0], lens[0]);
-	ip[lens[0]] = '\0';
-
-	char tmp[64];
-	if (lens[1] == 0 || lens[1] >= sizeof(tmp)) return 0;
-	Ql_memset(tmp, 0, sizeof(tmp));
-	Ql_strncpy(tmp, fields[1], lens[1]);
-	tmp[lens[1]] = '\0';
-	int pnum = atoi(tmp);
-	if (pnum <= 0 || pnum > 65535) return 0;
-	*port = (uint16_t)pnum;
-
-	if (lens[2] == 0 || lens[2] >= 50) return 0;
-	Ql_memset(user, 0, 50);
-	Ql_strncpy(user, fields[2], lens[2]);
-	user[lens[2]] = '\0';
-
-	if (lens[3] == 0 || lens[3] >= 50) return 0;
-	Ql_memset(pass, 0, 50);
-	Ql_strncpy(pass, fields[3], lens[3]);
-	pass[lens[3]] = '\0';
-
-	if (lens[4] == 0 || lens[4] >= 80) return 0;
-	Ql_memset(filename, 0, 80);
-	Ql_strncpy(filename, fields[4], lens[4]);
-	filename[lens[4]] = '\0';
-	return 1;
-}
-extern void FOTAStart(void);
-void LoadDefaultFOTAParams(char *Sender, uint8_t IsServer)
-{
-	memset((void*)&DownloadReq,0x00,sizeof(download_req_info_s));
-	Ql_strncpy(DownloadReq.IP, "124.123.18.16", sizeof(DownloadReq.IP) - 1);
-	DownloadReq.IP[sizeof(DownloadReq.IP) - 1] = '\0';
-	Ql_strncpy(DownloadReq.User, "CCMSV1", sizeof(DownloadReq.User) - 1);
-	DownloadReq.User[sizeof(DownloadReq.User) - 1] = '\0';
-	Ql_strncpy(DownloadReq.Pass, "CCMS@123", sizeof(DownloadReq.Pass) - 1);
-	DownloadReq.Pass[sizeof(DownloadReq.Pass) - 1] = '\0';
-	Ql_strncpy(DownloadReq.Sender, Sender, sizeof(DownloadReq.Sender) - 1);
-	DownloadReq.Sender[sizeof(DownloadReq.Sender) - 1] = '\0';
-	Ql_strncpy(DownloadReq.FilePath, "RAM:app_fota.bin", sizeof(DownloadReq.FilePath) - 1);
-	DownloadReq.FilePath[sizeof(DownloadReq.FilePath) - 1] = '\0';
-	Ql_strncpy(DownloadReq.InternalFilePath, SERVER_FOTA_FILEPATH, sizeof(DownloadReq.InternalFilePath) - 1);
-	DownloadReq.InternalFilePath[sizeof(DownloadReq.InternalFilePath) - 1] = '\0';
-	DownloadReq.Port = 21;
-	DownloadReq.IsServer = IsServer;
-	DownloadReq.AttemptCount=3;
-	DownloadReq.RequestType=FTP_REQ_TYPE_FOTA;
-	DownloadReq.IsValid = FOTA_REQ_VALID_CODE;
-	UpdateFTPConfigInFlash(&DownloadReq);
-	SendResponce(Sender,"Attemping FTP for FOTA...",IsServer,1);
-	FTPStart(&DownloadReq);
-	ThreadSleep(3000);
-	//Ql_Reset(0);
+    LOGData(TAG_OTA, "SMS Sending to %s: %s\n", formattedPh, msg);
+    bool isUCS2 = false;
+    SMS_SendTextMessage(formattedPh, msg, isUCS2);
 }
 
 uint8_t ParseFOTAPacket(char *buf, char *IP, uint16_t *port, char *User, char *pass, char *Filepath)
@@ -357,47 +311,42 @@ uint8_t ParseFOTAPacket(char *buf, char *IP, uint16_t *port, char *User, char *p
     if (!buf || !IP || !port || !User || !pass || !Filepath)
         return 0;
 
-    // Ensure it starts with "FOTA "
     if ((Ql_StrPrefixMatch(buf, "FOTA ") == 0) && (Ql_StrPrefixMatch(buf,"MOTA ") == 0)){
         return 0;
     }
 
-    // Skip "FOTA " (5 characters)
     p = buf + 5;
 
     while (*p && field < 5) {
         i = 0;
 
-        // Skip leading whitespace
         while (*p == ' ' || *p == '\t') p++;
 
-        // Copy until next comma or end
         while (*p && *p != ',' && *p != '\n' && *p != '\r' && i < sizeof(temp) - 1) {
             temp[i++] = *p++;
         }
         temp[i] = '\0';
 
-        // Skip the comma
         if (*p == ',') p++;
 
         switch (field) {
             case 0: 
-                Ql_strncpy(IP, temp, 64);  // Assuming max IP length
+                Ql_strncpy(IP, temp, 64);
                 IP[63] = '\0';
                 break;
             case 1: 
                 *port = (uint16_t)atoi(temp); 
                 break;
             case 2: 
-                Ql_strncpy(User, temp, 32);  // Assuming max user length
+                Ql_strncpy(User, temp, 32);
                 User[31] = '\0';
                 break;
             case 3: 
-                Ql_strncpy(pass, temp, 32);  // Assuming max password length
+                Ql_strncpy(pass, temp, 32);
                 pass[31] = '\0';
                 break;
             case 4: 
-                Ql_strncpy(Filepath, temp, 128);  // Assuming max path length
+                Ql_strncpy(Filepath, temp, 128);
                 Filepath[127] = '\0';
                 break;
         }
@@ -407,6 +356,7 @@ uint8_t ParseFOTAPacket(char *buf, char *IP, uint16_t *port, char *User, char *p
 
     return (field == 5) ? 1 : 0;
 }
+
 //SET MOTA ip,port,id,pass,filepath
 void MOTAPacket(char *buf,char *sender, uint8_t IsServer)
 {
@@ -499,7 +449,7 @@ void MakeACTMessage(uint8_t mode, char* code)
 	Ql_strncat(SimData,NetWork.IMEI,15);
 	
 	char alert_id_str[5];
-	Ql_sprintf(alert_id_str, ",%d,", mode + 1);
+	Ql_sprintf(alert_id_str, ",%02d,", mode + 1);
 	Ql_strcat(SimData, alert_id_str);
 	
 	//Ql_strcat(SimData,sLatitude);
@@ -2152,25 +2102,25 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			if(i)
 			{
 				flat = (double)atol(ss)/1000000;
-				LOGData(TAG_OTA,"FLat : %f",flat);
+				LOGData(TAG_OTA,"FLat : %s",ss);
 			}
 			i=GetValueFromData(ls,cmdName,',',1,',',ss);
 			if(i)
 			{
 				flng = (double)atol(ss)/1000000;
-				LOGData(TAG_OTA,"Flng : %f",flng);
+				LOGData(TAG_OTA,"Flng : %s",ss);
 			}
 			i=GetValueFromData(ls,cmdName,',',2,',',ss);
 			if(i)
 			{
 				pdop = (double)atol(ss)/100;
-				LOGData(TAG_OTA,"pdop : %f",pdop);
+				LOGData(TAG_OTA,"pdop : %s",ss);
 			}
 			i=GetValueFromData(ls,cmdName,',',3,',',ss);
 			if(i)
 			{
 				hdop = (double)atol(ss)/100;
-				LOGData(TAG_OTA,"hdop : %f",hdop);
+				LOGData(TAG_OTA,"hdop : %s",ss);
 			}
 			i=GetValueFromData(ls,cmdName,',',4,',',ss);
 			if(i)
@@ -2387,6 +2337,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			}
 			return 1;
 		}
+
 		ls=Ql_strstr(fn,"OPERATOR");
 		if(ls)
 		{
@@ -3310,39 +3261,77 @@ void SendRS485Response(char* response)
 	}
 }
 
+/* Trim leading/trailing whitespace and strip a leading '$' framing char. */
+static void NormalizeRS232Command(char *out, uint16_t outSize, const char *in)
+{
+	uint16_t start = 0, end, len;
+
+	if(outSize == 0) return;
+	if(in == NULL) { out[0] = '\0'; return; }
+
+	len = (uint16_t)Ql_strlen(in);
+	end = len;
+	while(start < end && (in[start]=='\r'||in[start]=='\n'||in[start]==' '||in[start]=='\t')) start++;
+	while(end > start && (in[end-1]=='\r'||in[end-1]=='\n'||in[end-1]==' '||in[end-1]=='\t')) end--;
+	if(start >= end) { out[0] = '\0'; return; }
+
+	len = end - start;
+	if(len >= outSize) len = outSize - 1;
+	Ql_memcpy(out, in + start, len);
+	out[len] = '\0';
+
+	if(out[0] == '$' && out[1] != '\0') {
+		uint16_t i;
+		for(i = 0; i < len; ++i) out[i] = out[i + 1];
+	}
+}
+
 void ProcessRS232OTAData(void)
 {
 	if (!RS232_DataAvailable)
 		return;
-		
-	LOGData(TAG_OTA, "Processing RS232 OTA data, length: %d", RS232_Buffer.datalen);
-	
+
+	LOGData(TAG_OTA, "Processing RS232 data, length: %d", RS232_Buffer.datalen);
+
 	// Null-terminate the received data
 	if (RS232_Buffer.datalen < MCOMM_COM_URT_EXG_BUFF_SIZE)
-	{
 		RS232_Buffer.data[RS232_Buffer.datalen] = '\0';
-	}
 	else
-	{
 		RS232_Buffer.data[MCOMM_COM_URT_EXG_BUFF_SIZE - 1] = '\0';
+
+	char normalized[MCOMM_COM_URT_EXG_BUFF_SIZE + 1] = {0};
+	NormalizeRS232Command(normalized, sizeof(normalized), (char*)RS232_Buffer.data);
+	if (normalized[0] == '\0') {
+		RS232_DataAvailable = 0;
+		return;
 	}
-	
-	// Process the OTA command
-	char sender_info[32];
-	Ql_sprintf(sender_info, "RS232_%s", NetWork.IMEI);
-	
-	LOGData(TAG_OTA, "RS232 OTA command: %s", (char*)RS232_Buffer.data);
-	
-	// Decode the SMS/OTA command using existing function
-	uint8_t result = DecodeSMS((char*)RS232_Buffer.data, OTA_SRC_RS232);
-	
-	if (!result)
-	{
-		// Send error response if command was not recognized
-		SendRS232Response("ERROR: Unknown command");
+	char* d = normalized;
+
+	// CLS fuel-sensor response (starts with '@') — route to the sensor parser.
+	if (d[0] == '@' && ParseCLSResponse(d, RS232_Buffer.datalen)) {
+		LOGData(TAG_OTA, "RS232 data handled as CLS Sensor response");
+		RS232_DataAvailable = 0;
+		return;
 	}
-	
-	// Clear the data available flag
+
+	LOGData(TAG_OTA, "RS232 OTA command: %s", d);
+
+	uint8_t result = 0;
+	if (Ql_strncmp(d, "SET ", 4) == 0 || Ql_strncmp(d, "GET ", 4) == 0 || Ql_strncmp(d, "CLR ", 4) == 0) {
+		DecodeOTAData(d, OTA_SRC_RS232);
+		result = 1;
+	} else {
+		result = DecodeSMS(d, OTA_SRC_RS232);
+	}
+
+	// Only reply ERROR when the input actually looked like a command (avoid
+	// spurious replies to RS232 line noise).
+	if (!result) {
+		if (Ql_strstr(d,"SETSENSOR")||Ql_strstr(d,"SETSOS")||Ql_strstr(d,"SETSNS")||
+		    Ql_strstr(d,"SET")||Ql_strstr(d,"GET")||Ql_strstr(d,"CLR")||Ql_strstr(d,"APN"))
+			SendRS232Response("ERROR: Unknown command");
+	}
+
 	RS232_DataAvailable = 0;
 }
 
@@ -3363,22 +3352,21 @@ void ProcessRS485OTAData(void)
 		RS485_Buffer.data[MCOMM_COM_URT_EXG_BUFF_SIZE - 1] = '\0';
 	}
 	
-	// Process the OTA command
-	char sender_info[32];
-	Ql_sprintf(sender_info, "RS485_%s", NetWork.IMEI);
-	
-	LOGData(TAG_OTA, "RS485 OTA command: %s", (char*)RS485_Buffer.data);
-	
-	// Decode the SMS/OTA command using existing function
-	uint8_t result = DecodeSMS((char*)RS485_Buffer.data, OTA_SRC_RS485);
-	
-	if (!result)
-	{
-		// Send error response if command was not recognized
-		SendRS485Response("ERROR: Unknown command");
+	char* d = (char*)RS485_Buffer.data;
+	LOGData(TAG_OTA, "RS485 OTA command: %s", d);
+
+	// Route SET/GET/CLR to the OTA decoder; everything else to the SMS decoder.
+	uint8_t result = 0;
+	if (Ql_strncmp(d, "SET ", 4) == 0 || Ql_strncmp(d, "GET ", 4) == 0 || Ql_strncmp(d, "CLR ", 4) == 0) {
+		DecodeOTAData(d, OTA_SRC_RS485);
+		result = 1;
+	} else {
+		result = DecodeSMS(d, OTA_SRC_RS485);
 	}
-	
-	// Clear the data available flag
+
+	if (!result)
+		SendRS485Response("ERROR: Unknown command");
+
 	RS485_DataAvailable = 0;
 }
 

@@ -258,12 +258,60 @@ uint8_t GetBatteryPercentage(float voltage)
 }
 
 
+/* --- Battery presence detection (charger-toggle method) ---
+ * With no battery installed, the VBAT ADC pin floats at the charger's
+ * regulation voltage (~4.1V), indistinguishable from a charged cell by
+ * voltage alone. A rolling average smooths charger-switching noise; the
+ * hardware-thread state machine (see HardwareThreadEntry) periodically
+ * pulses the charger OFF and checks whether the rail collapses. */
+#define BATT_ADC_SAMPLES        5
+#define BATT_DISCONNECT_CONFIRM 3
+static double  s_battAdcBuf[BATT_ADC_SAMPLES] = {0};
+static uint8_t s_battAdcIdx = 0;
+static uint8_t s_battAdcFilled = 0;
+static uint8_t s_battNewSamples = 0;          /* samples since last flush */
+static double  s_rawBattVolt = 0.0;
+static volatile uint8_t s_batteryConnected = 1; /* assume present until first check */
+static volatile uint8_t s_battCheckActive = 0;  /* 1 while charger is off for the presence probe */
+static uint8_t s_disconnectCount = 0;
+
 static void Callback_OnADCSampling(Enum_ADCPin adcPin, u32 adcValue, void *customParam)
 {
-    PeriPheralVal.BattVolt = (double)adcValue / 1000.0; // Convert to volts
-    PeriPheralVal.BattVolt = PeriPheralVal.BattVolt * 2; // Adjust for voltage divider
-    LOGData(TAG_HARDWARE,"ADC Sampling: %d mV, BattVolt: %.2f V", adcValue, PeriPheralVal.BattVolt);
-    PeriPheralVal.BattPerc = GetBatteryPercentage(PeriPheralVal.BattVolt);
+    double measured = (double)adcValue / 1000.0 * 2.0; // Convert to volts (divider x2)
+
+    /* 5-sample rolling average to suppress charger-switching noise */
+    s_battAdcBuf[s_battAdcIdx % BATT_ADC_SAMPLES] = measured;
+    s_battAdcIdx++;
+    if (s_battAdcIdx >= BATT_ADC_SAMPLES) s_battAdcFilled = 1;
+    if (s_battNewSamples < BATT_ADC_SAMPLES) s_battNewSamples++;
+
+    if (s_battAdcFilled)
+    {
+        double sum = 0.0;
+        for (int i = 0; i < BATT_ADC_SAMPLES; i++) sum += s_battAdcBuf[i];
+        s_rawBattVolt = sum / BATT_ADC_SAMPLES;
+    }
+    else
+    {
+        s_rawBattVolt = measured; /* use raw until the buffer fills */
+    }
+
+    /* Report 0 when no battery is present (charger float voltage is ignored). */
+    if (!s_batteryConnected || s_rawBattVolt < 2.8)
+    {
+        PeriPheralVal.BattVolt = 0.0;
+        PeriPheralVal.BattPerc = 0;
+    }
+    else
+    {
+        PeriPheralVal.BattVolt = s_rawBattVolt;
+        PeriPheralVal.BattPerc = GetBatteryPercentage((float)s_rawBattVolt);
+    }
+}
+
+uint8_t hw_battery_connected(void)
+{
+    return s_batteryConnected;
 }
 
 void hw_charger_init(void)
@@ -325,7 +373,7 @@ void CheckGPSAlerts(void)
     if(deltaSpeed > VTSData.VehicleData.HarshAcc/100){
         VAlert[HARSH_ACC_ALERT].Enable=1;
         AddAlert(HARSH_ACC_ALERT);
-        LOGData(TAG_SYSTIC,"********* GPS HARSH ACCEL ALERT (dS=%.2f > %.2f)********\n", deltaSpeed, (float)VTSData.VehicleData.HarshAcc);
+        LOGData(TAG_SYSTIC,"********* GPS HARSH ACCEL ALERT (dS=%d.%02d)********\n", (int)deltaSpeed, (int)(deltaSpeed * 100) % 100);
         //SendRS232String("\r\n ********* GPS HARSH ACCEL ALERT********\n");
     }
     
@@ -333,7 +381,7 @@ void CheckGPSAlerts(void)
     if(deltaSpeed < -1 * VTSData.VehicleData.HarshBreak/50){
         VAlert[HARSH_BRK_ALERT].Enable=1;
         AddAlert(HARSH_BRK_ALERT);
-        LOGData(TAG_SYSTIC,"********* GPS HARSH BRAKE ALERT (dS=%.2f < %.2f)********\n", deltaSpeed, -1.0f * VTSData.VehicleData.HarshBreak);
+        LOGData(TAG_SYSTIC,"********* GPS HARSH BRAKE ALERT (dS=%d.%02d)********\n", (int)deltaSpeed, (int)(deltaSpeed * 100) % 100);
         //SendRS232String("\r\n ********* GPS HARSH BRAKE ALERT********\n");
     }
 
@@ -661,7 +709,12 @@ void HardwareThreadEntry(s32 taskId)
         }
         #endif
 
-        if(PeriPheralVal.BattVolt < VTSData.BattThrs)
+        /* Only evaluate battery-low when a battery is actually present.
+         * With no battery, BattVolt is forced to 0 which would otherwise
+         * latch a false BATTERY LOW alert. */
+        /* Skip battery-low evaluation while the charger is off for the presence
+         * probe — the rail dips transiently and would fire a false LOW/RESTORE. */
+        if(s_batteryConnected && !s_battCheckActive && PeriPheralVal.BattVolt < VTSData.BattThrs)
         {
             if(!PrevBLow)
             {
@@ -681,9 +734,12 @@ void HardwareThreadEntry(s32 taskId)
                 VAlert[BATT_LOW_ALERT].Enable=0;
                 RemoveAlert(BATT_LOW_ALERT);
                 LOGData(TAG_HARDWARE,"********* BATTERY LOW RESTORE ********\n");
-                VAlert[BATT_LOW_RES_ALERT].Enable=1;
-                AddAlert(BATT_LOW_RES_ALERT);
-            }   
+                if(s_batteryConnected)
+                {
+                    VAlert[BATT_LOW_RES_ALERT].Enable=1;
+                    AddAlert(BATT_LOW_RES_ALERT);
+                }
+            }
         }
         
         
@@ -724,6 +780,75 @@ void HardwareThreadEntry(s32 taskId)
                 OP1_Set(1);}
             else{
                 OP1_Set(0);}
+
+        /* --- Battery presence via charger-toggle (detection only, NO alerts) ---
+         * With external power present the charger drives the VBAT rail to ~4.1V
+         * whether or not a cell is installed.  Every ~30s pulse the charger OFF
+         * and let the rail settle 3s: with no battery it collapses (<2.8V, needs
+         * 3 confirmations), a real cell holds.  Deliberately sends NO alerts —
+         * the battery-alert path previously caused M66 exception resets.
+         * (Requires the charger GPIO to gate the VBAT rail — bench-verify.) */
+        {
+            static uint16_t battChkTimer = 0;
+            static uint16_t battSettle   = 0;
+            static uint8_t  battChkState = 0;   /* 0 = idle, 1 = wait-settle */
+
+            if(PeriPheralVal.IsMain)
+            {
+                switch(battChkState)
+                {
+                    case 0:
+                        if(++battChkTimer >= 150)   /* 30 s (150 x 200 ms) */
+                        {
+                            battChkTimer = 0;
+                            CONTROL_CHARGER_OFF;    /* pause charge so an empty rail can collapse */
+                            s_battCheckActive = 1;  /* suppress battery-low alert during the dip */
+                            s_battNewSamples = 0;   /* flush rolling average */
+                            battSettle = 15;        /* 3 s settle (15 x 200 ms) */
+                            battChkState = 1;
+                        }
+                        break;
+
+                    case 1:
+                        if(battSettle > 0) battSettle--;
+                        if(battSettle == 0)
+                        {
+                            if(s_battNewSamples >= BATT_ADC_SAMPLES) /* decide only on post-settle samples */
+                            {
+                                if(s_rawBattVolt < 2.8)
+                                {
+                                    if(++s_disconnectCount >= BATT_DISCONNECT_CONFIRM)
+                                        s_batteryConnected = 0;
+                                }
+                                else
+                                {
+                                    s_disconnectCount = 0;
+                                    s_batteryConnected = 1;
+                                }
+                                CONTROL_CHARGER_ON; /* restore charge */
+                                s_battCheckActive = 0;
+                                battChkState = 0;
+                            }
+                            else
+                            {
+                                battSettle = 1;     /* wait one more tick for fresh samples */
+                            }
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                /* No external power → the device is running off the battery, so
+                 * it must be present. Restore charger if we were mid-check. */
+                if(battChkState == 1) CONTROL_CHARGER_ON;
+                s_battCheckActive = 0;
+                s_batteryConnected = 1;
+                s_disconnectCount  = 0;
+                battChkTimer = 0;
+                battChkState = 0;
+            }
+        }
 
         // Send RS232 status messages every ~1 second (5 iterations * 200ms)
         #ifdef ENABLE_RS232_PRINT
@@ -999,7 +1124,7 @@ void SystemInfoSend(void)
     
     Ql_strncat(ss, "\n", sizeof(ss) - Ql_strlen(ss) - 1);
     
-    LOGData(TAG_HARDWARE, "%s", ss);
+    LOGVerbose(TAG_HARDWARE, "%s", ss);
     SendRS232String(ss);
 }
 
@@ -1064,7 +1189,7 @@ void CellTowerInfoSend(void)
     Ql_strncat(cel, "\n", sizeof(cel) - Ql_strlen(cel) - 1);
     
     SendRS232String(cel);
-    LOGData(TAG_HARDWARE, "%s", cel);
+    LOGVerbose(TAG_HARDWARE, "%s", cel);
 }
 
 //$PER,imei,GPSModemState,GPSFix,HHMMSS,DDMMYY,IsMEMs,IsFlash,IsSOS,Ignition,out1,out2,in2,MainsVolt,BattVolt\r\n
@@ -1158,7 +1283,7 @@ void PeripheralInfoSend(void)
     Ql_strncat(per, "\n", sizeof(per) - Ql_strlen(per) - 1);
     
     SendRS232String(per);
-    LOGData(TAG_HARDWARE, "%s", per);
+    LOGVerbose(TAG_HARDWARE, "%s", per);
 }
 
 //$GPD,imei,tracksats,visiblesats,hdop,pdop,lat,long,speed,alt,heading\r\n
@@ -1228,6 +1353,6 @@ void GPSDataSend(void)
     Ql_strncat(gpd, "\n", sizeof(gpd) - Ql_strlen(gpd) - 1);
     
     SendRS232String(gpd);
-    LOGData(TAG_HARDWARE, "%s", gpd);
+    LOGVerbose(TAG_HARDWARE, "%s", gpd);
 }
 

@@ -47,8 +47,37 @@
  * GNSS / EPO Feature Definition
  ************************************************************************/
 #define EOP_USE
-// Enable to get verbose logs during EPO download/injection and binary ACK handling.
-#define EPO_VERBOSE_LOG
+/************************************************************************
+ * Protocol Specific Feature Controls
+ ************************************************************************/
+#ifdef PROTO_CDAC
+#ifndef HTTP_QUEUE
+#define HTTP_QUEUE
+#endif
+#define SOS_NC_CIRCUIT
+// ENABLE_UNIFIED_FIRMWARE must be undefined for CDAC
+#undef ENABLE_UNIFIED_FIRMWARE
+// ENABLE_BATTERY_MONITOR must be undefined for CDAC trace stability
+#undef ENABLE_BATTERY_MONITOR
+#endif
 
+/************************************************************************
+ * Minimal Build Toggle & Overrides
+ ************************************************************************/
+// #define SYSTEM_MINIMAL_FOTA_FORMATTER_BUILD
+
+#ifdef SYSTEM_MINIMAL_FOTA_FORMATTER_BUILD
+#undef VTS_BLE_ENABLE
+#define VTS_BLE_ENABLE 0
+#undef VTS_DEBUG_LOG_ENABLE
+#define VTS_DEBUG_LOG_ENABLE 0
+#undef SYSTEM_WATCHDOG_ENABLE
+#define SYSTEM_WATCHDOG_ENABLE 0
+#undef SYSTEM_RECOVERY_ENABLE
+#define SYSTEM_RECOVERY_ENABLE 0
+#undef ENABLE_GPS_RESET_RECOVERY
+#define ENABLE_GPS_RESET_RECOVERY 0
+#undef __OCPU_RIL_BT_SUPPORT__
+#endif
 
 #endif  //__CUSTOM_FEATURE_DEF_H__

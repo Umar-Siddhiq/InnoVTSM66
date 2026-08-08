@@ -3,8 +3,27 @@
 #ifdef HTTP_QUEUE
 
 #include "Server.h"
+#include "GPRS.h"
 
 HttpQueue httpQueue;
+static volatile uint8_t g_httpQueuePaused = 0;
+
+void HttpQueue_Pause(void)    { g_httpQueuePaused = 1; }
+void HttpQueue_Resume(void)   { g_httpQueuePaused = 0; }
+uint8_t HttpQueue_IsSending(void) { return httpQueue.sending; }
+
+/* Force-abort an in-progress queue send for SOS/tamper emergency.
+ * Closes the QHTTP session, resets all send-state flags, and logs the abort. */
+void HttpQueue_AbortSend(void)
+{
+    LOGData(TAG_SERVER, "HttpQueue: aborting in-progress send for emergency (IsSend=%d q.sending=%d)",
+            IsSendProcess, httpQueue.sending);
+    HTTP_Close(0);
+    IsSendProcess = 0;
+    httpQueue.sending = 0;
+    httpQueue.busy = 0;
+    httpQueue.queue_send_start_ms = 0;
+}
 
 static void http_queue_thread_init(u32 taskId)
 {
@@ -132,6 +151,7 @@ uint8_t HttpQueue_Add(const char *data, uint16_t frequency_sec, uint8_t storage_
     item->frequency_sec = frequency_sec;
     item->storage_type = storage_type;
     item->valid = 1;
+    item->retry_count = 0;
 
     httpQueue.tail = (uint8_t)((httpQueue.tail + 1) % HTTP_QUEUE_SIZE);
     httpQueue.count++;
@@ -140,90 +160,103 @@ uint8_t HttpQueue_Add(const char *data, uint16_t frequency_sec, uint8_t storage_
     return 1;
 }
 
-// Track when queue entered sending state for stuck detection
-static uint32_t queue_send_start_ms = 0;
-static const uint32_t QUEUE_STUCK_TIMEOUT_MS = 60000;  // 60 seconds
-
 void HttpQueue_Process(void)
 {
-    uint32_t now_ms = Ql_GetMsSincePwrOn();
-    
-    // EMERGENCY CLEAR: If sending or IsSendProcess stuck > 60 seconds, force reset
-    if((httpQueue.sending || IsSendProcess) && queue_send_start_ms > 0) {
-        uint32_t stuck_ms = now_ms - queue_send_start_ms;
-        if(stuck_ms > QUEUE_STUCK_TIMEOUT_MS) {
-            LOGData(TAG_SERVER, "[EMERGENCY] Queue STUCK for %ldms! sending=%d, IsSendProcess=%d, FORCING RESET",
-                    stuck_ms, httpQueue.sending, IsSendProcess);
-            httpQueue.sending = 0;
-            IsSendProcess = 0;
-            queue_send_start_ms = 0;
-            return;  // Let retry happen next call
-        }
-    }
-    
-    // Safety check for IsSendProcess corruption
-    if(IsSendProcess > 1) {
-        LOGData(TAG_SERVER, "WARNING: IsSendProcess corrupted! Value=%d, resetting to 0", IsSendProcess);
-        IsSendProcess = 0;
-    }
-    
     uint8_t sent = 0;
     uint8_t failed = 0;
-    LOGData(TAG_SERVER, "HTTP queue process ENTRY: count=%d, sending=%d, IsSendProcess=%d", httpQueue.count, httpQueue.sending, IsSendProcess);
-    if(httpQueue.count == 0 || httpQueue.sending || IsSendProcess) {
-        LOGData(TAG_SERVER, "HTTP queue process skipped: count=%d, sending=%d, IsSendProcess=%d", httpQueue.count, httpQueue.sending, IsSendProcess);
+    static uint32_t last_log_time = 0;
+    static uint32_t last_gprs_wait_log = 0;
+    uint32_t now = Ql_GetMsSincePwrOn();
+    
+    // Stuck Thread Watchdog
+    if (httpQueue.sending || IsSendProcess) {
+        if (httpQueue.queue_send_start_ms == 0) {
+            httpQueue.queue_send_start_ms = now;
+        } else if ((now - httpQueue.queue_send_start_ms) > QUEUE_STUCK_TIMEOUT_MS) {
+            LOGData(TAG_SERVER, "HTTP Queue Watchdog: stuck detected (sending=%d, IsSendProcess=%d) for %dms! Resetting state.", 
+                    httpQueue.sending, IsSendProcess, (int)(now - httpQueue.queue_send_start_ms));
+            httpQueue.sending = 0;
+            IsSendProcess = 0;
+            httpQueue.busy = 0; // Release queue lock
+            httpQueue.queue_send_start_ms = 0;
+        }
+    } else {
+        httpQueue.queue_send_start_ms = 0;
+    }
+
+    if (now - last_log_time > 10000) {
+        LOGVerbose(TAG_SERVER, "HttpQueue Status: count=%d, sending=%d, IsSendProcess=%d",
+                httpQueue.count, httpQueue.sending, IsSendProcess);
+        last_log_time = now;
+    }
+
+    if(httpQueue.count == 0 || httpQueue.sending || IsSendProcess || g_httpQueuePaused) {
         return;
     }
-    
-    // Mark start time for stuck detection
-    queue_send_start_ms = now_ms;
-
-    LOGData(TAG_SERVER, "HTTP queue process: pending=%d", httpQueue.count);
 
     httpQueue.sending = 1;
     if(!HttpQueue_WaitLock(50)) {
         httpQueue.sending = 0;
-        IsSendProcess = 0;
-        LOGData(TAG_SERVER, "[FIX_LEAK] HttpQueue initial lock timeout, IsSendProcess cleared");
+        httpQueue.queue_send_start_ms = 0;
         return;
     }
 
     HttpQueue_ExpireOld();
     if(httpQueue.count == 0) {
         httpQueue.sending = 0;
+        httpQueue.queue_send_start_ms = 0;
         HttpQueue_Unlock();
         return;
     }
 
-    if(ServerSocket[0].SocketState != SOCKET_CONNECTED) {
-        HTTPConnectFlag = 1;
+    if(GSM.GSMState != GPRS_ACTIVE) {
+        if(now - last_gprs_wait_log > 10000) {
+            LOGData(TAG_SERVER, "HTTP queue waiting for GPRS before send (state=%d, pending=%d)",
+                    GSM.GSMState, httpQueue.count);
+            last_gprs_wait_log = now;
+        }
         httpQueue.sending = 0;
+        httpQueue.queue_send_start_ms = 0;
         HttpQueue_Unlock();
         return;
     }
 
     IsSendProcess = 1;
+    LOGData(TAG_SERVER, "HTTP queue process: pending=%d", httpQueue.count);
     while(httpQueue.count > 0 && sent < HTTP_QUEUE_BURST && !failed) {
         HttpQueueItem *item = &httpQueue.items[httpQueue.head];
         uint8_t keepAlive = (httpQueue.count > 1 && sent < (HTTP_QUEUE_BURST - 1)) ? 1 : 0;
         char sendData[HTTP_QUEUE_PACKET_SIZE];
         uint16_t frequency = item->frequency_sec;
+        uint8_t storage_type = item->storage_type;
 
         Ql_strncpy(sendData, item->data, HTTP_QUEUE_PACKET_SIZE - 1);
         sendData[HTTP_QUEUE_PACKET_SIZE - 1] = '\0';
 
         HttpQueue_Unlock();
         if(!SendDataToServer(sendData, keepAlive, frequency)) {
+            if(!HttpQueue_WaitLock(200)) {
+                failed = 1;
+                break;
+            }
+            httpQueue.items[httpQueue.head].retry_count++;
+            if(httpQueue.items[httpQueue.head].retry_count >= HTTP_QUEUE_MAX_RETRIES) {
+                LOGData(TAG_SERVER, "HTTP queue: item retries exhausted (%d), evicting to flash",
+                        HTTP_QUEUE_MAX_RETRIES);
+                HttpQueue_RemoveHead();
+                HttpQueue_Unlock();
+                StoreFileToFlash(sendData, storage_type);
+                if(!HttpQueue_WaitLock(200)) {
+                    failed = 1;
+                    break;
+                }
+            }
             failed = 1;
-        }
-        if(!HttpQueue_WaitLock(200)) {
-            failed = 1;
-            IsSendProcess = 0;
-            LOGData(TAG_SERVER, "[FIX_LEAK] HttpQueue loop lock timeout, IsSendProcess cleared");
-            break;
-        }
-
-        if(!failed) {
+        } else {
+            if(!HttpQueue_WaitLock(200)) {
+                failed = 1;
+                break;
+            }
             HttpQueue_RemoveHead();
             sent++;
         }
@@ -235,7 +268,7 @@ void HttpQueue_Process(void)
 
     IsSendProcess = 0;
     httpQueue.sending = 0;
-    queue_send_start_ms = 0;  // Clear stuck timer on success
+    httpQueue.queue_send_start_ms = 0;
     HttpQueue_Unlock();
 }
 
@@ -247,6 +280,43 @@ uint8_t HttpQueue_Count(void)
 uint8_t HttpQueue_HasPending(void)
 {
     return (httpQueue.count > 0) ? 1 : 0;
+}
+
+uint8_t HttpQueue_HasNormalPending(void)
+{
+    uint8_t i, idx;
+    for(i = 0; i < httpQueue.count; i++) {
+        idx = (uint8_t)((httpQueue.head + i) % HTTP_QUEUE_SIZE);
+        if(httpQueue.items[idx].valid &&
+           httpQueue.items[idx].storage_type == HTTP_QUEUE_TYPE_NORMAL) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* Replace the most-recently-added NORMAL item in the queue with fresh data. */
+void HttpQueue_ReplaceLatestNormal(const char *data, uint16_t frequency_sec)
+{
+    int8_t i;
+    if(data == NULL || Ql_strlen(data) == 0) return;
+    if(!HttpQueue_WaitLock(50)) return;
+    for(i = (int8_t)(httpQueue.count - 1); i >= 0; i--) {
+        uint8_t idx = (uint8_t)((httpQueue.head + (uint8_t)i) % HTTP_QUEUE_SIZE);
+        if(httpQueue.items[idx].valid &&
+           httpQueue.items[idx].storage_type == HTTP_QUEUE_TYPE_NORMAL) {
+            Ql_strncpy(httpQueue.items[idx].data, data, HTTP_QUEUE_PACKET_SIZE - 1);
+            httpQueue.items[idx].data[HTTP_QUEUE_PACKET_SIZE - 1] = '\0';
+            httpQueue.items[idx].expiry_time =
+                Ql_GetMsSincePwrOn() + HTTP_QUEUE_CALC_EXPIRY_MS(frequency_sec);
+            httpQueue.items[idx].frequency_sec = frequency_sec;
+            httpQueue.items[idx].retry_count = 0;
+            LOGData(TAG_SERVER, "HTTP queue NRM replaced at idx=%d", idx);
+            HttpQueue_Unlock();
+            return;
+        }
+    }
+    HttpQueue_Unlock();
 }
 
 void HttpQueue_Flush(void)

@@ -163,6 +163,7 @@ void hw_led_process(void);
 int hw_led_add(int PinName, uint16_t ONTime, uint16_t TotalTime);
 void hw_led_init(void);
 uint8_t hw_led_state_set(int LED, uint8_t State, uint16_t ONTime, uint16_t TotalTime);
+uint8_t hw_battery_connected(void);   /* 1 = battery present, 0 = not connected / faulty */
 
 
 void hw_init(void);
