@@ -140,7 +140,7 @@ typedef enum {
 #ifndef PROTO_CDAC
 // #define HISTORY_DISABLED
 #endif
- #define PRF_AUTOSWITCH
+#define PRF_AUTOSWITCH
 #define HISTORY_INTERNAL
 // #define AUTO_SLEEP_ENABLE  // Auto sleep after 2 min ignition off
 extern char FirmVer[];
@@ -167,9 +167,9 @@ extern char FirmVer[];
 #define LOW_BAT_THRS_PER 85
 
 // #define SIMMAKE_APM
- #define SIMMAKE_IDEMIA_3P
+// #define SIMMAKE_IDEMIA_3P
 // #define SIMMAKE_SENS
-// #define SIMMAKE_GND
+ #define SIMMAKE_GND
 // #define SIMMAKE_TACHNOJACKS
 // #define SIMMAKE_COLORPLAST
 

@@ -43,6 +43,7 @@ nwy_file_ftp_info_s CurrentFile={0};
 uint32_t DataGetTimeout=0;
 
 static volatile s32 g_ftpLastErrCode = 0;
+char FtpErrorMsg[100] = {0};
 
 static void FTP_BuildLocalDownloadedPath(const char* storage, const char* remoteName, char* outPath, u16 outPathLen)
 {
@@ -265,31 +266,29 @@ uint8_t FTP_CleanupDiskSpace(uint32_t requiredSize)
     {
         LOGData(TAG_FTP, "Initiating selective cleanup...");
         
-        // 1. Delete large logs
+        // 1. Delete large logs and diagnostics
         Ql_FS_Delete("FOTA.txt");
         Ql_FS_Delete("EVENT.txt");
-        
+        Ql_FS_Delete("Diag.bin");
+
         // 2. Delete old firmware/temp downloads
         Ql_FS_Delete("app.bin");
         Ql_FS_Delete("mcu.bin");
         Ql_FS_Delete("app_fota.bin");
-        
+
         freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
-        
+
 #ifndef HISTORY_DISABLED
-        // 3. Purge history packets if space is still insufficient for download
+        // 3. Clear batch and history storage if space is still insufficient.
+        //    ClearBatchStorage/ClearHistoryStorage delete the actual UFS files;
+        //    ClearFileTable only resets the index and must NOT be used here.
         if (requiredSize > 0 && freeSpace < (requiredSize + 51200))
         {
-            #if defined(PROTO_CDAC)
-            LOGData(TAG_FTP, "UFS space still low (%lu bytes), clearing CDAC batch storage...", freeSpace);
-            ClearFileTable();
-            #else
-            uint32_t neededSpace = (requiredSize + 51200) - freeSpace;
-            // Each history packet is 512 bytes on disk
-            uint16_t packetsToDelete = (neededSpace + 511) / 512;
-            LOGData(TAG_FTP, "UFS space still low (%lu bytes), purging oldest %u history packets...", freeSpace, packetsToDelete);
-            DeleteFirstPacketsBulk(packetsToDelete);
-            #endif
+            uint16_t del = 0, fail = 0;
+            LOGData(TAG_FTP, "UFS space still low (%lu bytes), clearing batch and history storage...", freeSpace);
+            ClearBatchStorage(&del, &fail);
+            del = 0; fail = 0;
+            ClearHistoryStorage(&del, &fail);
             freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
         }
 #endif
@@ -378,6 +377,7 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
     if (remoteName[0] == 0)
     {
         LOGData(TAG_FTP, "Invalid remote filename: %s", FTPFilePath);
+        Ql_strncpy(FtpErrorMsg, "Invalid remote path", sizeof(FtpErrorMsg) - 1);
         return 0;
     }
     
@@ -387,6 +387,7 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
     if(FTPState != FTP_STATE_CONNECTED)
     {
         LOGData(TAG_FTP,"Cant Download without FTP Logged In!");
+        Ql_strncpy(FtpErrorMsg, "FTP not connected", sizeof(FtpErrorMsg) - 1);
         return 0;
     }
     // Set local storage
@@ -416,13 +417,24 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
     if(!FTPGetFileSize(remoteName,&FileSize))
     {
         LOGData(TAG_FTP,"Couldn't get Filesize for %s",remoteName);
+        Ql_strncpy(FtpErrorMsg, "File not found or empty", sizeof(FtpErrorMsg) - 1);
         return 0;
     }
     LOGData(TAG_FTP,"Got File Size: %d",FileSize);
-    if(!FTP_CleanupDiskSpace(FileSize))
+    /* Skip the UFS space check for RAM downloads — RAM has no UFS constraint.
+     * CONFIRMED by logs: UFS max free ~285 KB, firmware 342 KB, 108 KB gap permanent. */
+    if (Ql_strncmp(storage, "RAM", 3) != 0)
     {
-        LOGData(TAG_FTP, "Aborting download: UFS disk full, cannot store %d bytes", FileSize);
-        return 0;
+        if (!FTP_CleanupDiskSpace(FileSize))
+        {
+            LOGData(TAG_FTP, "Aborting download: UFS disk full, cannot store %d bytes", FileSize);
+            Ql_strncpy(FtpErrorMsg, "Insufficient UFS disk space", sizeof(FtpErrorMsg) - 1);
+            return 0;
+        }
+    }
+    else
+    {
+        LOGData(TAG_FTP, "RAM storage: skipping UFS space check for %d-byte file", FileSize);
     }
     // if(!FLS_DeleteExistingFile(InternalFilePath))
     // {
@@ -440,7 +452,7 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
     if (ret < 0)
     {
         LOGData(TAG_FTP,"<-- Failed to download, cause=%d -->\r\n", ret);
-        
+        Ql_sprintf(FtpErrorMsg, "QFTPGET failed (code: %d)", ret);
         ret = RIL_FTP_QFTPCLOSE();
         LOGData(TAG_FTP,"<-- FTP close connection, ret=%d -->\r\n", ret);
 
@@ -455,12 +467,14 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
         if(FTPDownloadState == FTP_TRANSFER_ERROR)
         {
             LOGData(TAG_FTP,"FTP Download Interrupted! err=%d", g_ftpLastErrCode);
+            Ql_sprintf(FtpErrorMsg, "Download interrupted (err: %d)", g_ftpLastErrCode);
             return 0;
         }
         ThreadSleep(1000);
         if(--FTPTimeout <= 0)
         {
             LOGData(TAG_FTP,"FTP Download Timeout!");
+            Ql_strncpy(FtpErrorMsg, "Download timeout (300s limit)", sizeof(FtpErrorMsg) - 1);
             FTPDownloadState = FTP_TRANSFER_ERROR;
 
             ret = RIL_FTP_QFTPCLOSE();
@@ -475,7 +489,7 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
     if(DownloadedFileSize != FileSize)
     {
         LOGData(TAG_FTP,"FILE Final Size Check fail!, exp : %d, got: %d",FileSize,DownloadedFileSize);
-        //SendRS232String("FOTA Download Failed due to Network!");
+        Ql_sprintf(FtpErrorMsg, "Size check mismatch (exp: %d, got: %d)", FileSize, DownloadedFileSize);
         Ql_FS_Delete(InternalFilePath);
         return 0;
     }
@@ -486,10 +500,12 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
     // Verify the file where the modem saved it.
     if (downloadedPath[0] == 0) {
         LOGData(TAG_FTP,"FTP internal error: downloadedPath empty");
+        Ql_strncpy(FtpErrorMsg, "Internal path error", sizeof(FtpErrorMsg) - 1);
         return 0;
     }
     if (Ql_FS_Check(downloadedPath) != QL_RET_OK) {
         LOGData(TAG_FTP,"FTP Download Success but local file not found: %s", downloadedPath);
+        Ql_strncpy(FtpErrorMsg, "Local file check failed", sizeof(FtpErrorMsg) - 1);
         return 0;
     }
 
@@ -514,6 +530,7 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
         if (ret != QL_RET_OK)
         {
             LOGData(TAG_FTP,"FTP Rename Failed, ret=%d (src=%s dst=%s)", ret, downloadedPath, InternalFilePath);
+            Ql_sprintf(FtpErrorMsg, "Rename failed (ret: %d)", ret);
             return 0;
         }
 
@@ -530,6 +547,7 @@ static uint8_t FTPDownloadFileWithStorage(char* FTPFilePath, char* InternalFileP
     if(verifySize != FileSize)
     {
         LOGData(TAG_FTP,"File verification FAILED! Expected: %d, Got: %d", FileSize, verifySize);
+        Ql_sprintf(FtpErrorMsg, "Verify mismatch (exp: %d, got: %d)", FileSize, verifySize);
         return 0;
     }
     LOGData(TAG_FTP,"File verification PASSED: %d bytes", verifySize);
@@ -570,7 +588,8 @@ uint8_t FTP_DownloadOnce(const char* ip, uint16_t port, const char* user, const 
 
 uint8_t FOTAUpdate(char *firmwareFileName)
 {
-    u32 fileHandle = 0, operationResult = 0;
+    s32 fileHandle = -1;
+    s32 operationResult = 0;
     u32 firmwareFileSize = 0;
     u32 bytesRead = 0;
     u32 totalBytesWritten = 0;
@@ -614,14 +633,21 @@ uint8_t FOTAUpdate(char *firmwareFileName)
         return 0;
     }
 
-    // Open firmware file
-    fileHandle = Ql_FS_Open(firmwareFileName, QL_FS_READ_ONLY);
-    
+    // Open firmware file — RAM files require Ql_FS_OpenRAMFile; Ql_FS_Open returns -10000 on RAM paths.
+    if (Ql_strncmp(firmwareFileName, "RAM:", 4) == 0)
+        fileHandle = Ql_FS_OpenRAMFile(firmwareFileName, QL_FS_READ_ONLY, 0);
+    else
+        fileHandle = Ql_FS_Open(firmwareFileName, QL_FS_READ_ONLY);
+    LOGData(TAG_FTP, "FOTA: Open(%s) = %d", firmwareFileName, fileHandle);
+
     if(fileHandle < 0)
     {
         LOGData(TAG_FTP, "FOTA Error: Failed to open firmware file, ret=%d", fileHandle);
         return 0;
     }
+
+    // Seek to start — RAM filesystem may not position at 0 by default.
+    Ql_FS_Seek(fileHandle, 0, QL_FS_FILE_BEGIN);
 
     // Allocate buffer for chunks
     if((chunkBuffer = Ql_MEM_Alloc(CHUNK_SIZE)) == NULL)
@@ -633,7 +659,7 @@ uint8_t FOTAUpdate(char *firmwareFileName)
 
     LOGData(TAG_FTP, "Firmware size: %d bytes, using %d-byte chunks", firmwareFileSize, CHUNK_SIZE);
     LOGData(TAG_FTP, "Processing data before update");
-    
+
     // Process firmware in chunks
     while(totalBytesWritten < firmwareFileSize)
     {
@@ -888,48 +914,114 @@ uint8_t FTPHandleReqType(download_req_info_s* hdl)
 
 uint8_t FTPStart(download_req_info_s* downloadHandle)
 {
-    if(downloadHandle->IsValid == FOTA_REQ_VALID_CODE)
+    if(downloadHandle->IsValid != FOTA_REQ_VALID_CODE)
+        return 0;
+
+    /* Aggressive disk cleanup ONCE before any attempt and before IsFotaProcessing is set,
+     * so FTP_ClearRecoverableDiskData's guard does not block it. */
     {
-        if(downloadHandle->RequestType == FTP_REQ_TYPE_FOTA)
-        {
-            IsFotaProcessing = 1;
-        }
-        else if(downloadHandle->RequestType == FTP_REQ_TYPE_CONFIG)
-        {
-            IsMotaProcessing = 1;
-        }
+        DiskCleanupResult cleanResult;
+        Ql_memset(&cleanResult, 0, sizeof(cleanResult));
+        FTP_ClearRecoverableDiskData(&cleanResult);
+        LOGData(TAG_FTP, "Pre-FTP disk cleanup: before=%lu after=%lu hist=%u batch=%u files=%u fail=%u",
+                cleanResult.freeSpaceBefore, cleanResult.freeSpaceAfter,
+                cleanResult.historyFilesDeleted, cleanResult.batchFilesDeleted,
+                cleanResult.transientFilesDeleted, cleanResult.failures);
+    }
+
+    if(downloadHandle->RequestType == FTP_REQ_TYPE_FOTA)
+        IsFotaProcessing = 1;
+    else if(downloadHandle->RequestType == FTP_REQ_TYPE_CONFIG)
+        IsMotaProcessing = 1;
+
+    /* Retry loop — AttemptCount is initialised to 3 by the SMS handler.
+     * Each failed login or download decrements the count via AbortFTPRoutine
+     * and continues to the next attempt. This matches the reference project's
+     * behaviour that allows transient network failures to self-recover. */
+    while(downloadHandle->AttemptCount > 0)
+    {
         PreFTPRoutine(downloadHandle);
+
+        /* Wait for GPRS to be active before attempting login. */
+        if (GSM.GSMState != GPRS_ACTIVE)
+        {
+            LOGData(TAG_FTP, "GPRS not active (state: %d). Waiting...", GSM.GSMState);
+            SendResponceFTP(downloadHandle, "Waiting for GPRS activation...");
+            u32 gprsWait = 0;
+            while (GSM.GSMState != GPRS_ACTIVE && gprsWait < 60)
+            {
+                ThreadSleep(1000);
+                gprsWait++;
+            }
+            if (GSM.GSMState != GPRS_ACTIVE)
+            {
+                LOGData(TAG_FTP, "GPRS activation timeout after %lu s.", gprsWait);
+                SendResponceFTP(downloadHandle, "GPRS Activation Timeout!");
+                AbortFTPRoutine(downloadHandle);
+                continue;
+            }
+            LOGData(TAG_FTP, "GPRS activated after %lu s.", gprsWait);
+        }
+
         if(!FTP_Login(downloadHandle->IP,downloadHandle->Port,0,downloadHandle->User,downloadHandle->Pass))
         {
             SendResponceFTP(downloadHandle,"FTP LOGIN ERROR!");
             ThreadSleep(2500);
             AbortFTPRoutine(downloadHandle);
-            return 0;
+            continue;
         }
-        if(!FTPDownloadFile(downloadHandle->FilePath,downloadHandle->InternalFilePath))
+
+        Ql_memset(FtpErrorMsg, 0, sizeof(FtpErrorMsg));
+        /* FOTA: UFS max free (~285 KB) is smaller than firmware (~342 KB).
+         * No amount of cleanup can bridge the 108 KB gap — CONFIRMED by logs.
+         * Download to RAM (~1.5 MB heap), read directly with the same "RAM:<name>"
+         * path. No rename: RAM filesystem rename causes Ql_FS_Read to fail -38. */
+        if(downloadHandle->RequestType == FTP_REQ_TYPE_FOTA)
         {
-            SendResponceFTP(downloadHandle,"FTP Download ERROR!");
+            Ql_sprintf(downloadHandle->InternalFilePath, "RAM:%s", downloadHandle->FilePath);
+            if(!FTPDownloadFileWithStorage(downloadHandle->FilePath,
+                                           downloadHandle->InternalFilePath, "RAM"))
+            {
+                char failMsg[130];
+                Ql_sprintf(failMsg, "FTP Download ERROR: %s", FtpErrorMsg);
+                SendResponceFTP(downloadHandle, failMsg);
+                ThreadSleep(2500);
+                FTP_Logout();
+                AbortFTPRoutine(downloadHandle);
+                continue;
+            }
+        }
+        else if(!FTPDownloadFile(downloadHandle->FilePath,downloadHandle->InternalFilePath))
+        {
+            char failMsg[130];
+            Ql_sprintf(failMsg, "FTP Download ERROR: %s", FtpErrorMsg);
+            SendResponceFTP(downloadHandle, failMsg);
             ThreadSleep(2500);
             FTP_Logout();
             AbortFTPRoutine(downloadHandle);
-            return 0;
+            continue;
         }
+
         FTP_Logout();
         SendResponceFTP(downloadHandle,"FTP Download Success. Processing File...");
         downloadHandle->IsValid=0;
         UpdateFTPConfigInFlash(downloadHandle);
         FTPState=FTP_STATE_CLOSED;
         ThreadSleep(1000);
-        
-         if(FTPHandleReqType(downloadHandle))
+
+        if(FTPHandleReqType(downloadHandle))
             downloadHandle->Status=1;
         else
             downloadHandle->Status=2;
 
         IsFotaProcessing = 0;
         IsMotaProcessing = 0;
+        return 1;
     }
-    return 1;
+
+    IsFotaProcessing = 0;
+    IsMotaProcessing = 0;
+    return 0;
 }
 
 
