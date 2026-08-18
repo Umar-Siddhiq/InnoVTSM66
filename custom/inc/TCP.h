@@ -35,6 +35,9 @@ typedef struct {
     uint32_t reconnect_delay_ms;  // Exponential backoff delay in milliseconds
     u64 last_ack_number;  // Track last ACK number for send verification
     uint8_t noackcount;   // Counter for consecutive no-ACK events
+    uint32_t lastRxTime;       // last time data was received from server (seconds since boot)
+    uint32_t connectedSince;   // time when socket entered CONNECTED state
+    uint8_t  sendsSinceRx;     // sends since last server response (saturates at 255)
 } runtimeValTypedef;
 
 /**
@@ -63,8 +66,10 @@ void CallBack(connectionupdatecb cb, int socketno);
 void TCPThreadEntry(s32 taskId);
 void tcp_thread_init(u32 taskId);
 uint8_t TCPSocket_SendString(TCPSocketTypedef* socket, char* str);
+uint8_t TCPSocket_SendStringNoAck(TCPSocketTypedef* socket, char* str);
 uint8_t TCPSocket_WaitAck(TCPSocketTypedef* socket, int sent_len);
 void TCP_CloseALLSockets(void);
 void TCPSocket_Process(TCPSocketTypedef* socket);
+uint8_t TCP_IsAnySocketConnected(void);
 
 #endif /* _TCP_H */

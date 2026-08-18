@@ -33,6 +33,7 @@ _RTC CurrentDateTime = {0};
 uint8_t IsQNITZSet=0;
 Providertypedef prfReq=0;
  uint8_t PrfChanged;
+uint8_t RegDenytemp;
 #define STK_ENB
 
 STKDatatypedef STKdata = {0};
@@ -1238,26 +1239,23 @@ static void CheckprfReq(void)
         prfReq = NONE;
         PrfChanged = 1;
 
-        // Reset module after successful profile switch
-        LOGData(TAG_GPRS, "Profile switch successful, initiating reset");
-        ThreadSleep(1000);
-        /* OLD CODE:
-         *   Ql_Reset(0);
-         *   ThreadSleep(2000);
-         * Use SystemRecovery_RequestReset() so the reset reason is logged
-         * before reboot and the watchdog is stopped cleanly. */
-#if SYSTEM_RECOVERY_ENABLE
-        SystemRecovery_RequestReset("profile switch successful");
-#else
-        LOGData(TAG_GPRS, "!!! Ql_Reset(0) IMMINENT - reason: profile switch successful !!!");
-        Ql_Reset(0);
-        ThreadSleep(2000);
-#endif
+        /* The STK command has already completed and the new IMSI was read
+         * successfully in SwitchProfile().  Rebooting the entire module here
+         * caused a reset for every successful profile change and turned a
+         * normal registration-denied retry into a reset loop.  Give the new
+         * profile a fresh registration debounce window in the current session
+         * instead. */
+        RegDenytemp = 0;
+        GSM.IsRegDenied = 0;
+        GSM.GSMState = SIM_DETECTED;
+        LOGData(TAG_PROFILE,
+                "Profile switch complete; continuing without device reset (profile=%d, IMSI=%s)",
+                targetProfile,
+                NetWork.IMSI);
     }
 }
 
 
-uint8_t RegDenytemp;
 void ProcessREGISTER(void)
 {
     //nwy_nw_regs_info_type_t reg_info;
@@ -2302,6 +2300,9 @@ void GPRSThreadEntry(s32 taskId)
 
         while(SleepConfig.IsEnabled)
         {
+#if SYSTEM_RECOVERY_ENABLE && SYSTEM_WATCHDOG_ENABLE
+            SystemRecovery_CheckInTask(WDT_TASK_GPRS);
+#endif
             ThreadSleep(2000);
             /* LED Manager automatically shows sleep state */
         }

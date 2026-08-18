@@ -18,6 +18,24 @@
 // #define __OCPU_RIL_VOLTAGE_URC_SUPPORT__
 
 /************************************************************************
+ * 16MB Flash Storage Target Configuration
+ * Enable FLASH_STORAGE_16MB for 16MB Flash hardware builds.
+ * When enabled:
+ *   - Automatically defines HISTORY_DISABLED (disables UFS history backup files)
+ *   - Automatically sets VTS_DEBUG_LOG_ENABLE to 0 (disables UART debug trace logs)
+ *   - RS232 communication & packets remain 100% active and untouched
+ ************************************************************************/
+#define FLASH_STORAGE_16MB
+
+#ifdef FLASH_STORAGE_16MB
+#ifndef HISTORY_DISABLED
+#define HISTORY_DISABLED
+#endif
+#undef VTS_DEBUG_LOG_ENABLE
+#define VTS_DEBUG_LOG_ENABLE 0
+#endif
+
+/************************************************************************
  * Logging (disable to save flash)
  ************************************************************************/
 #ifndef VTS_DEBUG_LOG_ENABLE
@@ -55,10 +73,46 @@
 #define HTTP_QUEUE
 #endif
 #define SOS_NC_CIRCUIT
-// ENABLE_UNIFIED_FIRMWARE must be undefined for CDAC
-#undef ENABLE_UNIFIED_FIRMWARE
 // ENABLE_BATTERY_MONITOR must be undefined for CDAC trace stability
 #undef ENABLE_BATTERY_MONITOR
+#endif
+
+/************************************************************************
+ * System Recovery & Watchdog
+ ************************************************************************/
+#ifndef SYSTEM_RECOVERY_ENABLE
+#define SYSTEM_RECOVERY_ENABLE 1
+#endif
+#ifndef SYSTEM_WATCHDOG_ENABLE
+#define SYSTEM_WATCHDOG_ENABLE 1
+#endif
+#ifndef SYSTEM_WATCHDOG_TIMEOUT_MS
+#define SYSTEM_WATCHDOG_TIMEOUT_MS 5000
+#endif
+#ifndef SYSTEM_WATCHDOG_FEED_MS
+#define SYSTEM_WATCHDOG_FEED_MS 500
+#endif
+#ifndef SYSTEM_WATCHDOG_SERVICE_INIT_ENABLE
+#define SYSTEM_WATCHDOG_SERVICE_INIT_ENABLE 0
+#endif
+#ifndef SYSTEM_WATCHDOG_SERVICE_INIT_PIN
+/* PINNAME_RXD_AUX is UART_PORT3 RX (GPS) — must not be used as WDT toggle */
+#define SYSTEM_WATCHDOG_SERVICE_INIT_PIN PINNAME_END
+#endif
+#ifndef SYSTEM_WATCHDOG_SERVICE_INIT_MS
+#define SYSTEM_WATCHDOG_SERVICE_INIT_MS 600
+#endif
+#ifndef SYSTEM_WATCHDOG_BOOT_DELAY_MS
+#define SYSTEM_WATCHDOG_BOOT_DELAY_MS 0
+#endif
+#ifndef SYSTEM_RESET_DELAY_MS
+#define SYSTEM_RESET_DELAY_MS 100
+#endif
+#ifndef SYSTEM_WATCHDOG_GPRS_STALL_MS
+#define SYSTEM_WATCHDOG_GPRS_STALL_MS 180000
+#endif
+#ifndef SYSTEM_CONNECTION_WATCHDOG_TIMEOUT_MS
+#define SYSTEM_CONNECTION_WATCHDOG_TIMEOUT_MS (2 * 60 * 60 * 1000ULL)
 #endif
 
 /************************************************************************

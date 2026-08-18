@@ -22,6 +22,11 @@ LEDSystemTypedef LEDSystem = {0};
 PepheralTypedef PeriPheralVal={0};
 SleepConfigTypedef SleepConfig = {0};
 
+uint8_t SleepConfig_IsEnabled(void)
+{
+    return SleepConfig.IsEnabled;
+}
+
 
 uint8_t RFIDData[RFID_MAX_DATALEN]={0};
 uint16_t RFIDDataCount = 0;
@@ -263,17 +268,117 @@ uint8_t GetBatteryPercentage(float voltage)
  * regulation voltage (~4.1V), indistinguishable from a charged cell by
  * voltage alone. A rolling average smooths charger-switching noise; the
  * hardware-thread state machine (see HardwareThreadEntry) periodically
- * pulses the charger OFF and checks whether the rail collapses. */
+ * pulses the charger OFF and checks whether the rail collapses.
+ *
+ * DETECTION METHOD — two-point slope, not absolute voltage.
+ * Field measurement (2026-08-12, no cell installed) showed the old
+ * absolute/single-delta test could never fire: with the charger off the rail
+ * fell only 4.19 -> 4.10 V in the ~4 s window, so delta (90 mV) stayed under
+ * the 300 mV threshold and the level (4.10 V) stayed well over 2.8 V.
+ *
+ * The discriminator is the SUSTAINED SLOPE, not the level:
+ *   - no cell  : rail is capacitor-only, decays monotonically (~22 mV/s
+ *                measured) and never plateaus
+ *   - real cell: rail drops fast for ~1-2 s (surface-charge relaxation) then
+ *                plateaus at the cell OCV and holds within a few mV
+ * So sample V1 at +5 s (after the initial transient) and V2 at +15 s, and
+ * treat continued decay between the two as "no battery". This is independent
+ * of the bulk-capacitor size and of the cell's state of charge. */
 #define BATT_ADC_SAMPLES        5
-#define BATT_DISCONNECT_CONFIRM 3
+#define BATT_DISCONNECT_CONFIRM 2
+#define BATT_SLOPE_THRESHOLD    0.06  /* >60mV over the 10s slope window => still decaying => no cell */
+#define BATT_ABSENT_VOLT        2.80  /* rail this low cannot be a cell        */
+#define BATT_BROWNOUT_VOLT      3.40  /* abort probe below this to avoid reset  */
+/* Probe period must be LONG relative to the 15 s probe itself (SETTLE+SLOPE),
+ * because the charger is held OFF for the whole probe. At the previous 150
+ * ticks (30 s) the charger was off 15 s of every 30 s — a 50% duty cycle that
+ * would keep a real battery from ever charging. 1500 ticks = 5 min gives a 5%
+ * duty cycle, and BATT_DISCONNECT_CONFIRM=2 still resolves presence in ~10 min. */
+#define BATT_CHECK_PERIOD_TICKS 1500  /* 5 min between probes (1500 x 200 ms)  */
+#define BATT_SETTLE_TICKS       25    /* 5 s  before sampling V1               */
+#define BATT_SLOPE_TICKS        50    /* 10 s between V1 and V2                */
+#define BATT_MIN_FRESH_SAMPLES  3     /* fresh ADC callbacks required per point */
+#define BATT_FULL_VOLT          4.15  /* voltage-based full indication only     */
 static double  s_battAdcBuf[BATT_ADC_SAMPLES] = {0};
 static uint8_t s_battAdcIdx = 0;
 static uint8_t s_battAdcFilled = 0;
 static uint8_t s_battNewSamples = 0;          /* samples since last flush */
 static double  s_rawBattVolt = 0.0;
+#if BATT_PRESENCE_DETECT_SUPPORTED
+/* Probe-only state. Guarded with the probe itself so the build stays clean when
+ * detection is compiled out. */
+static double  s_battBaselineVolt = 0.0;      /* voltage before charger toggle */
+static double  s_battV1 = 0.0;                /* probe sample at +5s  */
+static uint8_t s_disconnectCount = 0;
+#endif
+/* These two stay unconditional: s_batteryConnected is published via
+ * hw_battery_connected() to the LED manager and gates the battery-low alert;
+ * s_battCheckActive is read by the ADC callback. */
 static volatile uint8_t s_batteryConnected = 1; /* assume present until first check */
 static volatile uint8_t s_battCheckActive = 0;  /* 1 while charger is off for the presence probe */
-static uint8_t s_disconnectCount = 0;
+
+/* The charger IC does not provide a current/charge-done signal to the M66.
+ * Therefore CHARGING/FULL are displayed status estimates: FULL means the
+ * battery voltage has reached the configured full-voltage threshold while
+ * external power is present.  The status frame is deliberately separate from
+ * $PER and server packets, preserving their established parsers. */
+static const char *BatteryStatusText(BatteryStatusTypedef status)
+{
+    switch(status)
+    {
+        case BATTERY_STATUS_CHARGING:    return "CHARGING";
+        case BATTERY_STATUS_DISCHARGING: return "NOT_CHARGING";
+        case BATTERY_STATUS_FULL:        return "FULL";
+        /* Must be explicit: falling through to default would print NO_BATTERY,
+         * which asserts absence just as wrongly as FULL asserted presence. */
+        case BATTERY_STATUS_UNKNOWN:     return "UNKNOWN";
+        default:                         return "NO_BATTERY";
+    }
+}
+
+static void UpdateBatteryStatus(void)
+{
+    static uint8_t s_statusInitialised = 0;
+    BatteryStatusTypedef newStatus;
+
+    if(!s_batteryConnected || PeriPheralVal.BattVolt < BATT_ABSENT_VOLT)
+        newStatus = BATTERY_STATUS_NOBATTERY;
+#if !BATT_PRESENCE_DETECT_SUPPORTED
+    /* Presence cannot be determined on this hardware (see the measurement in
+     * Hardware.h). While mains is present the rail reads ~4.1-4.2V whether or
+     * not a cell is fitted, so reporting CHARGING/FULL here would be asserting
+     * something the firmware cannot know — that is the "shows 4.2V with no
+     * battery" complaint. Report the rail voltage, but label it UNKNOWN.
+     * Once a real presence signal exists, set BATT_PRESENCE_DETECT_SUPPORTED=1
+     * and this branch disappears. */
+    else if(PeriPheralVal.IsMain)
+        newStatus = BATTERY_STATUS_UNKNOWN;
+    else
+        newStatus = BATTERY_STATUS_DISCHARGING;  /* on battery => it is present */
+#else
+    else if(!PeriPheralVal.IsMain)
+        newStatus = BATTERY_STATUS_DISCHARGING;
+    else if(PeriPheralVal.BattVolt >= BATT_FULL_VOLT)
+        newStatus = BATTERY_STATUS_FULL;
+    else
+        newStatus = BATTERY_STATUS_CHARGING;
+#endif
+
+    if(!s_statusInitialised || PeriPheralVal.BatteryStatus != newStatus)
+    {
+        char statusFrame[48];
+        PeriPheralVal.BatteryStatus = newStatus;
+        s_statusInitialised = 1;
+        LOGData(TAG_HARDWARE, "BATT_STATUS: %s, %d.%02dV, mains=%d",
+            BatteryStatusText(newStatus),
+            (int)PeriPheralVal.BattVolt, (int)(PeriPheralVal.BattVolt * 100) % 100,
+            PeriPheralVal.IsMain);
+        Ql_sprintf(statusFrame, "$BATT,%s,%d.%02dV\n",
+            BatteryStatusText(newStatus),
+            (int)PeriPheralVal.BattVolt, (int)(PeriPheralVal.BattVolt * 100) % 100);
+        SendRS232String(statusFrame);
+    }
+}
 
 static void Callback_OnADCSampling(Enum_ADCPin adcPin, u32 adcValue, void *customParam)
 {
@@ -296,8 +401,15 @@ static void Callback_OnADCSampling(Enum_ADCPin adcPin, u32 adcValue, void *custo
         s_rawBattVolt = measured; /* use raw until the buffer fills */
     }
 
+    /* While the presence probe holds the charger off the rail is deliberately
+     * sagging.  Keep updating s_rawBattVolt (the probe needs it) but freeze the
+     * REPORTED value, so the dip never reaches packets, the LED manager or the
+     * battery-low alert. */
+    if (s_battCheckActive)
+        return;
+
     /* Report 0 when no battery is present (charger float voltage is ignored). */
-    if (!s_batteryConnected || s_rawBattVolt < 2.8)
+    if (!s_batteryConnected || s_rawBattVolt < BATT_ABSENT_VOLT)
     {
         PeriPheralVal.BattVolt = 0.0;
         PeriPheralVal.BattPerc = 0;
@@ -318,8 +430,8 @@ void hw_charger_init(void)
 {
     CONTROL_CHARGER_INIT;
     Ql_ADC_Register(ADC_VBAT_GPIO, Callback_OnADCSampling, NULL);
-    Ql_ADC_Init(ADC_VBAT_GPIO, 10, 200);
-    Ql_ADC_Sampling(ADC_VBAT_GPIO, TRUE); // Start ADC sampling
+    Ql_ADC_Init(ADC_VBAT_GPIO, 5, 200);
+    Ql_ADC_Sampling(ADC_VBAT_GPIO, TRUE);
 }
 
   
@@ -617,7 +729,7 @@ void HardwareThreadEntry(s32 taskId)
             if(!PeriPheralVal.IGN)  // Ignition is OFF
             {
                 // Check if ignition has been off for 2 minutes (120 seconds)
-                if(SleepConfig.IgnOffTimer >= 500)
+                if(SleepConfig.IgnOffTimer >= 120)
                 {
                     LOGData(TAG_HARDWARE, "Auto-sleep triggered: Ignition off for 2 minutes");
                     SleepModeON(60*60);  // Enter sleep mode for 30 minutes (in seconds)
@@ -679,7 +791,10 @@ void HardwareThreadEntry(s32 taskId)
             PrevTamp=0;
         #endif
 
-        //LOGData(TAG_HARDWARE,"BattVolt: %.2f, Adc : %d",PeriPheralVal.BattVolt, ADCVal);
+        LOGVerbose(TAG_HARDWARE,"BattRaw: %d.%02d Rpt: %d.%02d Conn: %d",
+            (int)s_rawBattVolt, (int)(s_rawBattVolt * 100) % 100,
+            (int)PeriPheralVal.BattVolt, (int)(PeriPheralVal.BattVolt * 100) % 100,
+            s_batteryConnected);
         #ifndef PROTO_CDAC
         if(PeriPheralVal.IGN)
         {
@@ -776,46 +891,133 @@ void HardwareThreadEntry(s32 taskId)
                     #endif
                 }
             }
+            UpdateBatteryStatus();
             if(SOS.IsSOS){
                 OP1_Set(1);}
             else{
                 OP1_Set(0);}
 
-        /* --- Battery presence via charger-toggle (detection only, NO alerts) ---
-         * With external power present the charger drives the VBAT rail to ~4.1V
-         * whether or not a cell is installed.  Every ~30s pulse the charger OFF
-         * and let the rail settle 3s: with no battery it collapses (<2.8V, needs
-         * 3 confirmations), a real cell holds.  Deliberately sends NO alerts —
-         * the battery-alert path previously caused M66 exception resets.
-         * (Requires the charger GPIO to gate the VBAT rail — bench-verify.) */
+        /* --- Battery presence via charger-toggle, two-point slope ---
+         * COMPILED OUT: BATT_PRESENCE_DETECT_SUPPORTED is 0 because measurement
+         * proved this method cannot work on this board — with NO cell fitted the
+         * rail drops 110mV then holds FLAT at 4.09V for ten seconds, so there is
+         * no sustained decay to detect and no threshold can separate "cell" from
+         * "no cell". The full curve and the list of every other signal that was
+         * checked and ruled out is in Hardware.h next to that define.
+         *
+         * Kept intact (not deleted) because the logic is correct and becomes
+         * usable the moment hardware provides a charger EN that truly high-Zs
+         * the rail — then flip the define to 1. Left enabled it would hold the
+         * charger off 15s out of every 5min and toggle the rail for nothing.
+         *
+         * Every BATT_CHECK_PERIOD_TICKS pulse the charger OFF for 15s and sample
+         * the rail twice: V1 at +5s (after the initial transient) and V2 at +15s.
+         * Continued decay between V1 and V2 means the rail is capacitor-only => no cell;
+         * a real cell has plateaued at its OCV by +5s and holds.
+         * Brownout guard restores the charger immediately below 3.4V (and
+         * counts that as absent — nothing was holding the rail up).
+         * Logs + RS232 output only, no packet alert. */
+#if BATT_PRESENCE_DETECT_SUPPORTED
         {
             static uint16_t battChkTimer = 0;
-            static uint16_t battSettle   = 0;
-            static uint8_t  battChkState = 0;   /* 0 = idle, 1 = wait-settle */
+            static uint16_t battWait     = 0;
+            static uint8_t  battChkState = 0;   /* 0=idle 1=wait-V1 2=wait-V2 */
+            static uint8_t  battWasConnected = 1;
+            static uint8_t  battSampleTick = 0; /* 200ms ticks between curve samples */
+            static uint8_t  battProbeSecs  = 0; /* seconds elapsed in current probe  */
+            static uint16_t battSkipLog    = 0; /* rate-limit the "probe skipped" log */
 
             if(PeriPheralVal.IsMain)
             {
-                switch(battChkState)
+                /* Log the whole decay curve while the charger is off, once per
+                 * second. Without this there is no way to tell a plateau (cell
+                 * present) from continued decay (capacitor only) after the fact,
+                 * and every threshold here is guesswork. Capture one probe with
+                 * NO battery and one WITH a known-good battery, then compare. */
+                if(s_battCheckActive && (++battSampleTick >= 5))
                 {
-                    case 0:
-                        if(++battChkTimer >= 150)   /* 30 s (150 x 200 ms) */
+                    battSampleTick = 0;
+                    LOGData(TAG_HARDWARE,"BATT_CHK: t=%ds v=%d.%02dV",
+                        (int)battProbeSecs++,
+                        (int)s_rawBattVolt, (int)(s_rawBattVolt * 100) % 100);
+                }
+
+                /* Brownout guard: abort probe if the rail drops dangerously low */
+                if(battChkState != 0 && s_rawBattVolt < BATT_BROWNOUT_VOLT && s_rawBattVolt > 0.1)
+                {
+                    CONTROL_CHARGER_ON;
+                    s_battCheckActive = 0;
+                    LOGData(TAG_HARDWARE,"BATT_CHK: brownout %d.%02dV -> absent",
+                        (int)s_rawBattVolt, (int)(s_rawBattVolt * 100) % 100);
+                    if(++s_disconnectCount >= BATT_DISCONNECT_CONFIRM)
+                        s_batteryConnected = 0;
+                    battChkState = 0;
+                    battChkTimer = 0;
+                }
+                else switch(battChkState)
+                {
+                    case 0: /* idle — count up to the probe period */
+                        if(++battChkTimer >= BATT_CHECK_PERIOD_TICKS)
                         {
                             battChkTimer = 0;
-                            CONTROL_CHARGER_OFF;    /* pause charge so an empty rail can collapse */
-                            s_battCheckActive = 1;  /* suppress battery-low alert during the dip */
-                            s_battNewSamples = 0;   /* flush rolling average */
-                            battSettle = 15;        /* 3 s settle (15 x 200 ms) */
+                            s_battBaselineVolt = s_rawBattVolt;
+                            CONTROL_CHARGER_OFF;
+                            s_battCheckActive = 1;
+                            s_battNewSamples = 0;
+                            battWait = BATT_SETTLE_TICKS;
                             battChkState = 1;
+                            battSampleTick = 0;
+                            battProbeSecs  = 0;
+                            LOGData(TAG_HARDWARE,"BATT_CHK: charger OFF, baseline=%d.%02dV",
+                                (int)s_battBaselineVolt, (int)(s_battBaselineVolt * 100) % 100);
                         }
                         break;
 
-                    case 1:
-                        if(battSettle > 0) battSettle--;
-                        if(battSettle == 0)
+                    case 1: /* +5s — take V1 once fresh samples have arrived */
+                        if(battWait > 0) battWait--;
+                        if(battWait == 0)
                         {
-                            if(s_battNewSamples >= BATT_ADC_SAMPLES) /* decide only on post-settle samples */
+                            if(s_battNewSamples >= BATT_MIN_FRESH_SAMPLES)
                             {
-                                if(s_rawBattVolt < 2.8)
+                                s_battV1 = s_rawBattVolt;
+                                s_battNewSamples = 0;
+                                battWait = BATT_SLOPE_TICKS;
+                                battChkState = 2;
+                                LOGData(TAG_HARDWARE,"BATT_CHK: V1=%d.%02dV",
+                                    (int)s_battV1, (int)(s_battV1 * 100) % 100);
+                            }
+                            else
+                            {
+                                battWait = 1;   /* wait one more tick for fresh data */
+                            }
+                        }
+                        break;
+
+                    case 2: /* +15s — take V2 and decide on the slope */
+                        if(battWait > 0) battWait--;
+                        if(battWait == 0)
+                        {
+                            if(s_battNewSamples >= BATT_MIN_FRESH_SAMPLES)
+                            {
+                                double slope = s_battV1 - s_rawBattVolt;
+                                double total = s_battBaselineVolt - s_rawBattVolt;
+                                /* Do NOT use the total charger-off drop as a
+                                 * disconnect criterion. A healthy cell on this
+                                 * board drops 87-119mV while its surface charge
+                                 * settles (confirmed in field logs), which was
+                                 * falsely changing Conn to 0 and reporting 0V.
+                                 * Only continued V1-to-V2 decay, after settle,
+                                 * distinguishes a capacitor-only rail. */
+                                uint8_t absent = (s_rawBattVolt < BATT_ABSENT_VOLT) ||
+                                                 (slope > BATT_SLOPE_THRESHOLD);
+
+                                LOGData(TAG_HARDWARE,
+                                    "BATT_CHK: V2=%d.%02dV slope=%dmV total=%dmV absent=%d cnt=%d",
+                                    (int)s_rawBattVolt, (int)(s_rawBattVolt * 100) % 100,
+                                    (int)(slope * 1000), (int)(total * 1000),
+                                    absent, s_disconnectCount);
+
+                                if(absent)
                                 {
                                     if(++s_disconnectCount >= BATT_DISCONNECT_CONFIRM)
                                         s_batteryConnected = 0;
@@ -825,30 +1027,61 @@ void HardwareThreadEntry(s32 taskId)
                                     s_disconnectCount = 0;
                                     s_batteryConnected = 1;
                                 }
-                                CONTROL_CHARGER_ON; /* restore charge */
+                                CONTROL_CHARGER_ON;
                                 s_battCheckActive = 0;
                                 battChkState = 0;
                             }
                             else
                             {
-                                battSettle = 1;     /* wait one more tick for fresh samples */
+                                battWait = 1;
                             }
                         }
                         break;
                 }
+
+                /* Log and RS232 output on state change (no packet alert) */
+                if(!s_batteryConnected && battWasConnected)
+                {
+                    LOGData(TAG_HARDWARE,"BATTERY DISCONNECTED (BattVolt forced to 0)");
+                    SendRS232String("$BATT,DISCONNECTED\n");
+                }
+                else if(s_batteryConnected && !battWasConnected)
+                {
+                    LOGData(TAG_HARDWARE,"BATTERY RECONNECTED");
+                    SendRS232String("$BATT,CONNECTED\n");
+                }
+                battWasConnected = s_batteryConnected;
             }
             else
             {
-                /* No external power → the device is running off the battery, so
-                 * it must be present. Restore charger if we were mid-check. */
-                if(battChkState == 1) CONTROL_CHARGER_ON;
+                /* No external power: the device is running off the battery, so a
+                 * battery must be present and the probe is meaningless.
+                 *
+                 * This branch also FORCES s_batteryConnected=1, which makes
+                 * BattVolt report the raw rail again. If IsMain is wrong (or the
+                 * mains threshold is mistuned) the probe is skipped forever and
+                 * "4.2V with no battery" is the exact result — and it used to
+                 * happen completely silently. Say so, once a minute. */
+                if(++battSkipLog >= 300)
+                {
+                    battSkipLog = 0;
+                    LOGData(TAG_HARDWARE,
+                        "BATT_CHK: skipped - no mains (MainsVolt=%d.%02dV) forcing Conn=1",
+                        (int)PeriPheralVal.MainsVolt,
+                        (int)(PeriPheralVal.MainsVolt * 100) % 100);
+                }
+                if(battChkState != 0) CONTROL_CHARGER_ON;
                 s_battCheckActive = 0;
                 s_batteryConnected = 1;
                 s_disconnectCount  = 0;
                 battChkTimer = 0;
                 battChkState = 0;
+                if(!battWasConnected)
+                    SendRS232String("$BATT,CONNECTED\n");
+                battWasConnected = 1;
             }
         }
+#endif /* BATT_PRESENCE_DETECT_SUPPORTED */
 
         // Send RS232 status messages every ~1 second (5 iterations * 200ms)
         #ifdef ENABLE_RS232_PRINT

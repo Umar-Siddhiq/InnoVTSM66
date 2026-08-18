@@ -253,8 +253,9 @@ void ProcessMCUData(uint8_t* data)
             }
             PeriPheralVal.IsTilt = mcuData->IsTilt;
 
-            //PeriPheralVal.BattVolt = mcuData->BattVolt;
-            LOGVerbose(TAG_MCU, "Mains ADC Value: %d, final:%d.%02d", mcuData->MainVolt, (int)PeriPheralVal.MainsVolt, (int)(PeriPheralVal.MainsVolt * 100) % 100);
+            LOGVerbose(TAG_MCU, "Mains ADC: %d (%d.%01dV) BattADC: %d",
+                mcuData->MainVolt, (int)PeriPheralVal.MainsVolt, (int)(PeriPheralVal.MainsVolt * 10) % 10,
+                mcuData->BattVolt);
             break;
         }
         case MCOMM_COM_FUNCTION_SETPH:
@@ -440,14 +441,38 @@ void mcu_rcv_thread_init(u32 taskId)
     }
 }
 
-uint8_t IsSent=0;
+/* volatile: this flag is polled in a spin-wait below while OTHER threads clear
+ * it, so the compiler must not cache it in a register. */
+volatile uint8_t IsSent=0;
+
+/* Must exceed the longest per-send WaitFlag timeout (1000 ms) so a legitimate
+ * in-flight transfer is never stolen from its owner. */
+#define MCOMM_TX_BUSY_TIMEOUT_MS 1500
 
 uint8_t MCOMM_SendData(uint8_t* data, int len, uint8_t isWait, uint8_t waitFlag, uint16_t timeout)
 {
-    // Wait if a previous transmission is ongoing
+    int waited = 0;
+
+    /* Wait if a previous transmission is ongoing.
+     *
+     * This was previously an UNBOUNDED, SILENT `while (IsSent) ThreadSleep(20);`.
+     * Every thread that talks to the external MCU funnels through here —
+     * Hardware (the ~1 Hz $INF/$CEL/$PER/$GPD RS232 rotation), GPS (NMEA
+     * mirroring), Sensors, and the Server thread via DecodeSMS -> RS232/RS485
+     * response.  If any caller left IsSent set (died mid-send, or lost the
+     * non-atomic claim below to a racing thread) then all of those threads
+     * blocked here FOREVER and emitted no log line at all, which is exactly
+     * the signature of a wedged thread that produces zero tagged output.
+     * Bound the wait and force-claim the transmitter when it expires. */
     while (IsSent)
     {
+        if (waited >= MCOMM_TX_BUSY_TIMEOUT_MS)
+        {
+            LOGData(TAG_MCU, "TX busy for %dms, force-claiming transmitter", waited);
+            break;
+        }
         ThreadSleep(20);
+        waited += 20;
     }
 
     IsSent = 1;
@@ -482,8 +507,6 @@ uint8_t MCOMM_SendData(uint8_t* data, int len, uint8_t isWait, uint8_t waitFlag,
     IsSent = 0;
     return 1;   // Success
 }
-
-
 int MCOMM_SendSerial(uint8_t Is485, const uint8_t* payload, int len)
 {
     if (!payload || len <= 0 || len > MCOMM_COM_URT_EXG_BUFF_SIZE)
@@ -493,24 +516,21 @@ int MCOMM_SendSerial(uint8_t Is485, const uint8_t* payload, int len)
     }
 
     uint8_t buffer[MCOMM_COM_LEN_EXTRAS + sizeof(UartExchangetypedef)];
-    int idx = 0;
+    Ql_memset(buffer, 0, sizeof(buffer));
 
     uint8_t function = Is485 ? MCOMM_COM_FUNCTION_485TX : MCOMM_COM_FUNCTION_232TX;
-    buffer[idx++] = MCOMM_COM_HEADER;
-    buffer[idx++] = function;
+    buffer[0] = MCOMM_COM_HEADER;
+    buffer[1] = function;
 
-    UartExchangetypedef uartexhange = {0};
-    uartexhange.datalen = len;
-    Ql_memcpy(uartexhange.data, payload, len); 
+    uint16_t datalen = (uint16_t)len;
+    Ql_memcpy(&buffer[2], &datalen, sizeof(uint16_t));
+    Ql_memcpy(&buffer[4], payload, len);
 
-    Ql_memcpy(&buffer[idx], &uartexhange, sizeof(UartExchangetypedef)); 
-    idx += sizeof(UartExchangetypedef); 
+    // Set footer at byte index 504 (MCOMM_COM_LEN_EXTRAS + sizeof(UartExchangetypedef) - 1)
+    buffer[MCOMM_COM_LEN_EXTRAS + sizeof(UartExchangetypedef) - 1] = MCOMM_COM_FOOTER;
 
-
-    buffer[idx++] = MCOMM_COM_FOOTER; 
-
-    
-    return MCOMM_SendData(buffer, idx, 1, MCOMM_COM_FUNCTION_SUCCESS, 1000);
+    // Send full 505-byte frame to satisfy MCU LENTABLE[6] frame boundary match
+    return MCOMM_SendData(buffer, sizeof(buffer), 0, MCOMM_COM_FUNCTION_SUCCESS, 100);
 }
 
 int MCOMM_FetchPerihperal(void)
@@ -522,7 +542,7 @@ int MCOMM_FetchPerihperal(void)
     buffer[idx++] = MCOMM_COM_FUNCTION_GETPH;
     buffer[idx++] = MCOMM_COM_FOOTER;
 
-    return MCOMM_SendData(buffer, idx, 1, MCOMM_COM_FUNCTION_GETPH, 1000);
+    return MCOMM_SendData(buffer, idx, 1, MCOMM_COM_FUNCTION_GETPH, 300);
 }
 
 int MCOMM_FetchVER(void)
@@ -534,7 +554,7 @@ int MCOMM_FetchVER(void)
     buffer[idx++] = MOMMM_COM_FUNCTION_VERSION;
     buffer[idx++] = MCOMM_COM_FOOTER;
 
-    return MCOMM_SendData(buffer, idx, 1, MOMMM_COM_FUNCTION_VERSION, 1000);
+    return MCOMM_SendData(buffer, idx, 1, MOMMM_COM_FUNCTION_VERSION, 300);
 }
 
 int MCOMM_SendSleep(uint16_t sleeptime)
@@ -553,8 +573,7 @@ int MCOMM_SendSleep(uint16_t sleeptime)
 
     buffer[idx++] = MCOMM_COM_FOOTER; 
 
-    
-    return MCOMM_SendData(buffer, idx, 1, MCOMM_COM_FUNCTION_SUCCESS, 1000);
+    return MCOMM_SendData(buffer, idx, 0, MCOMM_COM_FUNCTION_SUCCESS, 100);
 }
 
 

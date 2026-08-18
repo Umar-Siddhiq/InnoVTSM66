@@ -725,7 +725,13 @@ uint8_t FOTAUpdate(char *firmwareFileName)
         return 0;
     }
     
-    // Close all TCP connections before upgrade
+    /* Close all TCP connections before upgrade.
+     * NOTE: TCP_CloseALLSockets() also clears isEnabled on EVERY socket, and the
+     * only code that ever sets it back is InitSockets(). That is fine on the
+     * success path below (Ql_FOTA_Update() reboots), but every early return
+     * after this point MUST restore the sockets or the device keeps running with
+     * all servers permanently unreachable — sending nothing while still logging
+     * normally. */
     TCP_CloseALLSockets();
 
     // Delete the firmware file after successful processing
@@ -737,9 +743,13 @@ uint8_t FOTAUpdate(char *firmwareFileName)
     if((operationResult = Ql_FOTA_Update()) != QL_RET_OK)  // Changed from < to !=
     {
         LOGData(TAG_FTP, "FOTA Error: Update failed, error: %d", operationResult);
-        LOGData(TAG_FTP, "Reboot 1 second later...");
-        Ql_Sleep(1000);
-        // Don't force reset here - let the system handle it
+        /* We are past TCP_CloseALLSockets(), so every socket is closed AND
+         * disabled. Without this the device would run on indefinitely unable to
+         * reach any server, which looks exactly like the field failure where
+         * only the pre-FOTA login packet ever arrived. Re-arm them from config
+         * so the TCP thread reconnects. */
+        InitSockets();
+        LOGData(TAG_FTP, "FOTA update failed - sockets re-armed, continuing without upgrade");
         return 0;
     }
 
@@ -914,6 +924,16 @@ uint8_t FTPHandleReqType(download_req_info_s* hdl)
 
 uint8_t FTPStart(download_req_info_s* downloadHandle)
 {
+    /* Entry/exit logging is NOT optional here. This function runs on the server
+     * thread and everything from this point to the "Pre-FTP disk cleanup" line
+     * below used to be completely silent, so a stall inside it looked exactly
+     * like a dead server thread: no FTP, SERVER, TCP, FILE or BACKUP lines at
+     * all, while every other thread kept logging normally. Never let this path
+     * be silent again. */
+    LOGData(TAG_FTP, "FTPStart entry: valid=%04X type=%d attempts=%d file=%s",
+            downloadHandle->IsValid, downloadHandle->RequestType,
+            downloadHandle->AttemptCount, downloadHandle->FilePath);
+
     if(downloadHandle->IsValid != FOTA_REQ_VALID_CODE)
         return 0;
 
@@ -922,6 +942,7 @@ uint8_t FTPStart(download_req_info_s* downloadHandle)
     {
         DiskCleanupResult cleanResult;
         Ql_memset(&cleanResult, 0, sizeof(cleanResult));
+        LOGData(TAG_FTP, "Pre-FTP disk cleanup: starting UFS sweep");
         FTP_ClearRecoverableDiskData(&cleanResult);
         LOGData(TAG_FTP, "Pre-FTP disk cleanup: before=%lu after=%lu hist=%u batch=%u files=%u fail=%u",
                 cleanResult.freeSpaceBefore, cleanResult.freeSpaceAfter,

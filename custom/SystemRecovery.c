@@ -846,11 +846,10 @@ void SystemRecovery_FeedWatchdog(void)
     s_lastWatchdogFeedMs = nowMs;
     */
     // GPS Fault Watchdog Check (Grace period of 60s after boot, bypassed when GPS Simulation or FOTA is active)
-    extern bool FOTA_IsInProgress(void);
     extern uint8_t IsFotaProcessing;
     extern uint8_t IsMotaProcessing;
     extern VTSTypedef VTSData;
-    if (!VTSData.DisableGPSFaultReset && !GPS_IsSimulationActive() && !FOTA_IsInProgress() && !IsFotaProcessing && !IsMotaProcessing && (nowMs > 60000ULL))
+    if (!VTSData.DisableGPSFaultReset && !GPS_IsSimulationActive() && !IsFotaProcessing && !IsMotaProcessing && (nowMs > 60000ULL))
     {
         static u64 s_lastGpsOkMs = 0;
         if (s_lastGpsOkMs == 0)
@@ -889,7 +888,7 @@ void SystemRecovery_FeedWatchdog(void)
                 s_lastServerOkMs = nowMs; // Reset timer on boot or wakeup
             }
 
-            if (TCP_IsAnySocketConnected() || IsFotaProcessing || IsMotaProcessing || FOTA_IsInProgress())
+            if (TCP_IsAnySocketConnected() || IsFotaProcessing || IsMotaProcessing)
             {
                 s_lastServerOkMs = nowMs; // Connection is active or FOTA/MOTA in progress, reset watchdog
             }

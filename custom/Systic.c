@@ -6,6 +6,11 @@
 #include "LEDManager.h"
 #include "Sensors.h"
 #include "SOS.h"
+#include "SystemRecovery.h"
+#include "TCP.h"        /* ServerSocket[] / SOCKET_CONNECTED for the server-thread watchdog */
+#include "Server.h"     /* ServerLoopPhase / ServerLoopCount liveness counters   */
+#include "FTP.h"        /* FTPState — suppress the watchdog during FOTA download */
+#include "MOTA.h"       /* IsMotaProcessing — suppress during MCU firmware push   */
 #ifdef PROTO_CDAC
 #include "HTTP.h"
 extern void SMSAlert(uint8_t AlertNum);
@@ -17,7 +22,11 @@ void InitSysticthread(void);
 
 volatile TickTypeDef IntervalTick={0};
 volatile PacketReadyTypedef IsPacketReady={0};
-volatile uint8_t oc=0, ServerThreadTimeout=0, HourlyResetCount=0;
+volatile uint8_t oc=0, HourlyResetCount=0;
+/* MUST be 16-bit: ProcessServerThreadTimeout() compares against 600, which a
+ * uint8_t can never reach (it wraps at 255), silently disabling the watchdog.
+ * The extern in Server.c must match. */
+volatile uint16_t ServerThreadTimeout=0;
 volatile uint16_t GSMRegTimeout=0;
 #ifdef PROTO_CDAC
 VehicleTypeDef VehicleState = {0};
@@ -379,6 +388,9 @@ void UpdateTick(void)
         }
     }
 
+#if SYSTEM_RECOVERY_ENABLE && SYSTEM_WATCHDOG_ENABLE
+    SystemRecovery_FeedWatchdog();
+#endif
 }
 #ifdef PROTO_CDAC
 void UpdateVehicle(void)
@@ -430,19 +442,89 @@ void UpdateVehicle(void)
 void Systic_Event_100ms(void)
 {
     static uint8_t ledCounter = 0;
-    
-    //100 ms
+
     hw_led_process();
-    
-    // Update LED Manager every 200ms (every 2nd call)
+
     if (++ledCounter >= 2)
     {
         LEDManager_Process();
         ledCounter = 0;
     }
-    
+
+#if SYSTEM_RECOVERY_ENABLE && SYSTEM_WATCHDOG_ENABLE
+    SystemRecovery_FeedWatchdog();
+#endif
+
     msprev100ms = stime;
 }
+
+#ifndef PROTO_CDAC
+/* --- Server thread liveness watchdog (ported from the reference build) ---
+ * ServerThreadEntry() clears ServerThreadTimeout on every loop iteration
+ * (Server.c). If the server thread wedges anywhere — a stuck socket call, a
+ * blocked MCU transmitter, an unbounded wait — nothing else in this firmware
+ * notices: the hardware WDT keeps being fed by the Systic thread, the sockets
+ * stay open, and the device sits there sending nothing but the one login packet
+ * it managed before hanging. That is the exact field failure this restores
+ * recovery for (only $LGN received, no $PVT/health, forever).
+ *
+ * Only arm the counter once the network is genuinely up and at least one server
+ * socket is connected, so a device that is merely out of coverage is never
+ * rebooted for it. 600 s at a 1 s tick = 10 min of a silent server thread. */
+static void ProcessServerThreadTimeout(void)
+{
+    static uint16_t s_ftpExemptSecs = 0;
+
+    /* Deliberately NOT gated on socket-connected (the reference gates on it).
+     * The server thread must complete an iteration roughly every 100 ms whether
+     * or not a socket is up — with no connection handlePackets() simply stores
+     * to history and returns. Requiring a live socket would blind the watchdog
+     * to precisely the case where the thread wedges before/without connecting.
+     *
+     * Only these legitimately block the loop for minutes at a time: */
+    if (FTPState != FTP_STATE_CLOSED || IsFotaProcessing || IsMotaProcessing)
+    {
+        /* Bounded exemption. An unlimited one would permanently disable recovery
+         * for any stall that happens to occur once FTPState has left CLOSED —
+         * and a wedged FOTA is precisely how this device got stuck sending only
+         * login packets. Give a transfer a generous window, then resume
+         * counting regardless. */
+        if (++s_ftpExemptSecs < SERVER_FTP_EXEMPT_SECS)
+        {
+            ServerThreadTimeout = 0;    /* transfer legitimately in flight */
+            return;
+        }
+        /* Budget exhausted — fall through so the hang counter runs anyway. */
+    }
+    else
+    {
+        s_ftpExemptSecs = 0;
+    }
+
+    if (SleepConfig_IsEnabled())
+    {
+        ServerThreadTimeout = 0;    /* threads are parked in low-power sleep    */
+        return;
+    }
+
+    /* Report the stalled stage periodically on the way to the reset, so a field
+     * log names the wedged stage even if the capture ends before the reset. */
+    if (ServerThreadTimeout > 0 && (ServerThreadTimeout % 60) == 0)
+    {
+        LOGData(TAG_RECOVERY, "Server thread no progress %ds: phase=%d loops=%u sck0=%d",
+                ServerThreadTimeout, ServerLoopPhase,
+                (unsigned int)ServerLoopCount, ServerSocket[0].SocketState);
+    }
+
+    if (++ServerThreadTimeout > SERVER_THREAD_HANG_SECS)
+    {
+        ServerThreadTimeout = 0;
+        LOGData(TAG_RECOVERY, "Server thread hung %ds at phase=%d loops=%u, resetting",
+                SERVER_THREAD_HANG_SECS, ServerLoopPhase, (unsigned int)ServerLoopCount);
+        SystemRecovery_RequestReset("Server thread timeout");
+    }
+}
+#endif
 
 void Systic_Event_1s(void)
 {
@@ -453,6 +535,8 @@ void Systic_Event_1s(void)
     // CDAC Halt/Motion/Sleep state machine — drives VehicleMovingMode and the
     // NRM reporting cadence (CurrentInterval). Must run every second.
     UpdateVehicle();
+#else
+    ProcessServerThreadTimeout();
 #endif
 }
 

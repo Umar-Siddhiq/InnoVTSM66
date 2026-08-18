@@ -9,9 +9,11 @@
 #include "ql_fs.h"
 #include "Batch.h"
 #include "Sensors.h"
+#include "SystemRecovery.h"
 
 /* Defined in Server.c — routes SET/GET/CLR OTA commands from RS232/RS485. */
 extern void DecodeOTAData(char* buff, uint8_t isserver);
+extern void EmergencyPacket(uint8_t IsOff);
 
 // Forward declaration for RS232 response queueing (from Hardware.c)
 extern void QueueRS232Response(const char* response);
@@ -512,37 +514,44 @@ void MakeACTMessage(uint8_t mode, char* code)
 }
 
 
-// void SendFuelData(char* sender,uint8_t IsServer)
-// {
-// 	if(!IsFuelData)
-// 	{
-// 		SendResponce(sender,"No Fuel Data",IsServer,0);
-// 		return;
-// 	}
-// 	char *p, *n;
-// 	p = strchr(FuelData,'*');
+/* GEO commands are accepted by every non-CDAC protocol. */
+#ifndef PROTO_CDAC
+void SendGeoData(uint8_t index, uint8_t OTASource)
+{
+	char tmp[48];
+	int j;
+	Ql_memset(dataBuffer, 0x00, DATA_MAX_BUFF);
+	Ql_strcat(dataBuffer, "$GFR,");
+	if (VTSData.GeoLatLng[index].InOut != 0) {
+		Ql_sprintf(tmp, "Geo[%d]:ID:%d,Mask:%d,", index,
+		           VTSData.GeoLatLng[index].ID, VTSData.GeoLatLng[index].InOut);
+		Ql_strcat(dataBuffer, tmp);
+		for (j = 0; j < 10; j++) {
+			if (VTSData.GeoLatLng[index].Latitude[j] != 0) {
+				Ql_sprintf(tmp, "LAT[%d]:%09.6f,LNG[%d]:%010.6f,",
+				           j, (float)VTSData.GeoLatLng[index].Latitude[j],
+				           j, (float)VTSData.GeoLatLng[index].Longitude[j]);
+				Ql_strcat(dataBuffer, tmp);
+			}
+		}
+		{
+			uint16_t len = Ql_strlen(dataBuffer);
+			if (len > 0) dataBuffer[len - 1] = '*';
+		}
+	} else {
+		Ql_strcat(dataBuffer, "NC*");
+	}
+	if (OTASource == OTA_SRC_SCK_1)
+		TCPSocket_SendString(&ServerSocket[0], dataBuffer);
+	else if (OTASource == OTA_SRC_SCK_2)
+		TCPSocket_SendString(&ServerSocket[2], dataBuffer);
+	#ifdef EXTENDED_IPS
+	else if (OTASource == OTA_SRC_SCK_3)
+		TCPSocket_SendString(&ServerSocket[3], dataBuffer);
+	#endif
+}
+#endif
 
-// 	if(!p)
-// 		goto PRS_ERR;
-// 	p++;
-// 	n = strchr(p,'#');
-// 	if(!n)
-// 		goto PRS_ERR;
-// 	*n = 0;
-// 	if(Ql_strlen(p) > 120)
-// 		goto PRS_ERR;
-
-// 	memset(SimData,0x00,MSGSIZE);
-// 	Ql_sprintf(SimData,"Fuel: %s",p);
-
-// 	SendResponce(sender,SimData,IsServer,0);
-// 	return;
-// 	PRS_ERR:
-// 	Ql_sprintf(SimData,"invalid Fuel Format: %s",FuelData);
-// 	SendResponce(sender,SimData,IsServer,0);
-// 	return;
-	
-// }
 #if defined(PROTO_MAHARASHTRA1) || defined(PROTO_OG)
 void SRDecode(char* msg, uint8_t IsServer)
 {
@@ -1378,6 +1387,665 @@ void SRDecode(char* msg, uint8_t IsServer)
 
 }
 #endif
+
+#ifdef PROTO_OG
+/* AMD3 sect8+9 - inbound OTA command parser
+   Frame: $<IMEI>,<PWD>,<MODE>,<CMD_ID>[:<VALUE>],...*<XX>\r\n */
+uint8_t AIS140SocketReinitPending = 0;
+
+/* A server-IP/port command must not close the TCP session that delivered it
+ * before the required OA,12 result can be returned.  Non-TCP origins do not
+ * need that protection and can reconnect immediately. */
+static void AIS140ReinitSocketsAfterReply(uint8_t src)
+{
+    if (src >= OTA_SRC_SCK_1 && src <= OTA_SRC_SCK_4)
+        AIS140SocketReinitPending = 1;
+    else
+        InitSockets();
+}
+
+uint8_t AIS140ResetPending = 0;
+char AIS140ResetReason[32] = {0};
+
+void ParseStandardAIS140Command(const char* raw, uint8_t src)
+{
+    char buf[300];
+    char cmd_imei[20]  = {0};
+    char cmd_pwd[10]   = {0};
+    char mode_str[8]   = {0};
+    char cmd_id[8]     = {0};
+    char value[64]     = {0};
+    const char* p;
+    const char* star_pos;
+    uint8_t mode;
+    int cmd_num;
+    uint8_t status = 0;
+    uint8_t item_count = 0;
+    uint8_t overall_status = 1;
+    uint8_t reset_type = 0;
+
+    Ql_strncpy(buf, raw, sizeof(buf) - 1);
+    buf[sizeof(buf) - 1] = '\0';
+
+    p = (buf[0] == '$') ? buf + 1 : buf;
+
+    star_pos = Ql_strchr(p, '*');
+    if (!star_pos) { LOGData(TAG_OTA, "AMD3: no * in frame"); return; }
+
+    /* Layer 3 - XOR checksum (soft warning only, command still executes) */
+    {
+        uint8_t computed = GetXORChecksum(p, (int)(star_pos - p));
+        uint8_t received = (uint8_t)strtol(star_pos + 1, NULL, 16);
+        if (computed != received)
+            LOGData(TAG_OTA, "AMD3 chksum WARN: exp=%02X got=%02X", computed, received);
+    }
+
+    /* field 1: IMEI */
+    {
+        const char* comma = Ql_strchr(p, ',');
+        if (!comma) { LOGData(TAG_OTA, "AMD3: parse err IMEI"); return; }
+        int l = (int)(comma - p); if (l >= 20) l = 19;
+        Ql_strncpy(cmd_imei, p, l); cmd_imei[l] = '\0';
+        p = comma + 1;
+    }
+
+    /* Layer 1 - IMEI check */
+    if (Ql_strcmp(cmd_imei, NetWork.IMEI) != 0)
+    {
+        LOGData(TAG_OTA, "AMD3 IMEI mismatch: got=%s exp=%s", cmd_imei, NetWork.IMEI);
+        return;
+    }
+
+    /* field 2: PASSWORD */
+    {
+        const char* comma = Ql_strchr(p, ',');
+        if (!comma) { LOGData(TAG_OTA, "AMD3: parse err PWD"); return; }
+        int l = (int)(comma - p); if (l >= 10) l = 9;
+        Ql_strncpy(cmd_pwd, p, l); cmd_pwd[l] = '\0';
+        p = comma + 1;
+    }
+
+    /* Layer 2 - password = last 6 digits of IMEI */
+    {
+        char expected[7];
+        int imei_len = Ql_strlen(NetWork.IMEI);
+        Ql_strncpy(expected, NetWork.IMEI + imei_len - 6, 6);
+        expected[6] = '\0';
+        if (Ql_strcmp(cmd_pwd, expected) != 0)
+        {
+            LOGData(TAG_OTA, "AMD3 PWD mismatch");
+            return;
+        }
+    }
+
+    /* field 3: MODE */
+    {
+        const char* comma = Ql_strchr(p, ',');
+        if (!comma) { LOGData(TAG_OTA, "AMD3: parse err MODE"); return; }
+        int l = (int)(comma - p); if (l >= 8) l = 7;
+        Ql_strncpy(mode_str, p, l); mode_str[l] = '\0';
+        p = comma + 1;
+    }
+
+    if      (Ql_strcmp(mode_str, "GET") == 0) mode = 1;
+    else if (Ql_strcmp(mode_str, "SET") == 0) mode = 2;
+    else if (Ql_strcmp(mode_str, "CLR") == 0) mode = 3;
+    else { LOGData(TAG_OTA, "AMD3: unknown mode %s", mode_str); return; }
+
+    /* map source code to string */
+    {
+        const char* src_str = "SCK1";
+        if      (src == OTA_SRC_SMS)   src_str = "SMS";
+        else if (src == OTA_SRC_SCK_1) src_str = "SCK1";
+        else if (src == OTA_SRC_SCK_2) src_str = "SCK2";
+        else if (src == OTA_SRC_SCK_3) src_str = "SCK3";
+        else if (src == OTA_SRC_SCK_4) src_str = "SCK4";
+        else if (src == OTA_SRC_BLE)   src_str = "BLE";
+        else if (src == OTA_SRC_RS232) src_str = "RS232";
+        else if (src == OTA_SRC_RS485) src_str = "RS485";
+        Ql_strncpy(LastOTAResponse.Source, src_str, sizeof(LastOTAResponse.Source) - 1);
+    }
+    Ql_strncpy(LastOTAResponse.Mode, mode_str, sizeof(LastOTAResponse.Mode) - 1);
+
+    LastOTAResponse.CmdId[0] = '\0';
+    LastOTAResponse.Value[0] = '\0';
+
+    /* parse one or more CMD_ID[:VALUE] pairs separated by commas */
+    while (*p && p < star_pos)
+    {
+        const char* colon;
+        const char* next_comma;
+        int id_len;
+        char cur_val[64] = {0};
+
+        next_comma = Ql_strchr(p, ',');
+        if (!next_comma || next_comma > star_pos)
+            next_comma = star_pos;
+
+        colon = Ql_strchr(p, ':');
+        if (colon && colon < next_comma)
+        {
+            id_len = (int)(colon - p); if (id_len >= 8) id_len = 7;
+            Ql_strncpy(cmd_id, p, id_len); cmd_id[id_len] = '\0';
+            int vl = (int)(next_comma - (colon + 1)); if (vl >= 64) vl = 63;
+            Ql_strncpy(value, colon + 1, vl); value[vl] = '\0';
+        }
+        else
+        {
+            id_len = (int)(next_comma - p); if (id_len >= 8) id_len = 7;
+            Ql_strncpy(cmd_id, p, id_len); cmd_id[id_len] = '\0';
+            value[0] = '\0';
+        }
+
+        /* strip trailing CR LF from value */
+        {
+            int vl = Ql_strlen(value);
+            while (vl > 0 && (value[vl-1] == '\r' || value[vl-1] == '\n'))
+                value[--vl] = '\0';
+        }
+
+        cmd_num = (int)strtol(cmd_id, NULL, 10);
+        status = 0;
+
+        LOGData(TAG_OTA, "AMD3 cmd=%d mode=%d val=%s src=%d", cmd_num, mode, value, src);
+
+        switch (cmd_num)
+        {
+        case 1: /* Firmware version - GET only */
+            if (mode == 1) {
+                Ql_strncpy(cur_val, FirmVer, sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        case 2: /* PVT server IP */
+            if (mode == 1) {
+                Ql_strncpy(cur_val, VTSData.ServerData.IP1, sizeof(cur_val)-1);
+                status = 1;
+            } else if (mode == 2) {
+                int vl = Ql_strlen(value);
+                if (vl >= 5 && vl <= 49) {
+                    Ql_strncpy(VTSData.ServerData.IP1, value, sizeof(VTSData.ServerData.IP1)-1);
+                    UpdateConfigInFlash(); AIS140ReinitSocketsAfterReply(src);
+                    Ql_strncpy(cur_val, value, sizeof(cur_val)-1);
+                    status = 1;
+                }
+            } else if (mode == 3) {
+                Ql_strncpy(VTSData.ServerData.IP1, DEFAULT_IP1, sizeof(VTSData.ServerData.IP1)-1);
+                UpdateConfigInFlash(); AIS140ReinitSocketsAfterReply(src);
+                Ql_strncpy(cur_val, VTSData.ServerData.IP1, sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        case 3: /* PVT server port */
+            if (mode == 1) {
+                Ql_strncpy(cur_val, VTSData.ServerData.Port1, sizeof(cur_val)-1);
+                status = 1;
+            } else if (mode == 2) {
+                int vl = Ql_strlen(value);
+                if (vl >= 2 && vl <= 9) {
+                    Ql_strncpy(VTSData.ServerData.Port1, value, sizeof(VTSData.ServerData.Port1)-1);
+                    UpdateConfigInFlash(); AIS140ReinitSocketsAfterReply(src);
+                    Ql_strncpy(cur_val, value, sizeof(cur_val)-1);
+                    status = 1;
+                }
+            } else if (mode == 3) {
+                Ql_strncpy(VTSData.ServerData.Port1, DEFAULT_PORT1, sizeof(VTSData.ServerData.Port1)-1);
+                UpdateConfigInFlash(); AIS140ReinitSocketsAfterReply(src);
+                Ql_strncpy(cur_val, VTSData.ServerData.Port1, sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        case 4: /* Emergency server IP */
+            if (mode == 1) {
+                Ql_strncpy(cur_val, VTSData.ServerData.IP2, sizeof(cur_val)-1);
+                status = 1;
+            } else if (mode == 2) {
+                int vl = Ql_strlen(value);
+                if (vl >= 5 && vl <= 49) {
+                    Ql_strncpy(VTSData.ServerData.IP2, value, sizeof(VTSData.ServerData.IP2)-1);
+                    UpdateConfigInFlash(); AIS140ReinitSocketsAfterReply(src);
+                    Ql_strncpy(cur_val, value, sizeof(cur_val)-1);
+                    status = 1;
+                }
+            } else if (mode == 3) {
+                Ql_strncpy(VTSData.ServerData.IP2, DEFAULT_IP2, sizeof(VTSData.ServerData.IP2)-1);
+                UpdateConfigInFlash(); AIS140ReinitSocketsAfterReply(src);
+                Ql_strncpy(cur_val, VTSData.ServerData.IP2, sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        case 5: /* Emergency server port */
+            if (mode == 1) {
+                Ql_strncpy(cur_val, VTSData.ServerData.Port2, sizeof(cur_val)-1);
+                status = 1;
+            } else if (mode == 2) {
+                int vl = Ql_strlen(value);
+                if (vl >= 2 && vl <= 9) {
+                    Ql_strncpy(VTSData.ServerData.Port2, value, sizeof(VTSData.ServerData.Port2)-1);
+                    UpdateConfigInFlash(); AIS140ReinitSocketsAfterReply(src);
+                    Ql_strncpy(cur_val, value, sizeof(cur_val)-1);
+                    status = 1;
+                }
+            } else if (mode == 3) {
+                Ql_strncpy(VTSData.ServerData.Port2, DEFAULT_PORT2, sizeof(VTSData.ServerData.Port2)-1);
+                UpdateConfigInFlash(); AIS140ReinitSocketsAfterReply(src);
+                Ql_strncpy(cur_val, VTSData.ServerData.Port2, sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        case 6: /* Control centre number Mob0 */
+            if (mode == 1) {
+                Ql_strncpy(cur_val, VTSData.PhoneNumber.Mob0, sizeof(cur_val)-1);
+                status = 1;
+            } else if (mode == 2) {
+                int vl = Ql_strlen(value);
+                if (vl >= 6 && vl <= 14) {
+                    Ql_strncpy(VTSData.PhoneNumber.Mob0, value, sizeof(VTSData.PhoneNumber.Mob0)-1);
+                    UpdateConfigInFlash();
+                    Ql_strncpy(cur_val, value, sizeof(cur_val)-1);
+                    status = 1;
+                }
+            } else if (mode == 3) {
+                Ql_strncpy(VTSData.PhoneNumber.Mob0, DEFAULT_MOB0, sizeof(VTSData.PhoneNumber.Mob0)-1);
+                UpdateConfigInFlash();
+                Ql_strncpy(cur_val, VTSData.PhoneNumber.Mob0, sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        case 7: /* APN */
+            if (mode == 1) {
+                if (VTSData.AutoAPN)
+                    Ql_sprintf(cur_val, "AUTO:%s", NetWork.APN);
+                else
+                    Ql_strncpy(cur_val, VTSData.mAPN, sizeof(cur_val)-1);
+                status = 1;
+            } else if (mode == 2) {
+                if (Ql_strstr(value, "AUTO") || Ql_strstr(value, "auto")) {
+                    VTSData.AutoAPN = 1;
+                    UpdateConfigInFlash();
+                    Ql_sprintf(cur_val, "AUTO:%s", NetWork.APN);
+                    status = 1;
+                    reset_type = 1;
+                } else {
+                    int vl = Ql_strlen(value);
+                    if (vl >= 3 && vl <= 29) {
+                        VTSData.AutoAPN = 0;
+                        Ql_strncpy(VTSData.mAPN, value, sizeof(VTSData.mAPN)-1);
+                        Ql_strncpy(cur_val, value, sizeof(cur_val)-1);
+                        UpdateConfigInFlash();
+                        status = 1;
+                        reset_type = 1;
+                    }
+                }
+            } else if (mode == 3) {
+                VTSData.AutoAPN = 1;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "AUTO:%s", NetWork.APN);
+                status = 1;
+                reset_type = 1;
+            }
+            break;
+
+        case 8: /* Sleep/Data interval */
+            if (mode == 1) {
+                Ql_sprintf(cur_val, "%d", VTSData.IntervalData.DataInterval);
+                status = 1;
+            } else if (mode == 2) {
+                int v = (int)Ql_atoi(value);
+                if (v >= 5 && v <= 3600) {
+                    VTSData.IntervalData.DataInterval = (uint16_t)v;
+                    UpdateConfigInFlash();
+                    Ql_sprintf(cur_val, "%d", v); status = 1;
+                }
+            } else if (mode == 3) {
+                VTSData.IntervalData.DataInterval = DEFAULT_INV_STB;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", VTSData.IntervalData.DataInterval);
+                status = 1;
+            }
+            break;
+
+        case 9: /* Overspeed limit */
+            if (mode == 1) {
+                Ql_sprintf(cur_val, "%d", (int)VTSData.VehicleData.OverSpeed);
+                status = 1;
+            } else if (mode == 2) {
+                int v = (int)Ql_atoi(value);
+                if (v >= 11 && v <= 199) {
+                    VTSData.VehicleData.OverSpeed = (uint16_t)v;
+                    UpdateConfigInFlash();
+                    Ql_sprintf(cur_val, "%d", v); status = 1;
+                }
+            } else if (mode == 3) {
+                VTSData.VehicleData.OverSpeed = DEFAULT_OVERSPEED;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", (int)VTSData.VehicleData.OverSpeed);
+                status = 1;
+            }
+            break;
+
+        case 10: /* Harsh acceleration threshold */
+            if (mode == 1) {
+                Ql_sprintf(cur_val, "%d", VTSData.VehicleData.HarshAcc);
+                status = 1;
+            } else if (mode == 2) {
+                int v = (int)Ql_atoi(value);
+                VTSData.VehicleData.HarshAcc = (uint16_t)v;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", v); status = 1;
+            } else if (mode == 3) {
+                VTSData.VehicleData.HarshAcc = DEFAULT_HA;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", VTSData.VehicleData.HarshAcc);
+                status = 1;
+            }
+            break;
+
+        case 11: /* Harsh braking threshold */
+            if (mode == 1) {
+                Ql_sprintf(cur_val, "%d", VTSData.VehicleData.HarshBreak);
+                status = 1;
+            } else if (mode == 2) {
+                int v = (int)Ql_atoi(value);
+                VTSData.VehicleData.HarshBreak = (uint16_t)v;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", v); status = 1;
+            } else if (mode == 3) {
+                VTSData.VehicleData.HarshBreak = DEFAULT_HB;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", VTSData.VehicleData.HarshBreak);
+                status = 1;
+            }
+            break;
+
+        case 12: /* Harsh cornering threshold */
+            if (mode == 1) {
+                Ql_sprintf(cur_val, "%d", VTSData.VehicleData.RashTurn);
+                status = 1;
+            } else if (mode == 2) {
+                int v = (int)Ql_atoi(value);
+                VTSData.VehicleData.RashTurn = (uint16_t)v;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", v); status = 1;
+            } else if (mode == 3) {
+                VTSData.VehicleData.RashTurn = DEFAULT_RT;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", VTSData.VehicleData.RashTurn);
+                status = 1;
+            }
+            break;
+
+        case 13: /* Vehicle registration number */
+            if (mode == 1) {
+                Ql_strncpy(cur_val, VTSData.VehicleData.VehicleRegNo, sizeof(cur_val)-1);
+                status = 1;
+            } else if (mode == 2) {
+                int vl = Ql_strlen(value);
+                if (vl >= 3 && vl <= 19) {
+                    Ql_strncpy(VTSData.VehicleData.VehicleRegNo, value, sizeof(VTSData.VehicleData.VehicleRegNo)-1);
+                    UpdateConfigInFlash();
+                    Ql_strncpy(cur_val, value, sizeof(cur_val)-1);
+                    status = 1;
+                }
+            } else if (mode == 3) {
+                Ql_strncpy(VTSData.VehicleData.VehicleRegNo, DEFAULT_VEHREG, sizeof(VTSData.VehicleData.VehicleRegNo)-1);
+                UpdateConfigInFlash();
+                Ql_strncpy(cur_val, VTSData.VehicleData.VehicleRegNo, sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        case 14: /* Ignition ON interval */
+            if (mode == 1) {
+                Ql_sprintf(cur_val, "%d", VTSData.IntervalData.IgnitionInterval);
+                status = 1;
+            } else if (mode == 2) {
+                int v = (int)Ql_atoi(value);
+                if (v >= 5 && v <= 3600) {
+                    VTSData.IntervalData.IgnitionInterval = (uint16_t)v;
+                    UpdateConfigInFlash();
+                    Ql_sprintf(cur_val, "%d", v); status = 1;
+                }
+            } else if (mode == 3) {
+                VTSData.IntervalData.IgnitionInterval = DEFAULT_INV_IGN;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", VTSData.IntervalData.IgnitionInterval);
+                status = 1;
+            }
+            break;
+
+        case 15: /* Ignition OFF / data interval */
+            if (mode == 1) {
+                Ql_sprintf(cur_val, "%d", VTSData.IntervalData.DataInterval);
+                status = 1;
+            } else if (mode == 2) {
+                int v = (int)Ql_atoi(value);
+                if (v >= 5 && v <= 3600) {
+                    VTSData.IntervalData.DataInterval = (uint16_t)v;
+                    UpdateConfigInFlash();
+                    Ql_sprintf(cur_val, "%d", v); status = 1;
+                }
+            } else if (mode == 3) {
+                VTSData.IntervalData.DataInterval = DEFAULT_INV_STB;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", VTSData.IntervalData.DataInterval);
+                status = 1;
+            }
+            break;
+
+        case 16: /* Emergency SOS interval */
+            if (mode == 1) {
+                Ql_sprintf(cur_val, "%d", VTSData.IntervalData.SOSInterval);
+                status = 1;
+            } else if (mode == 2) {
+                int v = (int)Ql_atoi(value);
+                if (v >= 1 && v <= 300) {
+                    VTSData.IntervalData.SOSInterval = (uint16_t)v;
+                    UpdateConfigInFlash();
+                    Ql_sprintf(cur_val, "%d", v); status = 1;
+                }
+            } else if (mode == 3) {
+                VTSData.IntervalData.SOSInterval = DEFAULT_INV_SOS;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", VTSData.IntervalData.SOSInterval);
+                status = 1;
+            }
+            break;
+
+        case 17: /* Emergency auto-clear timeout */
+            if (mode == 1) {
+                Ql_sprintf(cur_val, "%d", VTSData.IntervalData.SOSTimeOut);
+                status = 1;
+            } else if (mode == 2) {
+                int v = (int)Ql_atoi(value);
+                if (v >= 0 && v <= 3600) {
+                    VTSData.IntervalData.SOSTimeOut = (uint16_t)v;
+                    UpdateConfigInFlash();
+                    Ql_sprintf(cur_val, "%d", v); status = 1;
+                }
+            } else if (mode == 3) {
+                VTSData.IntervalData.SOSTimeOut = 0;
+                UpdateConfigInFlash();
+                Ql_sprintf(cur_val, "%d", VTSData.IntervalData.SOSTimeOut);
+                status = 1;
+            }
+            break;
+
+        case 18: /* Device restart - SET only */
+            if (mode == 2) {
+                Ql_strncpy(cur_val, "1", sizeof(cur_val)-1);
+                status = 1;
+                reset_type = 2;
+            }
+            break;
+
+        case 19: /* IMEI - GET only */
+            if (mode == 1) {
+                Ql_strncpy(cur_val, NetWork.IMEI, sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        case 20: /* Clear emergency SOS - CLR only */
+            if (mode == 3) {
+                EmergencyPacket(0);
+                ResetSOS();
+                Ql_strncpy(cur_val, "0", sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        case 21: /* Emergency SMS centre number Mob1 */
+            if (mode == 1) {
+                Ql_strncpy(cur_val, VTSData.PhoneNumber.Mob1, sizeof(cur_val)-1);
+                status = 1;
+            } else if (mode == 2) {
+                int vl = Ql_strlen(value);
+                if (vl >= 7 && vl <= 13) {
+                    Ql_strncpy(VTSData.PhoneNumber.Mob1, value, sizeof(VTSData.PhoneNumber.Mob1)-1);
+                    UpdateConfigInFlash();
+                    Ql_strncpy(cur_val, value, sizeof(cur_val)-1);
+                    status = 1;
+                }
+            } else if (mode == 3) {
+                Ql_strncpy(VTSData.PhoneNumber.Mob1, DEFAULT_MOB1, sizeof(VTSData.PhoneNumber.Mob1)-1);
+                UpdateConfigInFlash();
+                Ql_strncpy(cur_val, VTSData.PhoneNumber.Mob1, sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        case 22: /* Signal strength - GET only */
+            if (mode == 1) {
+                Ql_sprintf(cur_val, "%d", GSM.SignalStrength);
+                status = 1;
+            }
+            break;
+
+        case 23: /* RFID tag - GET only */
+            if (mode == 1) {
+                uint8_t found = 0;
+                uint8_t ri;
+                for (ri = 0; ri < MAX_SENSORS; ri++) {
+                    if (SensorData[ri].SensorType == SENSOR_TYPE_RFID && SensorData[ri].IsActive) {
+                        Ql_strncpy(cur_val, (const char*)SensorData[ri].SensorData, sizeof(cur_val)-1);
+                        found = 1; break;
+                    }
+                }
+                if (!found)
+                    Ql_strncpy(cur_val, "NA", sizeof(cur_val)-1);
+                status = 1;
+            }
+            break;
+
+        default:
+            LOGData(TAG_OTA, "AMD3: unknown cmd %d", cmd_num);
+            break;
+        }
+
+        if (status == 0)
+            overall_status = 0;
+
+        if (item_count > 0)
+        {
+            if (Ql_strlen(LastOTAResponse.CmdId) + 1 < sizeof(LastOTAResponse.CmdId))
+                Ql_strcat(LastOTAResponse.CmdId, ",");
+            if (Ql_strlen(LastOTAResponse.Value) + 1 < sizeof(LastOTAResponse.Value))
+                Ql_strcat(LastOTAResponse.Value, ",");
+        }
+
+        if (Ql_strlen(LastOTAResponse.CmdId) + Ql_strlen(cmd_id) < sizeof(LastOTAResponse.CmdId))
+            Ql_strcat(LastOTAResponse.CmdId, cmd_id);
+
+        const char* val_to_append = (cur_val[0] != '\0') ? cur_val : "NA";
+        if (Ql_strlen(LastOTAResponse.Value) + Ql_strlen(val_to_append) < sizeof(LastOTAResponse.Value))
+            Ql_strcat(LastOTAResponse.Value, val_to_append);
+
+        item_count++;
+
+        if (next_comma >= star_pos) break;
+        p = next_comma + 1;
+    }
+
+    if (item_count > 0)
+    {
+        LastOTAResponse.Status  = overall_status;
+        LastOTAResponse.Pending = 1;
+        /* trigger OTA-ACK PVT packet */
+        AddAlert(CONF_CHANGE_ALERT);
+    }
+
+    if (reset_type == 1)
+    {
+        AIS140ResetPending = 1;
+        Ql_strncpy(AIS140ResetReason, "SMS_SET_APN", sizeof(AIS140ResetReason) - 1);
+        if (src < OTA_SRC_SCK_1 || src > OTA_SRC_SCK_4) {
+            ThreadSleep(500);
+            SystemRecovery_RequestReset(AIS140ResetReason);
+            AIS140ResetPending = 0;
+        }
+    }
+    else if (reset_type == 2)
+    {
+        AIS140ResetPending = 2;
+        Ql_strncpy(AIS140ResetReason, "SMS_RESTART", sizeof(AIS140ResetReason) - 1);
+        if (src < OTA_SRC_SCK_1 || src > OTA_SRC_SCK_4) {
+            ThreadSleep(1000);
+            SystemRecovery_RequestReset(AIS140ResetReason);
+            AIS140ResetPending = 0;
+        }
+    }
+}
+
+#endif /* PROTO_OG */
+
+/* SOS SMS fallback is shared by every non-CDAC protocol. */
+void SendSOSSMS(uint8_t isFall)
+{
+    char msg[160];
+    char ss[12];
+    uint8_t cs;
+
+    (void)isFall;
+
+    if (GSM.GSMState < SIM_DETECTED) return;
+    if (!IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob0)) return;
+
+    Ql_memset(msg, 0, sizeof(msg));
+    Ql_strcat(msg, "$EPB,EMR,");
+    Ql_strncat(msg, NetWork.IMEI, 15);
+    InsertChar(msg, ',');
+    AppendFixString(msg, sLatitude, 10, sLatitude);
+    InsertChar(msg, ',');
+    InsertChar(msg, GPS.LatDir ? GPS.LatDir : 'N');
+    InsertChar(msg, ',');
+    AppendFixString(msg, sLongitude, 10, sLongitude);
+    InsertChar(msg, ',');
+    InsertChar(msg, GPS.LngDir ? GPS.LngDir : 'E');
+    InsertChar(msg, ',');
+    InsertChar(msg, GPS.GPSFix ? 'A' : 'V');
+    InsertChar(msg, ',');
+    InsertFloatValue(msg, GPS.Speed, "%05.1f");
+    InsertChar(msg, ',');
+    AppendVariableString(msg, GSM.CellID, 5, 4, "0000");
+    InsertChar(msg, ',');
+    AppendVariableString(msg, GSM.LAC, 5, 4, "0000");
+    InsertChar(msg, ',');
+    InsertCurrentDateTime(msg, 0);
+    InsertCurrentDateTime(msg, 1);
+    cs = GetXORChecksum(msg + 1, Ql_strlen(msg) - 1);
+    Ql_sprintf(ss, "*%02X\r\n", cs);
+    Ql_strcat(msg, ss);
+
+    SendSMS(VTSData.PhoneNumber.Mob0, msg);
+    LOGData(TAG_OTA, "AMD3 SOS SMS -> %s", VTSData.PhoneNumber.Mob0);
+}
 
 
 uint8_t DecodeSMS(char* msg,uint8_t IsServer)
@@ -3308,7 +3976,7 @@ void ProcessRS232OTAData(void)
 	char* d = normalized;
 
 	// CLS fuel-sensor response (starts with '@') — route to the sensor parser.
-	if (d[0] == '@' && ParseCLSResponse(d, RS232_Buffer.datalen)) {
+	if (d[0] == '@' && ParseCLSResponse(d, Ql_strlen(d))) {
 		LOGData(TAG_OTA, "RS232 data handled as CLS Sensor response");
 		RS232_DataAvailable = 0;
 		return;
@@ -3317,7 +3985,7 @@ void ProcessRS232OTAData(void)
 	LOGData(TAG_OTA, "RS232 OTA command: %s", d);
 
 	uint8_t result = 0;
-	if (Ql_strncmp(d, "SET ", 4) == 0 || Ql_strncmp(d, "GET ", 4) == 0 || Ql_strncmp(d, "CLR ", 4) == 0) {
+	if (d[0] == '$' && Ql_strstr(d, NetWork.IMEI)) {
 		DecodeOTAData(d, OTA_SRC_RS232);
 		result = 1;
 	} else {

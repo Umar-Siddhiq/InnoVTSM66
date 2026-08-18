@@ -54,7 +54,15 @@ void CheckPacketCount(void)
     int freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
     LOGData(TAG_BACKUP, "History Remaining Space : %d", freeSpace);
 
-    MemoryPercent = freeSpace / 7000;
+    s64 totalSpace = Ql_FS_GetTotalSpace(Ql_FS_UFS);
+    if (totalSpace > 0)
+    {
+        MemoryPercent = (int)((freeSpace * 100) / totalSpace);
+    }
+    else
+    {
+        MemoryPercent = 0;
+    }
 }
 
 uint8_t WriteNewPacket(uint16_t pktnum)
@@ -63,8 +71,11 @@ uint8_t WriteNewPacket(uint16_t pktnum)
     Ql_memset(packetname, 0x00, sizeof(packetname));
     Ql_sprintf(packetname, "%s%d%s", PKT_NAME_HEADER, pktnum, PKT_NAME_FOOTER);
 
-    int len = sizeof(dataBuffer);
-    LOGData(TAG_BACKUP, "Writing packet in History, Length: %d", strlen(dataBuffer));
+    // Ensure dataBuffer is strictly null-terminated within buffer bounds
+    dataBuffer[sizeof(dataBuffer) - 1] = '\0';
+    int len = Ql_strlen(dataBuffer) + 1;
+    if (len > sizeof(dataBuffer)) len = sizeof(dataBuffer);
+    LOGData(TAG_BACKUP, "Writing packet in History, Length: %d", len);
     return SaveToFlash(packetname, (void *)&dataBuffer, len);
 }
 
@@ -150,9 +161,18 @@ uint8_t ClearHistoryStorage(uint16_t *deletedCount, uint16_t *failedCount)
     if (deletedCount) *deletedCount = 0;
     if (failedCount) *failedCount = 0;
 
+    /* This sweep is called from FTPStart() on the server thread and previously
+     * logged nothing on the success path, so 256 UFS check/delete calls ran
+     * completely silently — a stall in any one of them was indistinguishable
+     * from a dead thread. Emit a progress breadcrumb so the stalling index is
+     * visible in a field log without flooding it. */
+    LOGData(TAG_BACKUP, "ClearHistoryStorage: sweeping 1..%d", MAX_PACKET_COUNT);
+
     // Do not rely on LastPkt: an interrupted write can leave orphaned packets.
     for (i = 1; i <= MAX_PACKET_COUNT; i++)
     {
+        if ((i % 32) == 0)
+            LOGData(TAG_BACKUP, "ClearHistoryStorage: at %d/%d", i, MAX_PACKET_COUNT);
         Ql_memset(packetname, 0x00, sizeof(packetname));
         Ql_sprintf(packetname, "%s%d%s", PKT_NAME_HEADER, i, PKT_NAME_FOOTER);
         if (Ql_FS_Check(packetname) == QL_RET_OK)
@@ -206,53 +226,41 @@ void ReadLastPacket(void)
     return;
 }
 
-void DeleteFirstPacketsBulk(uint16_t countToDelete)
+void DeleteFirstPacket(void)
 {
     uint16_t i;
     char ss[30];
     char ff[30];
-
-    CheckPacketCount();
-    if (PacketConfig.LastPkt <= 0 || countToDelete == 0)
+    if(PacketConfig.LastPkt<=0)
         return;
 
-    if (countToDelete > PacketConfig.LastPkt)
-        countToDelete = PacketConfig.LastPkt;
-
-    // 1. Delete the first K packets
-    for (i = 1; i <= countToDelete; i++)
+    if(PacketConfig.LastPkt == 1)
     {
-        DeletePacket(i);
+        DeletePacket(1);
+        PacketConfig.LastPkt--;
+        UpdatePacketConfig();
+        return;
+
     }
 
-    // 2. Shift remaining packets: rename BK_i.bin to BK_(i-K).bin
-    if (countToDelete < PacketConfig.LastPkt)
+    DeletePacket(1);
+
+    for(i = 2;i<=PacketConfig.LastPkt;i++)
     {
-        for (i = countToDelete + 1; i <= PacketConfig.LastPkt; i++)
-        {
-            Ql_memset(ss, 0x00, 30);
-            Ql_memset(ff, 0x00, 30);
-            Ql_sprintf(ss, "%s%d%s", PKT_NAME_HEADER, i - countToDelete, PKT_NAME_FOOTER);
-            Ql_sprintf(ff, "%s%d%s", PKT_NAME_HEADER, i, PKT_NAME_FOOTER);
-            Ql_FS_Rename(ff, ss);
-        }
+        Ql_memset(ss,0x00,30);
+        Ql_memset(ff,0x00,30);
+        Ql_sprintf(ss,"%s%d%s",PKT_NAME_HEADER,i-1,PKT_NAME_FOOTER);
+        Ql_sprintf(ff,"%s%d%s",PKT_NAME_HEADER,i,PKT_NAME_FOOTER);
+        Ql_FS_Rename(ff, ss);
     }
 
-    // 3. Update the packet count configuration
-    PacketConfig.LastPkt -= countToDelete;
+    PacketConfig.LastPkt--;
     UpdatePacketConfig();
-    LOGData(TAG_BACKUP, "History Bulk Deleted %d packets, remaining: %d", countToDelete, PacketConfig.LastPkt);
+    return;
 }
 
-void DeleteFirstPacket(void)
-{
-    DeleteFirstPacketsBulk(1);
-}
-//#define ROLLOVER
 void SavePacket(void)
 {
-    int rem;
-    
     // Skip saving history packets during FOTA/MOTA updates
     if (IsMotaProcessing || IsFotaProcessing)
     {
@@ -276,20 +284,6 @@ void SavePacket(void)
         return;
     }
     
-    CheckPacketCount();
-    
-    // UFS Safety Reserve: Ensure at least 150 KB free space using efficient bulk deletion
-    uint32_t freeSpace = Ql_FS_GetFreeSpace(Ql_FS_UFS);
-    if (freeSpace < 153600 && PacketConfig.LastPkt > 0)
-    {
-        uint32_t neededSpace = 153600 - freeSpace;
-        // Each packet is 512 bytes on disk
-        uint16_t packetsToDelete = (neededSpace + 511) / 512;
-        LOGData(TAG_BACKUP, "Low UFS space (%d bytes), bulk purging oldest %u history packets to restore 150KB reserve...", freeSpace, packetsToDelete);
-        DeleteFirstPacketsBulk(packetsToDelete);
-        CheckPacketCount();
-    }
-
     if(PacketConfig.LastPkt >= MAX_PACKET_COUNT)
     {
         #ifdef ROLLOVER
@@ -306,8 +300,6 @@ void SavePacket(void)
         PacketConfig.LastPkt++;
         UpdatePacketConfig();
         LOGData(TAG_BACKUP,"History Packets Increased to %d",PacketConfig.LastPkt);
-        rem = Ql_FS_GetFreeSpace(Ql_FS_UFS);
-        LOGData(TAG_BACKUP,"Space Left :  %d \n",rem);
     }
     
 }

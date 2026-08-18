@@ -32,6 +32,7 @@
  ****************************************************************************/
 #include "ril.h"
 #include "ql_common.h"
+#include "custom_feature_def.h"
 
 /*========================================================================
 | 
@@ -62,12 +63,15 @@ static const ST_PowerKeyCfg pwrkeyCfg = {
     call Ql_LockPower () to lock power supply, or module will lose power when the level of PWRKEY pin goes high.
     */
 
-    TRUE,  // working mode for power-off on PWRKEY pin
+    FALSE, // application-controlled power-off on PWRKEY pin
     /*
-    Module automatically powers off when feeding a low level to POWER_KEY pin.
+    Do not automatically power off on a low level at POWER_KEY.  The power-key
+    line is shared with the carrier board and can see a transient during modem
+    activity; automatic power-off converts that transient into an unlogged
+    power cycle.  The application registers a callback and deliberately
+    ignores operational power-off requests instead.
 
-    When set to FALSE, the callback that Ql_PwrKey_Register registers will be triggered. 
-    Application may do post processing before switches off the module.
+    When set to FALSE, the callback that Ql_PwrKey_Register registers will be triggered.
     */
 };
 
@@ -77,8 +81,8 @@ static const ST_PowerKeyCfg pwrkeyCfg = {
 /*     Customer may specify two GPIOs if needed.                        */
 /************************************************************************/
 static const ST_ExtWatchdogCfg wtdCfg = {
-    PINNAME_PCM_OUT,  // Specify a pin which connects to the external watchdog
-    PINNAME_END   // Specify another pin for watchdog if needed
+    SYSTEM_WATCHDOG_SERVICE_INIT_PIN,
+    PINNAME_END
 };
 ST_ExtWatchdogCfg* Ql_WTD_GetWDIPinCfg(void)
 {

@@ -1,0 +1,81 @@
+/****************************************************************************
+ * @file     InnovateM031.ncfg
+ * @version  v1.34.0001
+ * @Date     Wed Apr 09 2025 19:33:58 GMT+0530 (India Standard Time)
+ * @brief    NuMicro config file
+ *
+ * @note Please do not modify this file.
+ *       Otherwise, it may not be loaded successfully.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright (C) 2013-2025 Nuvoton Technology Corp. All rights reserved.
+*****************************************************************************/
+MCU:M031LE3AE(LQFP48)
+Pin1:UART2_TXD
+Pin2:UART2_RXD
+Pin3:UART1_TXD
+Pin4:UART1_RXD
+Pin5:ADC0_CH1
+Pin6:ADC0_CH0
+Pin7:PA.11
+Pin8:PA.10
+Pin9:PA.9
+Pin10:PA.8
+Pin11:PF.5
+Pin12:PF.4
+Pin13:UART0_TXD
+Pin14:UART0_RXD
+Pin15:PA.7
+Pin16:PA.6
+Pin17:PA.5
+Pin18:PA.4
+Pin19:PA.3
+Pin20:SPI0_CLK
+Pin21:SPI0_MISO
+Pin22:SPI0_MOSI
+Pin23:PF.15
+Pin24:nRESET
+Pin25:ICE_DAT
+Pin26:ICE_CLK
+Pin27:PC.5
+Pin28:PC.4
+Pin29:PC.3
+Pin30:PC.2
+Pin31:PC.1
+Pin32:PC.0
+Pin33:PA.12
+Pin34:PA.13
+Pin35:PA.14
+Pin36:PA.15
+Pin37:VSS
+Pin38:LDO_CAP
+Pin39:VDD
+Pin40:PC.14
+Pin41:PB.15
+Pin42:ADC0_CH14
+Pin43:ADC0_CH13
+Pin44:PB.12
+Pin45:AVDD
+Pin46:AVSS
+Pin47:PB.7
+Pin48:PB.6
+GPIOpin:27
+GPIOpin:11
+GPIOpin:10
+GPIOpin:22
+GPIOpin:8
+GPIOpin:18
+GPIOpin:9
+GPIOpin:6
+GPIOpin:46
+SYS->GPA_MFPH = 0x00000000
+SYS->GPA_MFPL = 0x00000444
+SYS->GPB_MFPH = 0x01100000
+SYS->GPB_MFPL = 0x00DD6611
+SYS->GPC_MFPH = 0x00000000
+SYS->GPC_MFPL = 0x00000000
+SYS->GPF_MFPH = 0x00000000
+SYS->GPF_MFPL = 0x000033EE
+LockedPins=[]
+/*** (C) COPYRIGHT 2013-2025 Nuvoton Technology Corp. ***/

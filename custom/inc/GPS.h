@@ -104,5 +104,6 @@ void SendNMEAToRS232(void);
 void gps_overspeed_check(void);
 void ApplyFGPS(void);
 bool GPS_IsSimulationActive(void);
+uint8_t GPS_GetState(void);
 
 #endif // GPS_H

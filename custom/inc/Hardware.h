@@ -93,7 +93,40 @@
 #endif
 
 
-typedef enum {BATTERY_STATUS_NOBATTERY=0, BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_FULL} BatteryStatusTypedef;
+/* UNKNOWN is appended deliberately — the existing values are reported in the
+ * $BATT RS232 frame and must keep their numbering. */
+typedef enum {BATTERY_STATUS_NOBATTERY=0, BATTERY_STATUS_CHARGING, BATTERY_STATUS_DISCHARGING, BATTERY_STATUS_FULL, BATTERY_STATUS_UNKNOWN} BatteryStatusTypedef;
+
+/* --- Battery presence detection is NOT POSSIBLE on this hardware revision ---
+ * Set to 1 only when a real presence signal is wired (see below).
+ *
+ * MEASURED 2026-08-12, no battery installed, charger GPIO pulsed OFF for 15 s
+ * with the full rail curve logged once per second:
+ *     baseline 4.20V
+ *     t=0 4.18  t=1 4.16  t=2 4.14  t=3 4.12  t=4 4.10
+ *     t=5..t=14  4.09 4.09 4.09 4.09 4.09 4.09 4.09 4.09 4.09 4.09
+ *     => slope over the 10 s window = 2 mV, total step = 102 mV
+ * The rail drops 110 mV and then HOLDS FLAT at 4.09 V for ten seconds with no
+ * cell present, i.e. CONTROL_CHARGER_OFF does not open the VBAT path — the node
+ * stays actively driven. The 102 mV is a regulation step, not a discharge.
+ * A charged Li-ion cell's OCV (~4.05-4.15 V) is indistinguishable from it, so
+ * NO threshold on this node can separate "cell" from "no cell".
+ *
+ * Every other candidate signal was checked against the same log and is dead:
+ *   - MCU BattADC  : same node (BattADC/BattVolt constant ~528, and it tracks
+ *                    the identical 2221->2170 step and plateau)
+ *   - MCU ADCVal1  : flat 98-103 across the probe, unresponsive
+ *   - MCU ADCVal2  : flat 3718-3757 across the probe, unresponsive
+ *   - MCU IP1/IP2  : constant 1, not a charger STAT
+ *   - M66 GPIOs    : all nine defined pins are allocated; no spare, no STAT in
+ * To make detection possible, hardware must provide ONE of:
+ *   (a) the charger IC's STAT/CHG open-drain output routed to an M66 GPIO or an
+ *       MCU digital input, or
+ *   (b) a charger EN that truly high-Zs the output so the rail can collapse, or
+ *   (c) a sense divider on the BATTERY side of a blocking FET/diode, sampled
+ *       while the charge path is open.
+ * Until then the firmware must NOT assert that a battery is present. */
+#define BATT_PRESENCE_DETECT_SUPPORTED 0
 typedef struct
 {
 	uint8_t IP1;
@@ -127,6 +160,7 @@ typedef struct
 }SleepConfigTypedef;
 
 extern SleepConfigTypedef SleepConfig;
+uint8_t SleepConfig_IsEnabled(void);
 
 
 #define RFID_MAX_DATALEN 100

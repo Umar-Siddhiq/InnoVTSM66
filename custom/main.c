@@ -36,6 +36,7 @@
 #include "ql_trace.h"
 #include "ql_uart.h"
 #include "ql_system.h"
+#include "ql_power.h"
 #include "GPRS.h"
 #include "GPS.h"
 #include "Systic.h"
@@ -75,6 +76,39 @@ void LogData_Unlock(void)
 #endif
 char FirmVer[15]={0};
 
+/*
+ * Keep PWRKEY power-off under application control.  The board's PWRKEY line
+ * must not be allowed to turn a brief low pulse into a module power cycle.
+ * Intentional software resets continue to use their explicit Ql_Reset paths.
+ */
+static void PowerKeyIndication(s32 operation, s32 keyState)
+{
+    if (operation == POWER_OFF)
+    {
+        LOGData(TAG_MAIN,
+                "PWRKEY power-off indication ignored: state=%d (automatic power-off disabled)",
+                (int)keyState);
+    }
+    else
+    {
+        LOGData(TAG_MAIN, "PWRKEY indication: operation=%d state=%d",
+                (int)operation, (int)keyState);
+    }
+}
+
+static void RegisterPowerKeyProtection(void)
+{
+    s32 ret = Ql_PwrKey_Register(PowerKeyIndication);
+    if (ret < QL_RET_OK)
+    {
+        LOGData(TAG_MAIN, "PWRKEY callback registration failed: ret=%d", ret);
+    }
+    else
+    {
+        LOGData(TAG_MAIN, "PWRKEY protection active: automatic power-off disabled");
+    }
+}
+
 void print_long_string(const char* long_string) {
     size_t len = Ql_strlen(long_string);
     size_t chunk_size = 100; // Max bytes per log
@@ -101,8 +135,11 @@ void print_long_string(const char* long_string) {
                     (int)(start_index + 1), (int)len,
                     (int)(end_index - start_index), long_string + start_index);
 
-        // Print the chunk via the SDK debug trace
-        Ql_Debug_Trace(chunk);
+        /* Must pass chunk as an ARGUMENT, not as the format string: packet
+         * payloads are attacker/server-influenced data and any '%' in them
+         * would be parsed as a conversion specifier, making Ql_Debug_Trace
+         * read non-existent varargs (garbage pointer deref on "%s"). */
+        Ql_Debug_Trace("%s", chunk);
     }
 }
 
@@ -126,19 +163,11 @@ void system_init(void)
 {
     //debug_uart_init();
     AlertInitStruct();
-#ifdef ENABLE_UNIFIED_FIRMWARE
-    if (IS_PROTO_OG()) {
-        Ql_sprintf(FirmVer,"V%s",FIRMWAREVERSION);
-    } else {
-        strcpy(FirmVer,FIRMWAREVERSION);
-    }
-#else
     #ifndef PROTO_OG
     strcpy(FirmVer,FIRMWAREVERSION);
     #else
     Ql_sprintf(FirmVer,"V%s",FIRMWAREVERSION);
     #endif
-#endif
     LOGData(TAG_MAIN,"OpenCPU: APM %s Firware Version %s, State/Proto: %s\r\n", PROTOVER, FirmVer, PROTO_TAG);
     InitSystic();
     hw_init();
@@ -151,7 +180,24 @@ void system_init(void)
     if (DownloadReq.IsValid == FOTA_REQ_VALID_CODE)
     {
         IsFTPReq = 1;
-        LOGData(TAG_MAIN, "Pending FOTA/MOTA request detected at boot, auto-resume scheduled");
+
+        /* Consume the persisted request NOW, so the auto-resume is ONE-SHOT.
+         *
+         * The resume runs inside the server thread (handleFTPRequests(), the
+         * third call in its 100 ms loop) and FTPStart() begins with a silent
+         * multi-hundred-operation UFS sweep before it logs anything. If that
+         * stalls, the server thread never reaches any packet handling and the
+         * device sends nothing but the single login it managed beforehand —
+         * and because the request stayed valid in flash, the next boot armed
+         * the very same stall again, forever. Invalidating flash here keeps
+         * this boot's attempt (the in-RAM copy is still valid) while
+         * guaranteeing a wedged or reset attempt cannot re-arm itself. */
+        {
+            download_req_info_s consumed = DownloadReq;
+            consumed.IsValid = 0;
+            UpdateFTPConfigInFlash(&consumed);
+        }
+        LOGData(TAG_MAIN, "Pending FOTA/MOTA request at boot: one-shot auto-resume armed, flash record consumed");
     }
     /* ------------------------------------------------------------------
      * DIAGNOSTIC LOGGING SYSTEM — Load persistent counters at boot
@@ -169,9 +215,6 @@ void system_init(void)
     LOGData(TAG_BOOT, "=== BOOT COMPLETE === FW:%s SIM:%s Profile:%d BootCount:%lu ===",
             FirmVer, SIM_MAKE_STR, VTSState.CurrentProfile, DiagCounters.BootCount);
     SOSInit(VTSData.IntervalData.SOSTimeOut);
-#ifdef ENABLE_UNIFIED_FIRMWARE
-    VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.DataInterval;
-#else
     #ifdef PROTO_CDAC
     VehicleState.PacketState = NORMAL;
     VehicleState.VehicleMode = HALT;
@@ -180,7 +223,6 @@ void system_init(void)
     #else
     VTSData.IntervalData.CurrentInterval = VTSData.IntervalData.DataInterval;
     #endif
-#endif
 }
 
 typedef struct {
@@ -250,6 +292,8 @@ void proc_main_task(s32 taskId)
 #if VTS_DEBUG_LOG_ENABLE
     LogData_Init();
 #endif
+
+    RegisterPowerKeyProtection();
 
     /* LOG CLEANUP 2026-05-16: Duplicate of line ~101 banner which already
      * shows FW version + protocol + tag. This line carried no extra info.

@@ -133,6 +133,8 @@ static uint8_t FullEraseUfsAfterFlashCorruption(const char *reason, s32 ret)
 
 
 
+static uint8_t s_fileCheckBuf[512];
+
 uint8_t SaveToFlash(char *filename, void *data, u32 size)
 {
     int fd;
@@ -142,39 +144,41 @@ uint8_t SaveToFlash(char *filename, void *data, u32 size)
         return 0;
     }
 
-    // Check if file already exists with identical content to prevent unnecessary SPI flash wear
-    fd = Ql_FS_Open(filename, QL_FS_READ_ONLY);
-    if(fd >= 0)
+    // Check if file already exists with identical content to prevent unnecessary SPI flash wear (skipped for history BK_ files)
+    if (Ql_strncmp(filename, "BK_", 3) != 0)
     {
-        u32 fileSize = Ql_FS_GetSize(filename);
-        if(fileSize == size && size <= 2048)
+        fd = Ql_FS_Open(filename, QL_FS_READ_ONLY);
+        if(fd >= 0)
         {
-            uint8_t tempBuf[512];
-            uint8_t* checkPtr = (size <= 512) ? tempBuf : (uint8_t*)Ql_MEM_Alloc(size);
-            if(checkPtr)
+            u32 fileSize = Ql_FS_GetSize(filename);
+            if(fileSize == size && size <= 2048)
             {
-                u32 readBytes = 0;
-                s32 rRes = Ql_FS_Read(fd, checkPtr, size, &readBytes);
-                Ql_FS_Close(fd);
-                if(rRes == QL_RET_OK && readBytes == size)
+                uint8_t* checkPtr = (size <= 512) ? s_fileCheckBuf : (uint8_t*)Ql_MEM_Alloc(size);
+                if(checkPtr)
                 {
-                    if(Ql_memcmp(checkPtr, data, size) == 0)
+                    u32 readBytes = 0;
+                    s32 rRes = Ql_FS_Read(fd, checkPtr, size, &readBytes);
+                    Ql_FS_Close(fd);
+                    if(rRes == QL_RET_OK && readBytes == size)
                     {
-                        LOGData(TAG_FILE, "Flash write skipped (unchanged): %s (%lu bytes)", filename, size);
-                        if(size > 512 && checkPtr != tempBuf) Ql_MEM_Free(checkPtr);
-                        return 1;
+                        if(Ql_memcmp(checkPtr, data, size) == 0)
+                        {
+                            LOGData(TAG_FILE, "Flash write skipped (unchanged): %s (%lu bytes)", filename, size);
+                            if(size > 512 && checkPtr != s_fileCheckBuf) Ql_MEM_Free(checkPtr);
+                            return 1;
+                        }
                     }
+                    if(size > 512 && checkPtr != s_fileCheckBuf) Ql_MEM_Free(checkPtr);
                 }
-                if(size > 512 && checkPtr != tempBuf) Ql_MEM_Free(checkPtr);
+                else
+                {
+                    Ql_FS_Close(fd);
+                }
             }
             else
             {
                 Ql_FS_Close(fd);
             }
-        }
-        else
-        {
-            Ql_FS_Close(fd);
         }
     }
 
@@ -232,7 +236,19 @@ uint8_t LoadFromFlash(char *filename, void *data, u32 size, void (*defaultFunc)(
     }
 
     s32 fileSize = Ql_FS_GetSize(filename);
-    if (fileSize != size)
+    u32 readSize = size;
+
+    if (Ql_strncmp(filename, "BK_", 3) == 0)
+    {
+        if (fileSize <= 0 || fileSize > (s32)size)
+        {
+            LOGData(TAG_FILE, "Invalid history file size for %s: %d\n", filename, fileSize);
+            if (defaultFunc) defaultFunc();
+            return 0;
+        }
+        readSize = (u32)fileSize;
+    }
+    else if (fileSize != size)
     {
         LOGData(TAG_FILE, "Invalid file size for %s. Expected: %d, Found: %d\n", filename, size, fileSize);
         LogModemFlashCorruption(filename, "size", 0, (s32)size, fileSize);
@@ -258,19 +274,24 @@ uint8_t LoadFromFlash(char *filename, void *data, u32 size, void (*defaultFunc)(
     }
 
     u32 bytesRead = 0;
-    s32 ret = Ql_FS_Read(fd, data, size, &bytesRead);
+    s32 ret = Ql_FS_Read(fd, data, readSize, &bytesRead);
     Ql_FS_Close(fd);
 
-    if (ret != QL_RET_OK || bytesRead != size)
+    if (ret != QL_RET_OK || bytesRead != readSize)
     {
-        LOGData(TAG_FILE, "Read error/mismatch for %s. ret=%d, read=%d/%d\n", filename, ret, bytesRead, size);
-        LogModemFlashCorruption(filename, "read", ret, (s32)size, (s32)bytesRead);
+        LOGData(TAG_FILE, "Read error/mismatch for %s. ret=%d, read=%d/%d\n", filename, ret, bytesRead, readSize);
+        LogModemFlashCorruption(filename, "read", ret, (s32)readSize, (s32)bytesRead);
         if (IsFatalFsError(ret))
         {
             FullEraseUfsAfterFlashCorruption("read", ret);
         }
         if (defaultFunc) defaultFunc();
         return 0;
+    }
+
+    if (Ql_strncmp(filename, "BK_", 3) == 0 && bytesRead < size)
+    {
+        ((char*)data)[bytesRead] = '\0';
     }
 
     LOGData(TAG_FILE, "File loaded: %s (%d bytes)\n", filename, bytesRead);
@@ -572,12 +593,6 @@ void LoadDefault(void)
     VTSData.DefID = DEFVAL;
 	strcpy(VTSData.VendorID,DEFAULT_VENDOR);
 	VTSData.BattThrs=LOW_BAT_THRS_VOLT;
-#ifdef ENABLE_UNIFIED_FIRMWARE
-    VTSData.ActiveProtocol = VTS_PROTO_NIC;
-    VTSData.ActiveState = VTS_STATE_ODISHA_DEFAULT;
-    VTSData.FeatureFlags = (1u << VTS_FEATURE_BLE) | (1u << VTS_FEATURE_AUTOPRF) | (1u << VTS_FEATURE_GPSREC) | (1u << VTS_FEATURE_SOS);
-    GetDefaultIPsAndTags();
-#else
     #ifndef PROTO_CDAC
 	VTSData.IntervalData.DataInterval=300;
 	VTSData.IntervalData.HealthInterval=250;
@@ -605,7 +620,6 @@ void LoadDefault(void)
 	strcpy(VTSData.ServerData.Port2,DEFAULT_PORT2);   // 18110
     VTSData.ServerData.IPConfig[1]=1;
     #endif
-#endif
     strcpy(VTSData.ServerData.IP3,DEFAULT_IP3);
 	strcpy(VTSData.ServerData.Port3,DEFAULT_PORT3);
     VTSData.ServerData.IPConfig[2]=1;   
@@ -966,44 +980,3 @@ unsigned long Diag_GetBootCount(void)
     return (unsigned long)DiagCounters.BootCount;
 }
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void GetDefaultIPsAndTags(void)
-{
-    // Initialize intervals based on active protocol
-    VTSData.IntervalData.DataInterval = 300;
-    VTSData.IntervalData.HealthInterval = 250;
-    VTSData.IntervalData.IgnitionInterval = 10;
-    VTSData.IntervalData.SOSInterval = 5;
-    VTSData.IntervalData.SOSTimeOut = DEFAULT_INV_STM;
-    VTSData.IntervalData.StandbyInterval = 60;
-
-    // Set default IP and Port depending on Protocol and State
-    const char *default_ip = "vltspvt.delhi.gov.in";
-    const char *default_port = "9031";
-
-    if (IS_PROTO_NIC()) {
-        default_ip = "vltspvt.delhi.gov.in";
-        default_port = "9031";
-    } else if (IS_PROTO_MH()) {
-        default_ip = "data.vahanshakti.in";
-        default_port = "4030";
-    } else if (IS_PROTO_ODISHA()) {
-        if (VTSData.ActiveState == VTS_STATE_ODISHA_LADAKH) {
-            default_ip = "pvt.vltdladakh.in";
-            default_port = "60002";
-        } else {
-            default_ip = "pvtdevices.odishatransport.gov.in";
-            default_port = "8205";
-        }
-    }
-
-    strcpy(VTSData.ServerData.IP1, default_ip);
-    strcpy(VTSData.ServerData.Port1, default_port);
-    VTSData.ServerData.IPConfig[0] = 1;
-
-    // Set second server IP/Port to match primary for standard protocols
-    strcpy(VTSData.ServerData.IP2, default_ip);
-    strcpy(VTSData.ServerData.Port2, default_port);
-    VTSData.ServerData.IPConfig[1] = 1;
-}
-#endif

@@ -25,54 +25,6 @@
 #include <string.h>
 // #include "Geofence.h"
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-// Runtime enums for protocol and sub-state selection
-typedef enum {
-    VTS_PROTO_NONE = 0,
-    VTS_PROTO_NIC = 1,
-    VTS_PROTO_ODISHA = 2,
-    VTS_PROTO_MAHARASHTRA = 3,
-    VTS_PROTO_MAX
-} VTSProtocolType;
-
-typedef enum {
-    VTS_STATE_DEFAULT = 0,
-    // NIC
-    VTS_STATE_NIC_DELHI = 1,
-    VTS_STATE_NIC_PONDI = 2,
-    VTS_STATE_NIC_UTTRA = 3,
-    VTS_STATE_NIC_GOA = 4,
-    VTS_STATE_NIC_MDP = 5,
-    VTS_STATE_NIC_ISLAND = 6,
-    VTS_STATE_NIC_TAMIL = 7,
-    VTS_STATE_NIC_TRIPURA = 8,
-    VTS_STATE_NIC_VAHAN = 9,
-    VTS_STATE_NIC_HIMACHAL = 10,
-    VTS_STATE_NIC_BIHAR = 11,
-    // Odisha
-    VTS_STATE_ODISHA_DEFAULT = 12,
-    VTS_STATE_ODISHA_LADAKH = 13,
-    VTS_STATE_MAX
-} VTSStateType;
-
-typedef enum {
-    VTS_FEATURE_BLE = 0,
-    VTS_FEATURE_AUTOPRF = 1,
-    VTS_FEATURE_GPSREC = 2,
-    VTS_FEATURE_SOS = 3,
-    VTS_FEATURE_MAX
-} VTSFeatureType;
-
-#define IS_PROTO_CDAC()   (0)
-#define IS_PROTO_NIC()    (VTSData.ActiveProtocol == VTS_PROTO_NIC)
-#define IS_PROTO_ODISHA() (VTSData.ActiveProtocol == VTS_PROTO_ODISHA)
-#define IS_PROTO_MH()     (VTSData.ActiveProtocol == VTS_PROTO_MAHARASHTRA)
-#define IS_PROTO_OG()     (0)
-
-#define IS_FEATURE_ENABLED(feat) ((VTSData.FeatureFlags & (1u << (feat))) != 0)
-const char* GetActiveProtoTag(void);
-
-#else // ENABLE_UNIFIED_FIRMWARE not defined
 
 #ifdef PROTO_CDAC
 #define IS_PROTO_CDAC()   (1)
@@ -104,28 +56,10 @@ const char* GetActiveProtoTag(void);
 #define IS_PROTO_OG()     (0)
 #endif
 
-typedef enum {
-    VTS_FEATURE_BLE = 0,
-    VTS_FEATURE_AUTOPRF = 1,
-    VTS_FEATURE_GPSREC = 2,
-    VTS_FEATURE_SOS = 3,
-    VTS_FEATURE_MAX
-} VTSFeatureType;
 
-#define IS_FEATURE_ENABLED(feat) ( \
-    (feat) == VTS_FEATURE_BLE ? (defined(VTS_BLE_ENABLE) && VTS_BLE_ENABLE) : \
-    (feat) == VTS_FEATURE_AUTOPRF ? (!defined(AUTO_PROFILESWITCH_DISABLE)) : \
-    (feat) == VTS_FEATURE_GPSREC ? (defined(ENABLE_GPS_RESET_RECOVERY) && ENABLE_GPS_RESET_RECOVERY) : \
-    (feat) == VTS_FEATURE_SOS ? (!VTSData.DisableSOS) : 1 \
-)
-
-#endif // ENABLE_UNIFIED_FIRMWARE
-
-#ifndef ENABLE_UNIFIED_FIRMWARE
 #if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) &&                    \
     !defined(PROTO_CDAC) && !defined(PROTO_ODISA1) && !defined(PROTO_OG)
 #define PROTO_CDAC
-#endif
 #endif
 
 // Disable debug printing for PROTO_OG to reduce binary size
@@ -138,11 +72,11 @@ typedef enum {
 //
 
 #ifndef PROTO_CDAC
-// #define HISTORY_DISABLED
+#define HISTORY_DISABLED
 #endif
 #define PRF_AUTOSWITCH
-#define HISTORY_INTERNAL
-// #define AUTO_SLEEP_ENABLE  // Auto sleep after 2 min ignition off
+// #define HISTORY_INTERNAL
+//#define AUTO_SLEEP_ENABLE  // Auto sleep after 2 min ignition off
 extern char FirmVer[];
 
 #ifdef AUTO_SLEEP_ENABLE
@@ -293,7 +227,7 @@ extern char FirmVer[];
 // #define NIC_GOA
 // #define NIC_MDP
 // #define NIC_ISLAND
-// #define NIC_TAMIL
+ #define NIC_TAMIL
 // #define NIC_TRIPURA
 // #define NIC_VAHAN
 // #define NIC_HIMACHEL
@@ -489,8 +423,8 @@ extern char FirmVer[];
 #define DEFAULT_INV_STB 60
 #define DEFAULT_INV_STM 120
 
-#define DEFAULT_MOB0 "7017034104"
-#define DEFAULT_MOB1 "9655543732"
+#define DEFAULT_MOB0 "8489607555"
+#define DEFAULT_MOB1 "9600696008"
 
 #define DEFAULT_VEHREG "UNKNOWN"
 
@@ -506,10 +440,6 @@ extern char FirmVer[];
 #error NO VALID PROTOCOL SELECTED !!!
 #endif
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-#undef PROTO_TAG
-#define PROTO_TAG GetActiveProtoTag()
-#endif
 
 #ifndef DEFAULT_IP4
 #define DEFAULT_IP4 "NA"
@@ -517,13 +447,13 @@ extern char FirmVer[];
 #endif
 
 // #define VIRTUAL_IMEI
-#define VIMEI "868329083320931"
+#define VIMEI "861850061675811"
 
 // #define VIRTUAL_IMSI
 #define VIMSI "404844263390879"
 
 // #define VIRTUAL_SIMCCID
-#define VCID "8991840042633908791"
+#define VCID "89917350730001767711"
 
 #ifdef VIRTUAL_IMEI
 #ifdef VIMEI
@@ -616,26 +546,6 @@ typedef struct {
 
 } ServerDataTypedef;
 
-#if defined(ENABLE_UNIFIED_FIRMWARE)
-typedef struct {
-  uint16_t CurrentInterval;
-  uint16_t DataInterval;           // maps to MotionInterval (CDAC)
-  uint16_t StandbyInterval;        // maps to SleepInterval (CDAC)
-  uint16_t SOSInterval;            // maps to EmergencyInterval (CDAC)
-  uint16_t IgnitionInterval;       // maps to HaltInterval (CDAC)
-  uint16_t IsDataAvail;
-  uint16_t HealthInterval;
-  uint16_t SleepTime;
-  uint16_t HaltTime;
-  uint16_t SOSTimeOut;
-  uint16_t FullDataPacketInterval; // CDAC specific
-} IntervalTypeDef;
-
-#define MotionInterval DataInterval
-#define SleepInterval StandbyInterval
-#define EnergencyInterval SOSInterval
-#define HaltInterval IgnitionInterval
-#else
 #ifndef PROTO_CDAC
 typedef struct {
   uint16_t CurrentInterval;
@@ -668,7 +578,6 @@ typedef struct {
 #define SOSInterval EnergencyInterval
 #define StandbyInterval SleepInterval
 #define IgnitionInterval HaltInterval
-#endif
 #endif
 
 typedef struct {
@@ -703,15 +612,15 @@ typedef struct {
   uint64_t SOSSmsConfigSignature;
   uint8_t EnableHTTPS;
   uint8_t DisableGPSFaultReset;
-#ifdef ENABLE_UNIFIED_FIRMWARE
-  uint8_t ActiveProtocol;
-  uint8_t ActiveState;
-  uint32_t FeatureFlags;
-#endif
 } VTSTypedef;
 
+#ifdef PROTO_MAHARASHTRA1
 #define SOS_SMS_FEATURE_ENABLED 1
-#define SOS_WIRECUT_SMS_ENABLED 1
+// #define SOS_WIRECUT_SMS_ENABLED 1
+#else
+#define SOS_SMS_FEATURE_ENABLED 0
+// #define SOS_WIRECUT_SMS_ENABLED 0
+#endif
 #define SOS_SMS_CONFIG_SIGNATURE 0x534F53534D533032ULL
 
 extern VTSTypedef VTSData;

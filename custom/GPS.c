@@ -1069,6 +1069,11 @@ bool GPS_IsSimulationActive(void)
     return (fGPSLat != 0 && fGPSLong != 0);
 }
 
+uint8_t GPS_GetState(void)
+{
+    return GPS.State;
+}
+
 void ApplyFGPS(void)
 {
     GPS.GPSFix = 1;
@@ -1114,23 +1119,56 @@ void ApplyFGPS(void)
 
 void gps_reset_routine(void)
 {
+    static uint8_t s_fotaBypassLogged = 0;
     if (GPS_IsSimulationActive())
     {
         return;
     }
     if (IsMotaProcessing || IsFotaProcessing)
     {
+        if (!s_fotaBypassLogged)
+        {
+            LOGData(TAG_GPS, "GPS Reset Routine bypassed because FOTA/MOTA is in progress");
+            s_fotaBypassLogged = 1;
+        }
         return;
     }
-    LOGData(TAG_GPS,"GPS Reset Routine Triggered - Hardware Fault Detected\r\n");
-    ThreadSleep(1000);
-    if(GPSTimeout>0)
+    s_fotaBypassLogged = 0;
+#if ENABLE_GPS_RESET_RECOVERY
+    static uint32_t last_reset_ms = 0;
+    uint32_t now = Ql_GetMsSincePwrOn();
+
+    if (now - last_reset_ms < 60000)
+    {
         return;
-    
-    // Trigger module soft reset since GPS remains in fault state
-    LOGData(TAG_GPS,"GPS remains in FLT state, resetting MCU/Module...\r\n");
-    ThreadSleep(1000);
-    Ql_Reset(0);
+    }
+
+    last_reset_ms = now;
+
+    if (GPS.State == 2)
+    {
+        LOGData(TAG_GPS, "GPS State is 2 (No NMEA stream). Triggering module reset for recovery.");
+        ThreadSleep(1000);
+        if (GPSTimeout == 0)
+        {
+            LOGData(TAG_GPS, "GPS remains in fault state — resetting module.");
+            ThreadSleep(1000);
+            Ql_Reset(0);
+        }
+    }
+    else if (GPS.State == 0)
+    {
+        LOGData(TAG_GPS, "GPS State is 0 (Searching for satellite fix...).");
+    }
+#else
+    static uint32_t last_disabled_log_ms = 0;
+    uint32_t now = Ql_GetMsSincePwrOn();
+    if (now - last_disabled_log_ms >= 60000)
+    {
+        last_disabled_log_ms = now;
+        LOGData(TAG_GPS,"GPS Reset Routine Triggered (disabled by config)\r\n");
+    }
+#endif
 }
 
 void gps_thread_entry(s32 taskId)

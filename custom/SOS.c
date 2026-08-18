@@ -102,11 +102,7 @@ void UpdateSOSTimeOut(char* value)
 }
 
 #if defined(PROTO_CDAC)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void ProcessSOSCDAC(void)
-#else
 void ProcessSOS(void)
-#endif
 {
 	uint16_t pinValue;
 	
@@ -201,12 +197,8 @@ void ProcessSOS(void)
 
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || !defined(PROTO_CDAC)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void ProcessSOSStd(void)
-#else
+#if !defined(PROTO_CDAC)
 void ProcessSOS(void)
-#endif
 {
 	int pinValue=0;
 	
@@ -293,9 +285,3 @@ void ProcessSOS(void)
 }
 #endif
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void ProcessSOS(void)
-{
-	ProcessSOSStd();
-}
-#endif

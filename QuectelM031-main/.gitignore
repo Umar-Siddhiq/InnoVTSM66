@@ -1,0 +1,68 @@
+# KEIL uVision Build Output Files
+# Object files and listings
+**/obj/**
+**/lst/**
+
+/BootLoader/Keil/build.log
+/BootLoader/Keil/Nu_Link_Driver.ini
+/Application/KEIL/Nu_Link_Driver.ini
+
+# Build artifacts
+*.axf
+*.elf
+*.o
+*.d
+*.dep
+*.lnp
+*.sct
+*.map
+
+# KEIL uVision temporary files
+*.bak
+*.ddk
+*.edk
+*.lst
+*.lnp
+*.mpf
+*.obj
+*.opt
+*.plg
+*.rpt
+*.tmp
+*.tra
+*.uvguiex
+
+# Build logs
+*.build_log.htm
+build_log.htm
+
+# User-specific KEIL settings (keep project files but ignore user-specific GUIs)
+*.uvgui.*
+*.uvguiex
+
+# Hex/Bin output files (if generated in project root)
+*.hex
+*.bin
+*.elf
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Python cache (if any)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Keep the Library directory
+!/Library/
+
+
+Nu_Link_Driver.ini

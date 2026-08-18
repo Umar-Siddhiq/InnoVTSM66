@@ -613,6 +613,16 @@ uint8_t ProcessBLE(void)
         }
     }
 
+    // Dynamic IMEI Update: Update Bluetooth name once valid IMEI is retrieved from modem
+    if (BLE_IsInitialized && NetWork.IMEI[0] != '\0' && Ql_strstr(BTMaster.name, "NOIMEI") != NULL) {
+        const char *vendorId = (VTSData.VendorID[0] != '\0') ? VTSData.VendorID : DEFAULT_VENDOR;
+        Ql_memset(BTMaster.name, 0, sizeof(BTMaster.name));
+        Ql_snprintf(BTMaster.name, sizeof(BTMaster.name) - 1, "%s-%s", vendorId, NetWork.IMEI);
+        BTMaster.name[sizeof(BTMaster.name) - 1] = '\0';
+        LOGData(TAG_BLE, "Updating Bluetooth name with valid IMEI: %s", BTMaster.name);
+        RIL_BT_SetName(BTMaster.name, Ql_strlen(BTMaster.name));
+    }
+
     // Ensure visibility
     if (BTMaster.IsVisible == 0) {
         if (!BLE_SetVisible(1)) {

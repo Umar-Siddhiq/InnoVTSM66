@@ -49,9 +49,6 @@ void LoadState(void);
 void LoadDefault(void);
 void LoadDefaultState(void);
 void UpdateConfigInFlash(void);
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void GetDefaultIPsAndTags(void);
-#endif
 void UpdateStateInFlash(void);
 uint8_t LoadFromFlash(char *filename, void *data, u32 size, void (*defaultFunc)(void));
 uint8_t SaveToFlash(char *filename, void *data, u32 size);

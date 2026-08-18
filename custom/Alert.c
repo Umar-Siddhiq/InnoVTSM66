@@ -167,7 +167,7 @@ void RemoveNonRepeatAlert(uint8_t pos)
 void AlertInitStruct(void)			//AlertInitStruct
 {
 	uint16_t i;
-	const char VTAlertPKT[19][3] ={"10","11","16","03","22","09","17","13","14","15","23","20","21","18","19","12","06","04","05"};
+	const char VTAlertPKT[ALERT_COUNT][3] ={"10","11","16","03","22","09","17","13","14","15","23","20","21","18","19","12","06","04","05","01","02"};
 		
 	StoredAlert.TotalAlert=0;
 	StoredAlert.AlertPosition=0;

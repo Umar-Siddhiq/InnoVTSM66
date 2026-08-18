@@ -26,7 +26,7 @@ extern int lastcrc;
 extern double fGPSLat,fGPSLong,fGPSAlt,fGPSpdop,fGPShdop,fGPSSats,fGPSSpeed, fGPSHeading, fGPSForce;
 
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_CDAC)
+#ifdef PROTO_CDAC
 #define				SERVER_MAX_BUFF						512
 #define				DATA_MAX_BUFF						1024
 #define				CRITICAL_MAX_BUFF					512
@@ -48,7 +48,13 @@ typedef struct
 void SMSAlert(uint8_t AlertNum);
 #else
 
+/* OG $PVT frames can include an OTA response and an RFID trailer.  Those
+ * bounded fields together can exceed the legacy 512-byte shared buffer. */
+#if defined(PROTO_OG)
+#define				DATA_MAX_BUFF						1024
+#else
 #define				DATA_MAX_BUFF						512
+#endif
 #define				MAX_CRITICAL_PACKET					5
 #define				MAX_ALERT_PACKET					5
 #define				MAX_NORMAL_PACKET					5
@@ -132,6 +138,30 @@ extern volatile uint8_t SendLogin1,SendLogin2,SendLogin3	;
 #ifndef PROTO_CDAC
 extern uint16_t StoredHistoryDataCount;
 #endif
+/* Server-thread liveness instrumentation — see ServerThreadEntry() in Server.c.
+ * ServerLoopPhase names the stage the loop is currently in; ServerLoopCount is
+ * bumped once per completed iteration. ProcessServerThreadTimeout() (Systic.c)
+ * reports both when the thread stops making progress, so a wedged stage can be
+ * identified from a field log. */
+#define SRV_PHASE_BOOT       0
+#define SRV_PHASE_PROFILE    1
+#define SRV_PHASE_INTERVAL   2
+#define SRV_PHASE_FTP        3
+#define SRV_PHASE_INCOMING   4
+#define SRV_PHASE_RFID       5
+#define SRV_PHASE_LOGIN      6
+#define SRV_PHASE_PACKETS    7
+#define SRV_PHASE_RESPONSES  8
+#define SRV_PHASE_CDAC       9
+#define SRV_PHASE_SLEEP      10
+extern volatile uint8_t  ServerLoopPhase;
+extern volatile uint32_t ServerLoopCount;
+
+/* How many server-loop iterations (~100 ms each) handlePackets() will hold a
+ * socket-sourced OTA acknowledgement waiting for that socket to come back before
+ * letting the next $PVT carry it in its OTAResp field instead. 300 = ~30 s. */
+#define OTA_ACK_WAIT_TICKS   300
+
 void ServerThreadEntry(s32 taskId);
 void server_thread_init(u32 taskId);
 void SendResponce(char *Sender, char* Resp, uint8_t IsServer, uint8_t IsSET); 
@@ -146,16 +176,11 @@ uint8_t SendDataToServer(char *data, uint8_t KeepAlive, uint16_t currentInterval
 uint8_t SendDataToServer(char *data, uint8_t KeepAlive);
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_CDAC)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void InsertIntValueCDAC(uint16_t value, uint16_t position, uint16_t length);
-void InsertFloatValueCDAC(double value, uint16_t position, uint16_t length, const char* decimal);
-#else
+#ifdef PROTO_CDAC
 void InsertIntValue(uint16_t value, uint16_t position, uint16_t length);
 void InsertFloatValue(double value, uint16_t position, uint16_t length, const char* decimal);
 #define InsertIntValueCDAC InsertIntValue
 #define InsertFloatValueCDAC InsertFloatValue
-#endif
 #endif
 
 

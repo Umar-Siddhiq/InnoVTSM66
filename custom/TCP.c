@@ -6,6 +6,19 @@
 TCPSocketTypedef ServerSocket[TCP_MAX_SOCKETS] = {{0}};
 static uint8_t tcp_callbacks_registered = 0;
 
+uint8_t TCP_IsAnySocketConnected(void)
+{
+    int i;
+
+    for (i = 0; i < TCP_MAX_SOCKETS; ++i)
+    {
+        if (ServerSocket[i].SocketState == SOCKET_CONNECTED)
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
 // Helper function to get current time in seconds
 static uint32_t GetCurrentTime(void) {
     return  Ql_GetMsSincePwrOn() / 1000;
@@ -70,7 +83,10 @@ void callback_socket_connect(s32 socketId, s32 errCode, void* customParam) {
         // Initialize ACK tracking for new connection
         socket->rval.last_ack_number = 0;
         socket->rval.noackcount = 0;
-        
+        socket->rval.connectedSince = GetCurrentTime();
+        socket->rval.lastRxTime = GetCurrentTime();
+        socket->rval.sendsSinceRx = 0;
+
         CallBack(socket->OnConnect, socket->SocketNo);
     } else {
         LOGData(TAG_TCP, "<--Callback: socket %d connect failed, errCode=%d-->", 
@@ -153,6 +169,8 @@ void callback_socket_read(s32 socketId, s32 errCode, void* customParam) {
             
             Ql_memcpy(socket->rxBuffer, m_recv_buf, ret);
             socket->isRXData = 1;
+            socket->rval.lastRxTime = GetCurrentTime();
+            socket->rval.sendsSinceRx = 0;
             
             if (ret < RECV_BUFFER_LEN) {
                 break;  // No more data
@@ -377,10 +395,12 @@ void TCPSocket_Process(TCPSocketTypedef* socket) {
             if (ret == SOC_SUCCESS) {
                 LOGData(TAG_TCP, "Socket %d connected immediately", socket->SocketNo);
                 socket->SocketState = SOCKET_CONNECTED;
-                
-                // Note: Failure count reset is handled at GPRS activation, not TCP connection
-                // TCP success depends on server availability, but GPRS active proves operator granted data
-                
+                socket->rval.connectedSince = currentTime;
+                socket->rval.lastRxTime = currentTime;
+                socket->rval.sendsSinceRx = 0;
+                socket->rval.last_ack_number = 0;
+                socket->rval.noackcount = 0;
+
                 CallBack(socket->OnConnect, socket->SocketNo);
             } else if (ret == SOC_WOULDBLOCK) {
                 LOGData(TAG_TCP, "Socket %d connection pending", socket->SocketNo);
@@ -406,7 +426,24 @@ void TCPSocket_Process(TCPSocketTypedef* socket) {
         case SOCKET_CONNECTED:
             // Reset exponential backoff delay on successful connection
             socket->rval.reconnect_delay_ms = 0;
-            
+
+            // Zombie connection detection: if we've sent many packets
+            // but received nothing from the server, the TCP session may be
+            // half-open (NAT timeout, server closed its end silently).
+            // Force reconnect after 30+ unanswered sends AND 10 minutes
+            // with no server response. Grace period: skip check in first
+            // 2 minutes after connect (server may not respond immediately).
+            elapsedTime = currentTime - socket->rval.connectedSince;
+            if (elapsedTime > 120 && socket->rval.sendsSinceRx >= 30) {
+                uint32_t silentTime = currentTime - socket->rval.lastRxTime;
+                if (silentTime > 600) {
+                    LOGData(TAG_TCP, "Socket %d zombie detected: %d sends without server response in %lus, forcing reconnect",
+                            socket->SocketNo, socket->rval.sendsSinceRx, (unsigned long)silentTime);
+                    socket->SocketState = SOCKET_ERROR;
+                    break;
+                }
+            }
+
             // Call user's connected callback
             CallBack(socket->Connected, socket->SocketNo);
             break;
@@ -417,6 +454,10 @@ void TCPSocket_Process(TCPSocketTypedef* socket) {
                 Ql_SOC_Close(socket->SocketIndex);
                 socket->SocketIndex = -1;
             }
+            
+            // Reset ACK tracking on socket error/close
+            socket->rval.last_ack_number = 0;
+            socket->rval.noackcount = 0;
             
             // Exponential backoff on timeout
             if (socket->rval.reconnect_delay_ms == 0) {
@@ -475,18 +516,83 @@ uint8_t TCPSocket_SendString(TCPSocketTypedef* socket, char* str) {
 
     if (totalSent == len) {
         LOGData(TAG_TCP, "Socket %d sent %d bytes", socket->SocketNo, totalSent);
+        if (socket->rval.sendsSinceRx < 255)
+            socket->rval.sendsSinceRx++;
         print_long_string(str);
         
         // Wait for ACK to ensure data is delivered
         if (!TCPSocket_WaitAck(socket, totalSent)) {
-            LOGData(TAG_TCP, "Socket %d ACK verification failed", socket->SocketNo);
-            // Note: Socket state may be set to ERROR by WaitAck if noackcount exceeds limit
+            LOGData(TAG_TCP, "Socket %d ACK wait timed out, updating last_ack_number", socket->SocketNo);
+            u64 ack_num = 0;
+            if (Ql_SOC_GetAckNumber(socket->SocketIndex, &ack_num) == SOC_SUCCESS) {
+                socket->rval.last_ack_number = ack_num;
+            }
+            // If the socket is still connected, treat 100% transmitted bytes as success to prevent queue locks
+            if (socket->SocketState == SOCKET_CONNECTED) {
+                return 1;
+            }
             return 0;
         }
         
         return 1;
     } else {
         LOGData(TAG_TCP, "Socket %d send incomplete: %d/%d bytes", 
+                socket->SocketNo, totalSent, len);
+        socket->SocketState = SOCKET_ERROR;
+        return 0;
+    }
+}
+
+uint8_t TCPSocket_SendStringNoAck(TCPSocketTypedef* socket, char* str) {
+    int ret = 0;
+    int totalSent = 0;
+    int len = Ql_strlen(str);
+    int attempts = 0;
+
+    if (socket == NULL || str == NULL) {
+        return 0;
+    }
+
+    if (socket->SocketIndex < 0) {
+        LOGData(TAG_TCP, "Socket %d Disabled for sending data NoAck", socket->SocketNo);
+        return 0;
+    }
+
+    if (socket->SocketState != SOCKET_CONNECTED) {
+        LOGData(TAG_TCP, "Socket %d not connected for sending data NoAck", socket->SocketNo);
+        return 0;
+    }
+
+    while (totalSent < len && attempts < 3) {
+        ret = Ql_SOC_Send(socket->SocketIndex, (u8*)(str + totalSent), len - totalSent);
+        
+        if (ret > 0) {
+            totalSent += ret;
+            attempts = 0;  // Reset attempts on successful partial send
+        } else if (ret == 0) {
+            attempts++;
+            ThreadSleep(100);
+        } else {
+            LOGData(TAG_TCP, "Socket %d SendNoAck failed, ret=%d", socket->SocketNo, ret);
+            socket->SocketState = SOCKET_ERROR;
+            return 0;
+        }
+    }
+
+    if (totalSent == len) {
+        LOGData(TAG_TCP, "Socket %d sent %d bytes (NoAck)", socket->SocketNo, totalSent);
+        if (socket->rval.sendsSinceRx < 255)
+            socket->rval.sendsSinceRx++;
+        print_long_string(str);
+        
+        u64 ack_num = 0;
+        if (Ql_SOC_GetAckNumber(socket->SocketIndex, &ack_num) == SOC_SUCCESS) {
+            socket->rval.last_ack_number = ack_num;
+        }
+        
+        return 1;
+    } else {
+        LOGData(TAG_TCP, "Socket %d SendNoAck incomplete: %d/%d bytes", 
                 socket->SocketNo, totalSent, len);
         socket->SocketState = SOCKET_ERROR;
         return 0;
@@ -504,7 +610,7 @@ uint8_t TCPSocket_WaitAck(TCPSocketTypedef* socket, int sent_len) {
         return 1;  // Nothing to acknowledge
     }
 
-    const int timeout_ms = 3000;   // max wait time 
+    const int timeout_ms = 15000;   // max wait time (increased to 15s for 2G/GPRS latency)
     const int step_ms    = 100;    // polling interval (100ms)
     const int log_interval_ms = 1000;  // log every 1 second
 

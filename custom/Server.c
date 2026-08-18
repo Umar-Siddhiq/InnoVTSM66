@@ -3,6 +3,10 @@
 #if defined(PROTO_CDAC)
 #include "HttpQueue.h"
 #endif
+#ifdef PROTO_OG
+#include "SMS.h"
+#include "Sensors.h"
+#endif
 
 
 // Helper function prototypes
@@ -19,6 +23,7 @@ void InitBuffer(uint8_t alt);
 void LoginString(void);
 void CheckAlerts(void);
 void EmergencyPacket(uint8_t IsOff);
+void HealthPacket(void);
 void SendDatatoServer0(void);
 void ProcessHistoryPacket(void);
 void DecodeGeofence(char* data);
@@ -54,23 +59,6 @@ int lastcrc;
 uint16_t IsCritical = 0;
 uint16_t IsPackeAlert = 0;
 
-#if defined(ENABLE_UNIFIED_FIRMWARE)
-#define _REGULAR_SIZE	109
-uint8_t IsSendProcess = 0;
-uint32_t FrameNumber = 1;
-OTATypeDef OTAValue;
-extern VehicleTypeDef VehicleState;
-extern volatile char VehicleMovingMode;
-uint8_t IsOverSpeed;
-uint16_t DeltaDis = 0;
-uint16_t StoredHistoryDataCount = 0;
-uint8_t IsEMRSend = 0, IsEMRTSend = 0, CNFChange = 0;
-uint8_t IsStored = 0;
-char SendString[DATA_MAX_BUFF];
-char CriticalString[5][CRITICAL_MAX_BUFF];
-char ActivationKey[18];
-char dataBuffer[DATA_MAX_BUFF];
-#else
 #ifdef PROTO_CDAC
 #define _REGULAR_SIZE	109
 volatile uint8_t IsSendProcess = 0;
@@ -91,7 +79,6 @@ uint32_t FrameNumber = 0;
 uint8_t IsStored = 0;
 char dataBuffer[DATA_MAX_BUFF];
 #endif
-#endif
 
 double prevLat=0,prevLong=0;
 double fGPSLat=0,fGPSLong=0,fGPSAlt=0,fGPSpdop=0,fGPShdop=0,fGPSSats=0, fGPSSpeed=0, fGPSHeading=0, fGPSForce=0;
@@ -99,7 +86,7 @@ double fGPSLat=0,fGPSLong=0,fGPSAlt=0,fGPSpdop=0,fGPShdop=0,fGPSSats=0, fGPSSpee
 
 uint8_t IsServerRes=0;
 
-extern volatile uint8_t ServerThreadTimeout;
+extern volatile uint16_t ServerThreadTimeout;  /* 16-bit: threshold is 600s */
 
 uint8_t MemoryPercent;
 uint16_t GetMemeryPercentage(void);
@@ -166,6 +153,19 @@ char CRC8(const char *data,int length)
    }
    return crc;
 }
+
+uint8_t GetXORChecksum(const char* buf, int len)
+{
+    uint8_t cs = 0;
+    for (int i = 0; i < len; i++)
+        cs ^= (uint8_t)buf[i];
+    return cs;
+}
+
+#ifdef PROTO_OG
+OTAResponseTypeDef LastOTAResponse;
+#endif
+
 #if defined(PROTO_CDAC)
 void InsertStringValue(const char* value, uint16_t position, uint16_t length, uint8_t wh)
 {
@@ -200,11 +200,7 @@ void InsertStringValue(const char* value, uint16_t position, uint16_t length, ui
 	}
 }
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void InsertIntValueCDAC(uint16_t value, uint16_t position, uint16_t length)
-#else
 void InsertIntValue(uint16_t value, uint16_t position, uint16_t length)
-#endif
 {
 	uint16_t n=0, i=0;
 	uint16_t ln;
@@ -235,11 +231,7 @@ void InsertIntValue(uint16_t value, uint16_t position, uint16_t length)
 	}
 }
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void InsertFloatValueCDAC(double value, uint16_t position, uint16_t length,const char* decimal)
-#else
 void InsertFloatValue(double value, uint16_t position, uint16_t length,const char* decimal)
-#endif
 {
 	uint16_t n=0, i=0;
 	uint16_t ln;
@@ -394,44 +386,9 @@ void InitSockets(void)
 }
 
 
-#ifndef PROTO_CDAC
-// void SensorString(void)
-// {
-// 	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
-// 	strcpy(dataBuffer,"$SENS,");
-// 	Ql_strncat(dataBuffer,NetWork.IMEI,15);
-// 	InsertChar(dataBuffer,',');
-// 	AppendFixString(dataBuffer,sLatitude,10,sLatitude);
-// 	InsertChar(dataBuffer,',');
-// 	AppendFixString(dataBuffer,sLongitude,10,sLongitude);
-// 	InsertChar(dataBuffer,',');
-// 	InsertCurrentDateTime(dataBuffer,0);
-// 	InsertChar(dataBuffer,',');
-// 	InsertCurrentDateTime(dataBuffer,1);
-	
-// 	Ql_strcat(dataBuffer,",{");
-// 	if(DHT11.Status)
-// 	{
-// 		InsertIntValue(dataBuffer,DHT11.temp,"%01d,");
-// 		InsertIntValue(dataBuffer,DHT11.humidity,"%01d},{");
-// 	}
-// 	else
-// 		Ql_strcat(dataBuffer,"0,0},{");
-// 	if(IsFuelData)
-// 		Ql_strcat(dataBuffer,FuelData);
-// 	else
-// 		InsertChar(dataBuffer,'0');
-// 	Ql_strcat(dataBuffer,"}*");
 
-// }
-#endif
-
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_MAHARASHTRA1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void LoginStringMH(void)
-#else
+#ifdef PROTO_MAHARASHTRA1
 void LoginString(void)
-#endif
 {
 	char ss[18];
 	uint8_t crc;
@@ -465,12 +422,8 @@ void LoginString(void)
 }
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_NIC1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void LoginStringNIC(void)
-#else
+#ifdef PROTO_NIC1
 void LoginString(void)
-#endif
 {
 	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
 	strcpy(dataBuffer,"$LGN,");
@@ -564,43 +517,39 @@ void DataPacket(void)
 }
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_OG)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void LoginStringOG(void)
-#else
+/* AMD3 §3 — $LGN login packet */
+#ifdef PROTO_OG
 void LoginString(void)
-#endif
 {
-	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
-	strcpy(dataBuffer,"$");
-	Ql_strcat(dataBuffer,VTSData.VehicleData.VehicleRegNo);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,'$');
-	Ql_strncat(dataBuffer,NetWork.IMEI,15);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,'$');
-	Ql_strcat(dataBuffer,FirmVer);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,'$');
-	Ql_strcat(dataBuffer,"AIS140");
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,'$');
-	Ql_strcat(dataBuffer,sLatitude);
-	InsertChar(dataBuffer,'N');
-	Ql_strcat(dataBuffer,sLongitude);
-	InsertChar(dataBuffer,'E');
+	char ss[8];
+	uint8_t cs;
+	Ql_memset(dataBuffer, 0x00, DATA_MAX_BUFF);
+	Ql_sprintf(dataBuffer, "$LGN,%s,", VTSData.VehicleData.VehicleRegNo);
+	Ql_strncat(dataBuffer, NetWork.IMEI, 15);
+	InsertChar(dataBuffer, ',');
+	Ql_strcat(dataBuffer, NetWork.SIMNo);
+	InsertChar(dataBuffer, ',');
+	Ql_strcat(dataBuffer, FirmVer);
+	Ql_strcat(dataBuffer, ",0100,");
+	AppendFixString(dataBuffer, sLatitude, 10, sLatitude);
+	InsertChar(dataBuffer, ',');
+	InsertChar(dataBuffer, GPS.LatDir ? GPS.LatDir : 'N');
+	InsertChar(dataBuffer, ',');
+	AppendFixString(dataBuffer, sLongitude, 10, sLongitude);
+	InsertChar(dataBuffer, ',');
+	InsertChar(dataBuffer, GPS.LngDir ? GPS.LngDir : 'E');
+	/* XOR over bytes after leading '$' */
+	cs = GetXORChecksum(dataBuffer + 1, Ql_strlen(dataBuffer) - 1);
+	Ql_sprintf(ss, "*%02X\r\n", cs);
+	Ql_strcat(dataBuffer, ss);
 }
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_ODISA1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void LoginStringOD(void)
-#else
+#ifdef PROTO_ODISA1
 #if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG)
 void LoginString(void)
 #endif
-#endif
-#if defined(ENABLE_UNIFIED_FIRMWARE) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
+#if (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 {
 	char ss[18];
 	uint32_t crc;
@@ -630,52 +579,10 @@ void LoginString(void)
 #endif
 #endif
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void LoginString(void)
-{
-	if (IS_PROTO_NIC()) {
-		LoginStringNIC();
-	} else if (IS_PROTO_MH()) {
-		LoginStringMH();
-	} else if (IS_PROTO_ODISHA()) {
-		LoginStringOD();
-	} else if (IS_PROTO_OG()) {
-		LoginStringOG();
-	}
-}
-#endif
-
-// void MakeRFIDPacket(uint8_t *data, uint16_t len)
-// {
-// 	char ss[18];
-// 	uint32_t crc;
-// 	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
-// 	strcpy(dataBuffer,"$RFID,");
-// 	Ql_strcat(dataBuffer,VTSData.VehicleData.VehicleRegNo);
-// 	InsertChar(dataBuffer,',');
-// 	Ql_strncat(dataBuffer,NetWork.IMEI,15);
-// 	InsertChar(dataBuffer,',');
-// 	Ql_strcat(dataBuffer,FirmVer);
-// 	InsertChar(dataBuffer,',');
-// 	Ql_strcat(dataBuffer,sLatitude);
-// 	InsertChar(dataBuffer,',');
-// 	Ql_strcat(dataBuffer,sLongitude);
-// 	InsertChar(dataBuffer,',');
-// 	InsertHEXStringToBuffer(dataBuffer,data,len);
-// 	InsertChar(dataBuffer,',');
-// 	crc = checksum32(dataBuffer,Ql_strlen(dataBuffer));
-// 	lastcrc= crc;
-// 	Ql_sprintf(ss,"%08X*",crc);
-// 	Ql_strcat(dataBuffer,ss);
-// }
 
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_MAHARASHTRA1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void InitBufferMH(uint8_t alt)
-#else
+#ifdef PROTO_MAHARASHTRA1
 void InitBuffer(uint8_t alt)
-#endif
 {
 	char ss[20];
 	uint16_t i;
@@ -890,7 +797,7 @@ void InitBuffer(uint8_t alt)
 
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_NIC1) 
+#ifdef PROTO_NIC1
 
 void PrepareFTKBuffer(FTKConfigtypedef *ftk)
 {
@@ -1084,11 +991,7 @@ uint8_t ProcessFTK(FTKConfigtypedef* ftk)
     return 1;
 }
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void InitBufferNIC(uint8_t alt)
-#else
 void InitBuffer(uint8_t alt)
-#endif
 {
 	char ss[20];
 	uint16_t i;
@@ -1326,254 +1229,213 @@ void InitBuffer(uint8_t alt)
 
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_OG)
-
-
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void InitBufferOG(uint8_t alt)
-#else
-void InitBuffer(uint8_t alt)
-#endif
+#ifdef PROTO_OG
+/* AMD3 sect4 - $PVT packet */
+/* Append at most sourceCapacity bytes and never write past dataBuffer. */
+static uint8_t PVTAppendBounded(const char *source, uint16_t sourceCapacity)
 {
-	char ss[20];
-	uint16_t i;
-	uint8_t crc;
-	
-	//uint16_t dLen=23;
-	//GPS.sLngDir='E';
-	Ql_memset(dataBuffer,0,DATA_MAX_BUFF);
-	Ql_sprintf(dataBuffer,"$,NMP,%s,",VTSData.VendorID);
-	Ql_strcat(dataBuffer,FirmVer);
+	uint16_t used = (uint16_t)Ql_strlen(dataBuffer);
+	uint16_t length = 0;
 
-
-	switch(alt)
-	{
-		case 1:
-			Ql_strcat(dataBuffer,",NR,1,L,");// NORMAL PACKET
-			break;
-		case 3:
-			Ql_strcat(dataBuffer,",BD,3,L,"); // MAIN OFF
-			break;
-		case 4:
-			Ql_strcat(dataBuffer,",BL,4,L,"); // BATTERY LOW
-			break;
-		case 5:
-			Ql_strcat(dataBuffer,",BH,5,L,"); // Battery LOW Restore
-			break;
-		case 6:
-			Ql_strcat(dataBuffer,",BR,6,L,"); // MAIN ON
-			break;
-		case 7:
-			Ql_strcat(dataBuffer,",IN,7,L,"); // IGNITION ON
-			break;
-		case 8:
-			Ql_strcat(dataBuffer,",IF,8,L,"); // IGNITION OFF
-			break;
-		case 9:
-			Ql_strcat(dataBuffer,",TA,9,L,"); // BOX TAMPER
-			break;
-		case 10:
-			Ql_strcat(dataBuffer,",EA,10,L,"); // SOS ON
-			break;
-		case 11:
-			Ql_strcat(dataBuffer,",EA,11,L,"); // SOS OFF
-			break;
-		case 12:
-			Ql_strcat(dataBuffer,",OT,12,L,"); // OTA 
-			break;
-		case 13:
-			Ql_strcat(dataBuffer,",HB,13,L,"); // Harsh Braking
-			break;
-		case 14:
-			Ql_strcat(dataBuffer,",HA,14,L,"); // Harsh Acceleration
-			break;
-		case 15:
-			Ql_strcat(dataBuffer,",RT,15,L,"); // Rash turn
-			break;
-		case 16:
-			Ql_strcat(dataBuffer,",DT,16,L,");  // SOS Tamper
-			break;
-		case 17:
-			Ql_strcat(dataBuffer,",GI,18,L,");  // GeoFence In
-			break;
-		case 18:
-			Ql_strcat(dataBuffer,",GO,19,L,");  // GeoFence Out
-			break;
-				
-		case 23:
-			Ql_strcat(dataBuffer,",OS,17,L,"); // Over Speed
-			break;
-		case 24:
-			Ql_strcat(dataBuffer,",TL,24,L,"); // Vehicle Tilt
-			break;
-
-		case 25:
-			Ql_strcat(dataBuffer,",RF,25,L,"); // RFID Data
-		case 30:
-			Ql_strcat(dataBuffer,",HP,1,L,"); // HP Data
-	}
-	Ql_strncat(dataBuffer,NetWork.IMEI,15);
-	InsertChar(dataBuffer,',');
-	AppendVariableString(dataBuffer,VTSData.VehicleData.VehicleRegNo,12,5,"UNKNOWN");
-	InsertChar(dataBuffer,',');
-	if(GPS.GPSFix)
-		InsertChar(dataBuffer,'1');
-	else	
-		InsertChar(dataBuffer,'0');
-	InsertChar(dataBuffer,',');
-	InsertCurrentDateTime(dataBuffer,0);
-	InsertChar(dataBuffer,',');
-	InsertCurrentDateTime(dataBuffer,1);
-	InsertChar(dataBuffer,',');
-	AppendFixString(dataBuffer,sLatitude,10,sLatitude);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,GPS.LatDir);
-	InsertChar(dataBuffer,',');
-	AppendFixString(dataBuffer,sLongitude,10,sLongitude);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,GPS.LngDir);
-	InsertChar(dataBuffer,',');
-	//AppendVariableString(dataBuffer,sSpeed,7,1,"000.0");
-	StringAdd(dataBuffer,"%05.1f",GPS.Speed);
-	InsertChar(dataBuffer,',');
-	//InsertFloatValue(dataBuffer,GPS.Heading,"%06.2f");
-	//AppendVariableString(dataBuffer,sHeading,7,1,"000.0");
-	StringAdd(dataBuffer,"%06.2f",GPS.Heading);
-	InsertChar(dataBuffer,',');
-	InsertIntValue(dataBuffer,GPS.NoOfSatalite,"%02d");
-	InsertChar(dataBuffer,',');
-	
-	StringAdd(dataBuffer,"%03.1f",GPS.Altitude);
-	InsertChar(dataBuffer,',');
-	
-	StringAdd(dataBuffer,"%04.1f",GPS.PDOP);
-	InsertChar(dataBuffer,',');
-	
-	StringAdd(dataBuffer,"%04.1f",GPS.HDOP);
-	InsertChar(dataBuffer,',');
-	Ql_strcat(dataBuffer,NetWork.Network);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,PeriPheralVal.IGN + '0');
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,PeriPheralVal.IsMain + '0');
-	InsertChar(dataBuffer,',');
-	InsertFloatValue(dataBuffer,PeriPheralVal.MainsVolt,"%04.1f");
-	InsertChar(dataBuffer,',');
-	InsertFloatValue(dataBuffer,PeriPheralVal.BattVolt,"%03.1f");
-	InsertChar(dataBuffer,',');
-	if(VAlert[SOS_ON_ALERT].Enable || VAlert[SOS_OFF_ALERT].Enable)
-		InsertChar(dataBuffer,'1');
-	else
-		InsertChar(dataBuffer,'0');
-	InsertChar(dataBuffer,',');
-
-	if(PeriPheralVal.IsCoverOpen)
-		InsertChar(dataBuffer,'O');
-	else
-		InsertChar(dataBuffer,'C');
-	InsertChar(dataBuffer,',');
-
-	
-
-
-	InsertIntValue(dataBuffer,GSM.SignalStrength,"%2d");
-	InsertChar(dataBuffer,',');
-	
-	InsertIntValue(dataBuffer,GSM.MCC,"%02d");
-	InsertChar(dataBuffer,',');
-	InsertIntValue(dataBuffer,GSM.MNC,"%02d");
-	InsertChar(dataBuffer,',');
-	AppendVariableString(dataBuffer,GSM.LAC,5,4,"00D6");
-	InsertChar(dataBuffer,',');
-	AppendVariableString(dataBuffer,GSM.CellID,5,4,"CFBD");
-	InsertChar(dataBuffer,',');
-
-	for(i=0;i<4;i++)
-	{
-		AppendVariableString(dataBuffer,GSM.NeigbourCell[i].CellID,5,1,"0");
-		InsertChar(dataBuffer,',');	
-		AppendVariableString(dataBuffer,GSM.NeigbourCell[i].LAC,6,2,"0");
-		InsertChar(dataBuffer,',');
-		AppendVariableString(dataBuffer,GSM.NeigbourCell[i].CellDB,4,1,"0");
-		InsertChar(dataBuffer,',');
-		
-	}
-	InsertChar(dataBuffer,PeriPheralVal.IP1 + '0');
-	InsertChar(dataBuffer,PeriPheralVal.IP2 + '0');
-	InsertChar(dataBuffer,PeriPheralVal.IGN + '0');
-	if(INPUT_SOS_VAL)
-		InsertChar(dataBuffer,'1');
-	else
-		InsertChar(dataBuffer,'0');
-	
-
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,PeriPheralVal.OP1 + '0');
-	InsertChar(dataBuffer,PeriPheralVal.OP2 + '0');
-	InsertChar(dataBuffer,',');
-
-	InsertIntValue(dataBuffer,FrameNumber,"%06d");
-	InsertChar(dataBuffer,',');
-	
-
-	crc = CRC8(dataBuffer,Ql_strlen(dataBuffer));
-	Ql_sprintf(ss,"%02X",crc);
-	Ql_strcat(dataBuffer,ss);
-	lastcrc= crc;
-	Ql_sprintf(ss,",*");
-	Ql_strcat(dataBuffer,ss);
-	FrameNumber++;
-	
+	if (source == NULL || used >= (DATA_MAX_BUFF - 1))
+		return 0;
+	while (length < sourceCapacity && source[length] != '\0')
+		length++;
+	if (length > (uint16_t)(DATA_MAX_BUFF - 1 - used))
+		return 0;
+	Ql_memcpy(dataBuffer + used, source, length);
+	dataBuffer[used + length] = '\0';
+	return 1;
 }
 
+static uint8_t PVTAppendChar(char value)
+{
+	return PVTAppendBounded(&value, 1);
+}
 
+static uint8_t PVTAppendVariable(const char *source, uint16_t sourceCapacity,
+		uint16_t maxLength, uint16_t minLength, const char *defaultValue)
+{
+	uint16_t length = 0;
+
+	if (source != NULL)
+	{
+		while (length < sourceCapacity && source[length] != '\0')
+			length++;
+	}
+	if (length >= minLength && length <= maxLength)
+		return PVTAppendBounded(source, sourceCapacity);
+	return PVTAppendBounded(defaultValue, (uint16_t)(Ql_strlen(defaultValue) + 1));
+}
+
+static uint8_t PVTAppendUInt(uint32_t value, const char *format)
+{
+	char valueBuffer[20];
+	int written = Ql_snprintf(valueBuffer, sizeof(valueBuffer), format, (unsigned int)value);
+
+	return written >= 0 && written < sizeof(valueBuffer) &&
+		PVTAppendBounded(valueBuffer, sizeof(valueBuffer));
+}
+
+static uint8_t PVTAppendFloat(double value, const char *format)
+{
+	char valueBuffer[20];
+	int written = Ql_snprintf(valueBuffer, sizeof(valueBuffer), format, value);
+
+	return written >= 0 && written < sizeof(valueBuffer) &&
+		PVTAppendBounded(valueBuffer, sizeof(valueBuffer));
+}
+
+static uint8_t PVTAppendCurrentDateTime(uint8_t isTime)
+{
+	char valueBuffer[12];
+	int written;
+
+	if (isTime)
+		written = Ql_snprintf(valueBuffer, sizeof(valueBuffer), "%02d%02d%02d",
+			CurrentDateTime.Hour, CurrentDateTime.Min, CurrentDateTime.Sec);
+	else
+		written = Ql_snprintf(valueBuffer, sizeof(valueBuffer), "%02d%02d20%02d",
+			CurrentDateTime.Date, CurrentDateTime.Month, CurrentDateTime.Year);
+	return written >= 0 && written < sizeof(valueBuffer) &&
+		PVTAppendBounded(valueBuffer, sizeof(valueBuffer));
+}
+
+void InitBuffer(uint8_t alt)
+{
+	char ss[32];
+	uint16_t i;
+	uint8_t cs;
+	float dd;
+	const char *packetType = ",NR,1,L,";
+
+	Ql_memset(dataBuffer, 0, DATA_MAX_BUFF);
+	if (!PVTAppendBounded("$PVT,", sizeof("$PVT,")) ||
+		!PVTAppendBounded(VTSData.VendorID, sizeof(VTSData.VendorID)) ||
+		!PVTAppendBounded(",", 1) ||
+		!PVTAppendBounded(FirmVer, 15))
+		goto packet_overflow;
+
+	switch (alt)
+	{
+		case 3:  packetType = ",BD,3,L,";  break;
+		case 4:  packetType = ",BL,4,L,";  break;
+		case 5:  packetType = ",BC,5,L,";  break;
+		case 6:  packetType = ",BR,6,L,";  break;
+		case 7:  packetType = ",IN,7,L,";  break;
+		case 8:  packetType = ",IF,8,L,";  break;
+		case 9:  packetType = ",TA,9,L,";  break;
+		case 10: packetType = ",EA,10,L,"; break;
+		case 11: packetType = ",EA,11,L,"; break;
+		case 12: packetType = ",OA,12,L,"; break;
+		case 13: packetType = ",HB,13,L,"; break;
+		case 14: packetType = ",HA,14,L,"; break;
+		case 15: packetType = ",RT,15,L,"; break;
+		case 16: packetType = ",DT,16,L,"; break;
+		case 17: packetType = ",GI,18,L,"; break;
+		case 18: packetType = ",GO,19,L,"; break;
+		case 23: packetType = ",OS,17,L,"; break;
+		case 24: packetType = ",TL,24,L,"; break;
+	}
+	if (!PVTAppendBounded(packetType, (uint16_t)(Ql_strlen(packetType) + 1))) goto packet_overflow;
+
+	if (!PVTAppendBounded(NetWork.IMEI, 15)) goto packet_overflow;
+	if (!PVTAppendChar(',') || !PVTAppendVariable(VTSData.VehicleData.VehicleRegNo, sizeof(VTSData.VehicleData.VehicleRegNo), 12, 5, "UNKNOWN") ||
+		!PVTAppendChar(',') || !PVTAppendChar(GPS.GPSFix ? '1' : '0') || !PVTAppendChar(',') ||
+		!PVTAppendCurrentDateTime(0) || !PVTAppendChar(',') ||
+		!PVTAppendCurrentDateTime(1) || !PVTAppendChar(',') ||
+		!PVTAppendVariable(sLatitude, 20, 20, 0, "0.000000") ||
+		!PVTAppendChar(',') || !PVTAppendChar(GPS.LatDir ? GPS.LatDir : 'N') || !PVTAppendChar(',') ||
+		!PVTAppendVariable(sLongitude, 20, 20, 0, "0.000000") || !PVTAppendChar(',') ||
+		!PVTAppendChar(GPS.LngDir ? GPS.LngDir : 'E') || !PVTAppendChar(',') ||
+		!PVTAppendFloat(GPS.Speed, "%05.1f") || !PVTAppendChar(',') || !PVTAppendFloat(GPS.Heading, "%06.2f") ||
+		!PVTAppendChar(',') || !PVTAppendUInt(GPS.NoOfSatalite, "%02d") || !PVTAppendChar(',') ||
+		!PVTAppendFloat(GPS.Altitude, "%03.1f") || !PVTAppendChar(',') || !PVTAppendFloat(GPS.PDOP, "%04.1f") ||
+		!PVTAppendChar(',') || !PVTAppendFloat(GPS.HDOP, "%04.1f") || !PVTAppendChar(',') ||
+		!PVTAppendBounded(NetWork.Network, sizeof(NetWork.Network)) || !PVTAppendChar(',') ||
+		!PVTAppendChar(PeriPheralVal.IGN + '0') || !PVTAppendChar(',') || !PVTAppendChar(PeriPheralVal.IsMain + '0') ||
+		!PVTAppendChar(',') || !PVTAppendFloat(PeriPheralVal.MainsVolt, "%04.1f") || !PVTAppendChar(',') ||
+		!PVTAppendFloat(PeriPheralVal.BattVolt, "%03.1f") || !PVTAppendChar(',') ||
+		!PVTAppendChar((VAlert[SOS_ON_ALERT].Enable || VAlert[SOS_OFF_ALERT].Enable) ? '1' : '0') || !PVTAppendChar(',') ||
+		!PVTAppendChar(PeriPheralVal.IsCoverOpen ? 'O' : 'C') || !PVTAppendChar(',') ||
+		!PVTAppendUInt(GSM.SignalStrength, "%2d") || !PVTAppendChar(',') || !PVTAppendUInt(GSM.MCC, "%02d") ||
+		!PVTAppendChar(',') || !PVTAppendUInt(GSM.MNC, "%02d") || !PVTAppendChar(',') ||
+		!PVTAppendVariable(GSM.LAC, sizeof(GSM.LAC), 5, 4, "00D6") || !PVTAppendChar(',') ||
+		!PVTAppendVariable(GSM.CellID, sizeof(GSM.CellID), 5, 4, "CFBD") || !PVTAppendChar(','))
+		goto packet_overflow;
+
+	/* Neighbour cells - AMD3 order: RSSI,LAC,CID */
+	for (i = 0; i < 4; i++)
+	{
+		if (!PVTAppendVariable(GSM.NeigbourCell[i].CellDB, sizeof(GSM.NeigbourCell[i].CellDB), 4, 1, "0") ||
+			!PVTAppendChar(',') || !PVTAppendVariable(GSM.NeigbourCell[i].LAC, sizeof(GSM.NeigbourCell[i].LAC), 6, 2, "0") ||
+			!PVTAppendChar(',') || !PVTAppendVariable(GSM.NeigbourCell[i].CellID, sizeof(GSM.NeigbourCell[i].CellID), 5, 1, "0") ||
+			!PVTAppendChar(',')) goto packet_overflow;
+	}
+
+	/* DINs: IP1 IP2 IGN SOS */
+	if (!PVTAppendChar(PeriPheralVal.IP1 + '0') || !PVTAppendChar(PeriPheralVal.IP2 + '0') ||
+		!PVTAppendChar(PeriPheralVal.IGN + '0') || !PVTAppendChar(INPUT_SOS_VAL ? '1' : '0') || !PVTAppendChar(',')) goto packet_overflow;
+	/* DOUTs: OP1 OP2 */
+	if (!PVTAppendChar(PeriPheralVal.OP1 + '0') || !PVTAppendChar(PeriPheralVal.OP2 + '0') || !PVTAppendChar(',') ||
+		!PVTAppendUInt(FrameNumber, "%06d") || !PVTAppendChar(',') || !PVTAppendBounded("0.00,0.00,", sizeof("0.00,0.00,"))) goto packet_overflow;
+	dd = (float)DeltaDis;
+	if (!PVTAppendFloat(dd, "%05.1f") || !PVTAppendChar(',')) goto packet_overflow;
+
+	/* OTA response - AMD3 sect10 */
+	if (LastOTAResponse.Pending)
+	{
+		if (!PVTAppendBounded("(", 2) || !PVTAppendBounded(LastOTAResponse.Source, sizeof(LastOTAResponse.Source)) ||
+			!PVTAppendBounded("|", 2) || !PVTAppendBounded(LastOTAResponse.Mode, sizeof(LastOTAResponse.Mode)) ||
+			!PVTAppendBounded("|", 2) || !PVTAppendBounded(LastOTAResponse.CmdId, sizeof(LastOTAResponse.CmdId)) ||
+			!PVTAppendBounded(":", 2) || !PVTAppendBounded(LastOTAResponse.Value, sizeof(LastOTAResponse.Value)) ||
+			!PVTAppendBounded(":", 2) || !PVTAppendUInt(LastOTAResponse.Status, "%d") || !PVTAppendBounded(")", 2))
+			goto packet_overflow;
+		LastOTAResponse.Pending = 0;
+	}
+	else
+	{
+		if (!PVTAppendBounded("()", 3)) goto packet_overflow;
+	}
+	if (!PVTAppendChar(',')) goto packet_overflow;
+
+	/* TrailerID: first active RFID sensor, else () */
+	{
+		uint8_t rfid_found = 0;
+		for (i = 0; i < MAX_SENSORS; i++)
+		{
+			if (SensorData[i].SensorType == SENSOR_TYPE_RFID && SensorData[i].IsActive)
+			{
+			Ql_snprintf(ss, sizeof(ss), "TAG%.*s", 12,
+				(const char*)SensorData[i].SensorData);
+			if (!PVTAppendBounded(ss, sizeof(ss))) goto packet_overflow;
+				rfid_found = 1;
+				break;
+			}
+		}
+		if (!rfid_found)
+			if (!PVTAppendBounded("()", 3)) goto packet_overflow;
+	}
+
+	cs = GetXORChecksum(dataBuffer + 1, Ql_strlen(dataBuffer) - 1);
+	Ql_sprintf(ss, "*%02X\r\n", cs);
+	lastcrc = cs;
+	if (!PVTAppendBounded(ss, sizeof(ss))) goto packet_overflow;
+	FrameNumber++;
+	return;
+
+packet_overflow:
+	/* Do not continue with a partially constructed frame: historical code
+	 * wrote past dataBuffer here and reset the module while saving NR packets. */
+	LOGData(TAG_SERVER, "PVT frame rejected: bounded packet buffer exceeded (len=%d)", Ql_strlen(dataBuffer));
+	Ql_strcpy(dataBuffer, "$PVT,ERR*00\r\n");
+}
 #endif
 
 #if defined(PROTO_CDAC)
 
 
 
-// uint8_t GetAlertsHeader(void)
-// {
-// 	uint8_t rt;
-// 	uint16_t n=0;
-// 	uint16_t dLen=8;
-// 	uint8_t j=StoredAlert.AlertPosition;
-// 	Ql_memset(SendString,0,DATA_MAX_BUFF);	
-// 	Ql_memset(SendString,'0',118);
-// 	InsertStringValue("vltdata=",0,8,0);
-// 	if(!StoredAlert.TotalAlert)
-// 	{
-// 		InsertStringValue("NRM",dLen + 0,3,0);
-// 		InsertStringValue("01L",dLen + 18,3,0);
-// 		SendString[dLen + _REGULAR_SIZE]=0;
-// 		return 0xFF;
-// 	}
-// 	LOGData(TAG_SERVER,"Stored total alt %d > 0,  altsval : %d, pos: %d",StoredAlert.TotalAlert,StoredAlert.Alerts[j],j);
-// 	if(StoredAlert.Alerts[j] != 0xFF)
-// 	{
-// 		LOGData(TAG_SERVER,"found stored alert %d",StoredAlert.Alerts[j]);
-// 		InsertStringValue(VAlert[StoredAlert.Alerts[j]].Header,dLen + 0,3,1);
-// 		InsertStringValue(VAlert[StoredAlert.Alerts[j]].ID,dLen + 18,2,1);
-// 		SendString[dLen + 20]='L';
-// 		if(VAlert[StoredAlert.Alerts[j]].WithACK)
-// 		{
-// 			LOGData(TAG_SERVER,"alert ack size %d",Ql_strlen(VAlert[StoredAlert.Alerts[j]].ACK));
-// 			InsertStringValue(VAlert[StoredAlert.Alerts[j]].ACK,dLen + _REGULAR_SIZE,Ql_strlen(VAlert[StoredAlert.Alerts[j]].ACK),1);
-// 			n=Ql_strlen(VAlert[StoredAlert.Alerts[j]].ACK);
-// 			SendString[dLen+_REGULAR_SIZE+n]=0;
-// 		}
-// 		else
-// 			SendString[dLen+_REGULAR_SIZE]=0;
-// 		RemoveNonRepeatAlert(j);
-// 		StoredAlert.AlertPosition++;
-// 		if(StoredAlert.AlertPosition >= StoredAlert.TotalAlert)
-// 			StoredAlert.AlertPosition=0;
-// 		rt=StoredAlert.Alerts[j];
-// 		return rt;
-// 	}
-// 	return 0xFF;
-// }
 
 void MakeNormalPacket(void)
 {
@@ -1590,15 +1452,11 @@ void MakeNormalPacket(void)
 
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_ODISA1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void InitBufferOD(uint8_t alt)
-#else
+#ifdef PROTO_ODISA1
 #if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG)
 void InitBuffer(uint8_t alt)
 #endif
-#endif
-#if defined(ENABLE_UNIFIED_FIRMWARE) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
+#if (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 {
 	char ss[20];
 	uint16_t i;
@@ -1824,28 +1682,10 @@ void InitBuffer(uint8_t alt)
 #endif
 #endif
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void InitBuffer(uint8_t alt)
-{
-	if (IS_PROTO_NIC()) {
-		InitBufferNIC(alt);
-	} else if (IS_PROTO_MH()) {
-		InitBufferMH(alt);
-	} else if (IS_PROTO_ODISHA()) {
-		InitBufferOD(alt);
-	} else if (IS_PROTO_OG()) {
-		InitBufferOG(alt);
-	}
-}
-#endif
 
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_MAHARASHTRA1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void EmergencyPacketMH(uint8_t IsOff)
-#else
+#ifdef PROTO_MAHARASHTRA1
 void EmergencyPacket(uint8_t IsOff)
-#endif
 {
 	char ss[20];
 	uint8_t crc;
@@ -1908,12 +1748,8 @@ void EmergencyPacket(uint8_t IsOff)
 
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_NIC1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void EmergencyPacketNIC(uint8_t IsOff)
-#else
+#ifdef PROTO_NIC1
 void EmergencyPacket(uint8_t IsOff)
-#endif
 {
 	char ss[20];
 	uint16_t crc;
@@ -1965,74 +1801,58 @@ void EmergencyPacket(uint8_t IsOff)
 
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_OG)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void EmergencyPacketOG(uint8_t IsOff)
-#else
+#ifdef PROTO_OG
+/* AMD3 sect5 - $EPB emergency packet */
 void EmergencyPacket(uint8_t IsOff)
-#endif
 {
 	char ss[20];
-	uint8_t crc;
-
-	// if(prevLat==0)
-	// 	DeltaDis=0;
-	// else
-	// 	DeltaDis = calculateDistance(prevLat,prevLong,GPS.Latitude,GPS.Longitude);
+	uint8_t cs;
+	float dd;
 
 	prevLat = GPS.Latitude;
 	prevLong = GPS.Longitude;
 
-	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
-	if(IsOff)
-		Ql_strcat(dataBuffer,"$,EPB,EMR,");
+	Ql_memset(dataBuffer, 0x00, DATA_MAX_BUFF);
+	if (IsOff)
+		Ql_strcat(dataBuffer, "$EPB,EMR,");
 	else
-		Ql_strcat(dataBuffer,"$,EPB,SEM,");
+		Ql_strcat(dataBuffer, "$EPB,SEM,");
 
-	Ql_strncat(dataBuffer,NetWork.IMEI,15);
-
-	if(IsStored)
-		AppendFixString(dataBuffer,",SP,",4,",SP,");
+	Ql_strncat(dataBuffer, NetWork.IMEI, 15);
+	InsertChar(dataBuffer, ',');
+	if (IsStored)
+		Ql_strcat(dataBuffer, "SP,");
 	else
-		AppendFixString(dataBuffer,",NM,",4,",NM,");
-
-	InsertCurrentDateTime(dataBuffer,0);
-	InsertCurrentDateTime(dataBuffer,1);
-
-	if(GPS.GPSFix)
-		Ql_strcat(dataBuffer,",A,");
-	else
-		Ql_strcat(dataBuffer,",V,");
-
-	AppendFixString(dataBuffer,sLatitude,10,sLatitude);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,GPS.LatDir);
-	InsertChar(dataBuffer,',');
-	AppendFixString(dataBuffer,sLongitude,10,sLongitude);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,GPS.LngDir);
-	InsertChar(dataBuffer,',');
-	StringAdd(dataBuffer,"%05.1f",GPS.Altitude);
-	InsertChar(dataBuffer,',');
-	StringAdd(dataBuffer,"%05.1f",GPS.Speed);
-	InsertChar(dataBuffer,',');
-	float dd = (float)DeltaDis;
-	InsertFloatValue(dataBuffer,dd,"%05.1f");
-	//InsertIntValue(dataBuffer,DeltaDis,"%02d");
-	InsertChar(dataBuffer,',');
-	Ql_strcat(dataBuffer,"G,");
-	Ql_strcat(dataBuffer,VTSData.VehicleData.VehicleRegNo);
-	InsertChar(dataBuffer,',');
-	AppendVariableString(dataBuffer,VTSData.PhoneNumber.Mob1,14,9,"NO_NUMBER");
-	crc = CRC8(dataBuffer,Ql_strlen(dataBuffer));
-	lastcrc= crc;
-	Ql_sprintf(ss,",*,%02X",crc);
-	//Ql_sprintf(ss,"*");
-	Ql_strcat(dataBuffer,ss);
-	
+		Ql_strcat(dataBuffer, "NM,");
+	InsertCurrentDateTime(dataBuffer, 0);
+	InsertCurrentDateTime(dataBuffer, 1);
+	InsertChar(dataBuffer, ',');
+	InsertChar(dataBuffer, GPS.GPSFix ? 'A' : 'V');
+	InsertChar(dataBuffer, ',');
+	AppendFixString(dataBuffer, sLatitude, 10, sLatitude);
+	InsertChar(dataBuffer, ',');
+	InsertChar(dataBuffer, GPS.LatDir ? GPS.LatDir : 'N');
+	InsertChar(dataBuffer, ',');
+	AppendFixString(dataBuffer, sLongitude, 10, sLongitude);
+	InsertChar(dataBuffer, ',');
+	InsertChar(dataBuffer, GPS.LngDir ? GPS.LngDir : 'E');
+	InsertChar(dataBuffer, ',');
+	InsertFloatValue(dataBuffer, GPS.Altitude, "%05.1f");
+	InsertChar(dataBuffer, ',');
+	InsertFloatValue(dataBuffer, GPS.Speed, "%05.1f");
+	InsertChar(dataBuffer, ',');
+	dd = (float)DeltaDis;
+	InsertFloatValue(dataBuffer, dd, "%05.1f");
+	InsertChar(dataBuffer, ',');
+	Ql_strcat(dataBuffer, "G,");
+	Ql_strcat(dataBuffer, VTSData.VehicleData.VehicleRegNo);
+	InsertChar(dataBuffer, ',');
+	AppendVariableString(dataBuffer, VTSData.PhoneNumber.Mob1, 14, 9, "NO_NUMBER");
+	cs = GetXORChecksum(dataBuffer + 1, Ql_strlen(dataBuffer) - 1);
+	lastcrc = cs;
+	Ql_sprintf(ss, "*%02X\r\n", cs);
+	Ql_strcat(dataBuffer, ss);
 }
-
-
 #endif
 
 #if defined(PROTO_CDAC)
@@ -2162,15 +1982,11 @@ uint16_t MakeAlertString(void)
 
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_ODISA1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void EmergencyPacketOD(uint8_t IsOff)
-#else
+#ifdef PROTO_ODISA1
 #if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG)
 void EmergencyPacket(uint8_t IsOff)
 #endif
-#endif
-#if defined(ENABLE_UNIFIED_FIRMWARE) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
+#if (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 {
 	char ss[20];
 	uint32_t crc;
@@ -2236,27 +2052,9 @@ void EmergencyPacket(uint8_t IsOff)
 #endif
 #endif
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void EmergencyPacket(uint8_t IsOff)
-{
-	if (IS_PROTO_NIC()) {
-		EmergencyPacketNIC(IsOff);
-	} else if (IS_PROTO_MH()) {
-		EmergencyPacketMH(IsOff);
-	} else if (IS_PROTO_ODISHA()) {
-		EmergencyPacketOD(IsOff);
-	} else if (IS_PROTO_OG()) {
-		EmergencyPacketOG(IsOff);
-	}
-}
-#endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_MAHARASHTRA1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void HealthPacketMH(void)
-#else
+#ifdef PROTO_MAHARASHTRA1
 void HealthPacket(void)
-#endif
 {
 	GetMemeryPercentage();
 	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
@@ -2306,11 +2104,7 @@ void HealthPacket(void)
 #endif
 
 #if defined(PROTO_CDAC)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void HealthPacketCDAC(void)
-#else
 void HealthPacket(void)
-#endif
 {
 	uint16_t dLen=8;
 	Ql_memset(SendString,0,DATA_MAX_BUFF);	
@@ -2337,65 +2131,54 @@ void HealthPacket(void)
 
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_OG)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void HealthPacketOG(void)
-#else
+#ifdef PROTO_OG
 void HealthPacket(void)
-#endif
+/* AMD3 sect6 - $HLM health/heartbeat packet */
 {
-	GetMemeryPercentage();
-	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
-	Ql_strcat(dataBuffer,"$,HLM,");
-	Ql_strcat(dataBuffer,VTSData.VendorID);
-	InsertChar(dataBuffer,',');
-	//INV,");
-	Ql_strcat(dataBuffer,FirmVer);
-	InsertChar(dataBuffer,',');
-	Ql_strncat(dataBuffer,NetWork.IMEI,15);
-	InsertChar(dataBuffer,',');
-	InsertIntValue(dataBuffer,PeriPheralVal.BattPerc,"%03d");
-	InsertChar(dataBuffer,',');
-	InsertIntValue(dataBuffer,LOW_BAT_THRS_PER,"%03d");
-	InsertChar(dataBuffer,',');
-	float memPer = (float)MemoryPercent;
-	InsertFloatValue(dataBuffer,memPer,"%04.1f");
-	//InsertIntValue(dataBuffer,MemoryPercent,"%03d");
-	InsertChar(dataBuffer,',');
-	InsertIntValue(dataBuffer,VTSData.IntervalData.IgnitionInterval,"%d");
-	InsertChar(dataBuffer,',');
-	InsertIntValue(dataBuffer,VTSData.IntervalData.DataInterval,"%d");
-	//AppendFixString(dataBuffer,",010000,00*",11,",010000,00*");
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,PeriPheralVal.IP1 + '0');
-	InsertChar(dataBuffer,PeriPheralVal.IP2 + '0');
-	InsertChar(dataBuffer,PeriPheralVal.IGN + '0');
-	if(PrevTamp)
-		InsertChar(dataBuffer,'1');
-	else
-		InsertChar(dataBuffer,'0');
-	InsertChar(dataBuffer,',');
+	char ss[20];
+	uint8_t cs;
+	float memPer;
 
-	//InsertFloatValue(dataBuffer,PeriPheralVal.AN1,"%04.1f,");
-	//InsertFloatValue(dataBuffer,PeriPheralVal.AN2,"%04.1f,*");
-	strcat(dataBuffer,"0.00 0.00,*");
-	// crc = checksum32(dataBuffer,Ql_strlen(dataBuffer));
-	// Ql_sprintf(ss,"%08X*",crc);
-	// lastcrc= crc;
-	// Ql_strcat(dataBuffer,ss);
-	
+	GetMemeryPercentage();
+	Ql_memset(dataBuffer, 0x00, DATA_MAX_BUFF);
+	Ql_sprintf(dataBuffer, "$HLM,%s,", VTSData.VendorID);
+	Ql_strcat(dataBuffer, FirmVer);
+	InsertChar(dataBuffer, ',');
+	Ql_strncat(dataBuffer, NetWork.IMEI, 15);
+	InsertChar(dataBuffer, ',');
+	InsertIntValue(dataBuffer, PeriPheralVal.BattPerc, "%03d");
+	InsertChar(dataBuffer, ',');
+	InsertIntValue(dataBuffer, LOW_BAT_THRS_PER, "%03d");
+	InsertChar(dataBuffer, ',');
+	memPer = (float)MemoryPercent;
+	InsertFloatValue(dataBuffer, memPer, "%04.1f");
+	InsertChar(dataBuffer, ',');
+	InsertIntValue(dataBuffer, VTSData.IntervalData.IgnitionInterval, "%d");
+	InsertChar(dataBuffer, ',');
+	InsertIntValue(dataBuffer, VTSData.IntervalData.DataInterval, "%d");
+	InsertChar(dataBuffer, ',');
+	/* IOStatus: IP1 IP2 IGN SOS OP1 OP2 0 0 */
+	InsertChar(dataBuffer, PeriPheralVal.IP1 + '0');
+	InsertChar(dataBuffer, PeriPheralVal.IP2 + '0');
+	InsertChar(dataBuffer, PeriPheralVal.IGN + '0');
+	InsertChar(dataBuffer, INPUT_SOS_VAL ? '1' : '0');
+	InsertChar(dataBuffer, PeriPheralVal.OP1 + '0');
+	InsertChar(dataBuffer, PeriPheralVal.OP2 + '0');
+	Ql_strcat(dataBuffer, "00");
+	InsertChar(dataBuffer, ',');
+	Ql_strcat(dataBuffer, "0.00,0.00");
+	cs = GetXORChecksum(dataBuffer + 1, Ql_strlen(dataBuffer) - 1);
+	Ql_sprintf(ss, "*%02X\r\n", cs);
+	lastcrc = cs;
+	Ql_strcat(dataBuffer, ss);
 }
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_ODISA1) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void HealthPacketOD(void)
-#else
+#if defined(PROTO_ODISA1) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 #if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_CDAC) && !defined(PROTO_OG)
 void HealthPacket(void)
 #endif
-#endif
-#if defined(ENABLE_UNIFIED_FIRMWARE) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
+#if (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 {
 	GetMemeryPercentage();
 	Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
@@ -2450,25 +2233,9 @@ void HealthPacket(void)
 #endif
 #endif
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void HealthPacket(void)
-{
-	if (IS_PROTO_MH()) {
-		HealthPacketMH();
-	} else if (IS_PROTO_OG()) {
-		HealthPacketOG();
-	} else {
-		HealthPacketOD();
-	}
-}
-#endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_MAHARASHTRA1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void MakeParamChangeStringMH(char* Sender, char* param, uint8_t IsServer)
-#else
+#ifdef PROTO_MAHARASHTRA1
 void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
-#endif
 {
 
 	char ss[20];
@@ -2629,158 +2396,92 @@ void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_OG)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void MakeParamChangeStringOG(char* Sender, char* param, uint8_t IsServer)
-#else
+#ifdef PROTO_OG
+/* AMD3 sect10 - the OTA / parameter-change acknowledgement is NOT a frame type
+ * of its own.  It is a $PVT packet carrying type code OA,12 whose OTAResp field
+ * holds "(Source|Mode|CmdId:Value:Status)".
+ *
+ * The legacy Maharashtra builder that used to live here emitted
+ *   "$,NMP,<VID>,<FW>,OT,12,L,...<CRC8>,*\n<SMS|SERVER>,<sender>,<param>"
+ * which is wrong in five ways for OG: packet id ($,NMP vs $PVT), type code
+ * (OT vs OA), checksum algorithm (CRC8 vs XOR-8), terminator (",*\n" vs
+ * "*XX\r\n") and trailing text after the terminator.  Build the frame through
+ * InitBuffer(12) instead so the OG build has exactly one $PVT layout. */
 void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
-#endif
 {
+	OTAResponseTypeDef saved;
+	const char* src_str = "SCK1";
+	const char* id      = param ? param : "";
+	uint8_t n;
 
-	char ss[20];
-	uint16_t i;
-	uint8_t crc;
-	
-	//uint16_t dLen=23;
-	//GPS.sLngDir='E';
-	Ql_memset(dataBuffer,0,DATA_MAX_BUFF);
-	Ql_sprintf(dataBuffer,"$,NMP,%s,",VTSData.VendorID);
-	Ql_strcat(dataBuffer,FirmVer);
+	(void)Sender;
 
-	Ql_strcat(dataBuffer,",OT,12,L,"); // OTA 
-	
-	Ql_strncat(dataBuffer,NetWork.IMEI,15);
-	InsertChar(dataBuffer,',');
-	AppendVariableString(dataBuffer,VTSData.VehicleData.VehicleRegNo,12,5,"UNKNOWN");
-	InsertChar(dataBuffer,',');
-	if(GPS.GPSFix)
-		InsertChar(dataBuffer,'1');
-	else
-		InsertChar(dataBuffer,'0');
+	/* InitBuffer(12) consumes LastOTAResponse and clears Pending, so keep any
+	 * AMD3 acknowledgement that has not been transmitted yet. */
+	saved = LastOTAResponse;
 
-	InsertChar(dataBuffer,',');
-	InsertCurrentDateTime(dataBuffer,0);
-	InsertChar(dataBuffer,',');
-	InsertCurrentDateTime(dataBuffer,1);
-	InsertChar(dataBuffer,',');
-	AppendFixString(dataBuffer,sLatitude,10,sLatitude);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,GPS.LatDir);
-	InsertChar(dataBuffer,',');
-	AppendFixString(dataBuffer,sLongitude,10,sLongitude);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,GPS.LngDir);
-	InsertChar(dataBuffer,',');
-	//AppendVariableString(dataBuffer,sSpeed,7,1,"000.0");
-	StringAdd(dataBuffer,"%05.1f",GPS.Speed);
-	InsertChar(dataBuffer,',');
-	//InsertFloatValue(dataBuffer,GPS.Heading,"%06.2f");
-	//AppendVariableString(dataBuffer,sHeading,7,1,"000.0");
-	StringAdd(dataBuffer,"%06.2f",GPS.Heading);
-	InsertChar(dataBuffer,',');
-	InsertIntValue(dataBuffer,GPS.NoOfSatalite,"%02d");
-	InsertChar(dataBuffer,',');
-	
-	StringAdd(dataBuffer,"%03.1f",GPS.Altitude);
-	InsertChar(dataBuffer,',');
-	
-	StringAdd(dataBuffer,"%04.1f",GPS.PDOP);
-	InsertChar(dataBuffer,',');
-	
-	StringAdd(dataBuffer,"%04.1f",GPS.HDOP);
-	InsertChar(dataBuffer,',');
-	Ql_strcat(dataBuffer,NetWork.Network);
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,PeriPheralVal.IGN + '0');
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,PeriPheralVal.IsMain + '0');
-	InsertChar(dataBuffer,',');
-	InsertFloatValue(dataBuffer,PeriPheralVal.MainsVolt,"%04.1f");
-	InsertChar(dataBuffer,',');
-	InsertFloatValue(dataBuffer,PeriPheralVal.BattVolt,"%03.1f");
-	InsertChar(dataBuffer,',');
-	if(VAlert[SOS_ON_ALERT].Enable || VAlert[SOS_OFF_ALERT].Enable)
-		InsertChar(dataBuffer,'1');
-	else
-		InsertChar(dataBuffer,'0');
-	InsertChar(dataBuffer,',');
+	if      (IsServer == OTA_SRC_SMS)   src_str = "SMS";
+	else if (IsServer == OTA_SRC_SCK_1) src_str = "SCK1";
+	else if (IsServer == OTA_SRC_SCK_2) src_str = "SCK2";
+	else if (IsServer == OTA_SRC_SCK_3) src_str = "SCK3";
+	else if (IsServer == OTA_SRC_SCK_4) src_str = "SCK4";
+	else if (IsServer == OTA_SRC_BLE)   src_str = "BLE";
+	else if (IsServer == OTA_SRC_RS232) src_str = "RS232";
+	else if (IsServer == OTA_SRC_RS485) src_str = "RS485";
 
-	if(PeriPheralVal.IsCoverOpen)
-		InsertChar(dataBuffer,'O');
-	else
-		InsertChar(dataBuffer,'C');
-	InsertChar(dataBuffer,',');
+	Ql_memset(&LastOTAResponse, 0, sizeof(LastOTAResponse));
+	Ql_strncpy(LastOTAResponse.Source, src_str, sizeof(LastOTAResponse.Source) - 1);
 
-	
-
-
-	InsertIntValue(dataBuffer,GSM.SignalStrength,"%2d");
-	InsertChar(dataBuffer,',');
-	
-	InsertIntValue(dataBuffer,GSM.MCC,"%02d");
-	InsertChar(dataBuffer,',');
-	InsertIntValue(dataBuffer,GSM.MNC,"%02d");
-	InsertChar(dataBuffer,',');
-	AppendVariableString(dataBuffer,GSM.LAC,5,4,"00D6");
-	InsertChar(dataBuffer,',');
-	AppendVariableString(dataBuffer,GSM.CellID,5,4,"CFBD");
-	InsertChar(dataBuffer,',');
-
-	for(i=0;i<4;i++)
+	/* Legacy replies arrive as "SET:PIP" / "GET:APN" / "CLR:VRN", or as a bare
+	 * action mnemonic ("RST", "FOTA", "IMON") which is always a write. */
+	if (Ql_strlen(id) >= 4 && id[3] == ':' &&
+	    (id[0] == 'G' || id[0] == 'S' || id[0] == 'C'))
 	{
-		AppendVariableString(dataBuffer,GSM.NeigbourCell[i].CellID,5,1,"0");
-		InsertChar(dataBuffer,',');	
-		AppendVariableString(dataBuffer,GSM.NeigbourCell[i].LAC,6,2,"0");
-		InsertChar(dataBuffer,',');
-		AppendVariableString(dataBuffer,GSM.NeigbourCell[i].CellDB,4,1,"0");
-		InsertChar(dataBuffer,',');
+		Ql_strncpy(LastOTAResponse.Mode, id, 3);
+		LastOTAResponse.Mode[3] = '\0';
+		id += 4;
 	}
-	InsertChar(dataBuffer,PeriPheralVal.IP1 + '0');
-	InsertChar(dataBuffer,PeriPheralVal.IP2 + '0');
-	InsertChar(dataBuffer,PeriPheralVal.IGN + '0');
-	if(INPUT_SOS_VAL)
-		InsertChar(dataBuffer,'1');
 	else
-		InsertChar(dataBuffer,'0');
-	
-
-	InsertChar(dataBuffer,',');
-	InsertChar(dataBuffer,PeriPheralVal.OP1 + '0');
-	InsertChar(dataBuffer,PeriPheralVal.OP2 + '0');
-	InsertChar(dataBuffer,',');
-
-	InsertIntValue(dataBuffer,FrameNumber,"%06d");
-	InsertChar(dataBuffer,',');
-
-	
-		
-
-
-	
-
-	
-	crc = CRC8(dataBuffer,Ql_strlen(dataBuffer));
-	Ql_sprintf(ss,"%02X",crc);
-	Ql_strcat(dataBuffer,ss);
-	lastcrc= crc;
-	Ql_sprintf(ss,",*\n");
-	Ql_strcat(dataBuffer,ss);
-	FrameNumber++;
-
-	if(IsServer==OTA_SRC_SMS)
-		Ql_strcat(dataBuffer,"SMS,");
-	else
-		Ql_strcat(dataBuffer,"SERVER,");
-
-	Ql_strcat(dataBuffer,Sender);
-	InsertChar(dataBuffer,',');
-	Ql_strcat(dataBuffer,param);
-	if(IsSRCMD)
 	{
-		InsertChar(dataBuffer,'-');
-		Ql_strcat(dataBuffer,CMD_Buff);
+		Ql_strcpy(LastOTAResponse.Mode, "SET");
 	}
 
+	/* Copy the mnemonic only - stop at the first separator so free-text replies
+	 * ("MOTA INVALID COMMAND") cannot inject a comma into the PVT field list. */
+	for (n = 0; n < sizeof(LastOTAResponse.CmdId) - 1; n++)
+	{
+		if (id[n] == '\0' || id[n] == ' ' || id[n] == ',' ||
+		    id[n] == '(' || id[n] == ')' || id[n] == '|' || id[n] == '*')
+			break;
+		LastOTAResponse.CmdId[n] = id[n];
+	}
+
+	/* DecodeSMS() clears CMD_Buff on entry, so a non-empty buffer holds the
+	 * value this command read back or wrote.  Values such as GET:PIP return
+	 * "<ip>,<port>" - a bare comma inside OTAResp would shift every field that
+	 * follows it, so remap the PVT-structural characters onto ':' (the AMD3
+	 * intra-field separator) and drop the frame terminators outright. */
+	if (CMD_Buff[0] != '\0')
+	{
+		uint16_t v = 0;
+		while (CMD_Buff[v] != '\0' && v < sizeof(LastOTAResponse.Value) - 1)
+		{
+			char c = CMD_Buff[v];
+			if (c == '\r' || c == '\n')
+				break;
+			if (c == ',' || c == '|' || c == '(' || c == ')' || c == '*')
+				c = ':';
+			LastOTAResponse.Value[v] = c;
+			v++;
+		}
+	}
+
+	LastOTAResponse.Status  = 1;
+	LastOTAResponse.Pending = 1;
+
+	InitBuffer(12);   /* $PVT,...,OA,12,L,...,(SRC|MODE|ID:VAL:1),()*XX\r\n */
+
+	LastOTAResponse = saved;
 }
 #endif
 
@@ -3118,91 +2819,6 @@ void MakeBatchPacket(uint8_t count, uint8_t* nmcount, uint8_t* critcount)
 	LOGData(TAG_SERVER,"Total Batch hPacket - crit: %d, non-crit: %d ",*critcount,*nmcount);
 }
 
-// void UpdateOTA(char* data, uint8_t IsSet)
-// {
-// 	char* fn = data+4;
-// 	Ql_memset(&OTAValue,0,sizeof(OTAValue));
-// 	uint16_t ln=Ql_strlen(fn);
-// 	uint8_t i=0, n=0, j=0;
-// 	if(IsSet)  // SET PU:something,SU:something     or    SET EO      or    SET EP:something
-// 	{
-// 		while(n < ln)
-// 		{
-// 			if(*fn==':')
-// 			{
-// 				if(i == 0)
-// 				{
-// 					i=1;
-// 					j=0;
-// 					n++;
-// 					fn++;
-// 				}
-				
-// 			}
-// 			else if(*fn==',')
-// 			{
-// 				i=0;
-// 				j=0;
-// 				n++;
-// 				fn++;
-// 				OTAValue.TotalOTA++;
-// 				if(OTAValue.TotalOTA >= 6)
-// 					return;
-// 			}
-// 			if(i==0)
-// 			{
-// 				OTAValue.OTData[OTAValue.TotalOTA].KeyVal[j]=*fn;
-// 			}
-// 			else
-// 			{
-// 				if(*fn == 0x0D)
-// 					*fn=0;
-// 				OTAValue.OTData[OTAValue.TotalOTA].Value[j]=*fn;
-// 			}
-// 			j++;
-// 			n++;
-// 			fn++;
-			
-// 		}
-// 		if (i > 0)
-// 				OTAValue.TotalOTA++;
-// 	}
-// 	else
-// 	{
-// 		while(n < ln) // GET PU,EM,SM                  or   GET PU
-// 		{
-// 			if(*fn==',')
-// 			{
-// 				i=1;
-// 				n=0;
-// 			}
-// 			else if(*fn == '\r' || *fn == '\n' || *fn == '\0')
-// 			{
-// 				i=1;
-				
-// 				n=1;
-// 			}
-// 			else 
-// 				i=0;
-// 			if(i==0)
-// 			{
-// 				OTAValue.OTData[OTAValue.TotalOTA].KeyVal[j++]=*fn;
-// 			}
-// 			else
-// 			{
-// 				OTAValue.OTData[OTAValue.TotalOTA].KeyVal[j]=0;
-// 				OTAValue.TotalOTA++;
-// 				j=0;
-// 				if(n==1)
-// 					break;
-// 			}
-// 			fn++;
-			
-// 		}
-// 	}
-	
-		
-// }
 static char* OTA_SkipCommand(char *requestData)
 {
 	char *p = requestData;
@@ -3691,6 +3307,24 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 	if(Ql_strlen(buff)<3)
 		return;
 
+#ifdef PROTO_OG
+    /* Servers may combine their application ACK and the AMD3 command in one
+     * TCP receive buffer (for example: "ACK\r\n$<IMEI>,...,GET,001*XX").
+     * Route the embedded '$' frame, not only a frame at byte zero; otherwise
+     * a valid GET/SET command falls through to the legacy decoder and is
+     * silently ignored. */
+    {
+        char* amd3_frame = Ql_strstr(buff, "$");
+        if(amd3_frame && Ql_strstr(amd3_frame, NetWork.IMEI))
+        {
+            LOGData(TAG_SERVER, "AMD3 command found at RX offset %d",
+                    (int)(amd3_frame - buff));
+            ParseStandardAIS140Command(amd3_frame, isserver);
+            return;
+        }
+    }
+#endif
+
 	if(Ql_strstr(buff,"XSET")|| Ql_strstr(buff,"XGET"))
 	{
 		DecodeSMS(buff,isserver);
@@ -4115,12 +3749,36 @@ void DecodeOTAData(char* buff,uint8_t isserver)
 
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_NIC1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void MakeParamChangeStringNIC(char* Sender, char* param, uint8_t IsServer)
-#else
-void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
+#ifdef PROTO_OG
+/* AMD3 OTA frames are handled independently from the CDAC OTA engine. */
+void DecodeOTAData(char* buff, uint8_t isserver)
+{
+	char* frame;
+
+	if (!buff)
+		return;
+
+	/* TCP may deliver an application ACK and the AMD3 frame together.  The
+	 * command is valid even when '$' is not the first received byte. */
+	frame = Ql_strstr(buff, "$");
+	if (frame && Ql_strstr(frame, NetWork.IMEI))
+		ParseStandardAIS140Command(frame, isserver);
+}
 #endif
+
+#if !defined(PROTO_CDAC) && !defined(PROTO_OG)
+/* MH1 / NIC1 / ODISA1 have no dedicated OTA frame grammar - inbound server
+ * commands use the same textual syntax as SMS.  handleServerResponses() calls
+ * DecodeOTAData() unconditionally, so these builds need this thin adapter. */
+void DecodeOTAData(char* buff, uint8_t isserver)
+{
+	if (buff)
+		DecodeSMS(buff, isserver);
+}
+#endif
+
+#ifdef PROTO_NIC1
+void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 {
 	// Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
 	// Ql_sprintf(dataBuffer,"$,PC,12,%s,%d,%s,",NetWork.IMEI,IsServer,Sender);
@@ -4274,15 +3932,11 @@ void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 }
 #endif
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || defined(PROTO_ODISA1)
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void MakeParamChangeStringOD(char* Sender, char* param, uint8_t IsServer)
-#else
+#ifdef PROTO_ODISA1
 #if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG)
 void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 #endif
-#endif
-#if defined(ENABLE_UNIFIED_FIRMWARE) || (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
+#if (!defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) && !defined(PROTO_CDAC) && !defined(PROTO_OG))
 {
 	// Ql_memset(dataBuffer,0x00,DATA_MAX_BUFF);
 	// Ql_sprintf(dataBuffer,"$,PC,12,%s,%d,%s,",NetWork.IMEI,IsServer,Sender);
@@ -4445,143 +4099,9 @@ void MakeShortPCString(char* Sender, char* param, uint8_t IsServer)
 #endif
 #endif
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
-{
-	if (IS_PROTO_NIC()) {
-		MakeParamChangeStringNIC(Sender, param, IsServer);
-	} else if (IS_PROTO_MH()) {
-		MakeParamChangeStringMH(Sender, param, IsServer);
-	} else if (IS_PROTO_ODISHA()) {
-		MakeParamChangeStringOD(Sender, param, IsServer);
-	} else if (IS_PROTO_OG()) {
-		MakeParamChangeStringOG(Sender, param, IsServer);
-	}
-}
-#endif
 
 void SendResponce(char *Sender, char* Resp, uint8_t IsServer, uint8_t IsSET)
 {
-#if defined(ENABLE_UNIFIED_FIRMWARE)
-    // Handle SMS response
-    if(IsServer==OTA_SRC_SMS) {
-        if (IS_PROTO_MH() || IS_PROTO_OG() || IsSRCMD) {
-            char combinedResp[300];
-            if(CMD_Buff[0] != '\0')
-                Ql_sprintf(combinedResp,"%s-%s",Resp,CMD_Buff);
-            else
-                Ql_sprintf(combinedResp,"%s",Resp);
-            SendSMS(Sender,combinedResp);
-        } else {
-            SendSMS(Sender,Resp);
-        }
-    }
-
-    // Handle SET commands - send to all servers
-    if(IsSET) {
-        if(IsSMS) {
-            MakeParamChangeString(Sender,Resp,IsServer);
-        }
-        else if(IsServer==OTA_SRC_SCK_1) {
-            MakeParamChangeString(VTSData.ServerData.IP1,Resp,IsServer);
-        }
-        else if(IsServer==OTA_SRC_SCK_2) {
-            MakeParamChangeString(VTSData.ServerData.IP3,Resp,IsServer);
-        }
-        else if(IsServer==OTA_SRC_SCK_3) {
-            MakeParamChangeString(VTSData.ServerData.IP4,Resp,IsServer); 
-        }
-        else if(IsServer==OTA_SRC_RS232) {
-            SendRS232Response(Resp);  // Send response to RS232 source
-            MakeParamChangeString("RS232",Resp,IsServer);
-        }
-        else if(IsServer==OTA_SRC_RS485) {
-            SendRS485Response(Resp);  // Send response to RS485 source
-            MakeParamChangeString("RS485",Resp,IsServer);
-        }
-        else
-        {
-            BLE_SendReply((uint8_t*)Resp,strlen(Resp));
-            MakeParamChangeString("BLE",Resp,IsServer);	
-        }
-        
-        // Send to all connected servers
-        TCPSocket_SendString(&ServerSocket[0],dataBuffer);
-        TCPSocket_SendString(&ServerSocket[2],dataBuffer);
-        #ifdef EXTENDED_IPS
-        TCPSocket_SendString(&ServerSocket[3],dataBuffer);
-        #endif
-
-        if (IS_PROTO_ODISHA()) {
-            if(IsSMS) {
-                MakeShortPCString(Sender,Resp,IsServer);
-            }
-            else if(IsServer==OTA_SRC_SCK_1) {
-                MakeShortPCString(VTSData.ServerData.IP1,Resp,IsServer);
-            }
-            else if(IsServer==OTA_SRC_SCK_2) {
-                MakeShortPCString(VTSData.ServerData.IP3,Resp,IsServer);
-            }
-            else if(IsServer==OTA_SRC_SCK_3) {
-                MakeShortPCString(VTSData.ServerData.IP4,Resp,IsServer);
-            }
-            else if(IsServer==OTA_SRC_RS232) {
-                MakeShortPCString("RS232",Resp,IsServer);
-            }
-            else if(IsServer==OTA_SRC_RS485) {
-                MakeShortPCString("RS485",Resp,IsServer);
-            }
-            
-            // Send short PC string to all servers
-            TCPSocket_SendString(&ServerSocket[0],dataBuffer);
-            TCPSocket_SendString(&ServerSocket[2],dataBuffer);
-            #ifdef EXTENDED_IPS
-            TCPSocket_SendString(&ServerSocket[3],dataBuffer);
-            #endif
-        }
-        return;
-    }
-
-    // Handle non-SET commands - send only to source
-    if(IsServer==OTA_SRC_BLE) {
-        BLE_SendReply((uint8_t*)Resp,strlen(Resp));
-    }
-    else if(IsServer==OTA_SRC_SCK_1) {
-        MakeParamChangeString(VTSData.ServerData.IP1,Resp,IsServer);
-        TCPSocket_SendString(&ServerSocket[0],dataBuffer);
-        if (IS_PROTO_ODISHA()) {
-            MakeShortPCString(VTSData.ServerData.IP1,Resp,IsServer);
-            TCPSocket_SendString(&ServerSocket[0],dataBuffer);
-        }
-    }
-    else if(IsServer==OTA_SRC_SCK_2) {
-        MakeParamChangeString(VTSData.ServerData.IP3,Resp,IsServer);
-        TCPSocket_SendString(&ServerSocket[2],dataBuffer);
-        #ifdef EXTENDED_IPS
-        TCPSocket_SendString(&ServerSocket[3],dataBuffer);
-        #endif
-        if (IS_PROTO_ODISHA()) {
-            MakeShortPCString(VTSData.ServerData.IP3,Resp,IsServer);
-            TCPSocket_SendString(&ServerSocket[2],dataBuffer);
-        }
-    }
-    else if(IsServer==OTA_SRC_SCK_3) {
-        MakeParamChangeString(VTSData.ServerData.IP4,Resp,IsServer);
-        #ifdef EXTENDED_IPS
-        TCPSocket_SendString(&ServerSocket[3],dataBuffer);
-        #endif
-        if (IS_PROTO_ODISHA()) {
-            MakeShortPCString(VTSData.ServerData.IP4,Resp,IsServer);
-            TCPSocket_SendString(&ServerSocket[3],dataBuffer);
-        }
-    }
-    else if(IsServer==OTA_SRC_RS232) {
-        SendRS232Response(Resp);
-    }
-    else if(IsServer==OTA_SRC_RS485) {
-        SendRS485Response(Resp);
-    }
-#else
     #ifndef PROTO_CDAC
     // Handle SMS response
     if(IsServer==OTA_SRC_SMS) {
@@ -4713,9 +4233,8 @@ void SendResponce(char *Sender, char* Resp, uint8_t IsServer, uint8_t IsSET)
     else if(IsServer==OTA_SRC_RS485)
         SendRS485Response(Resp);
     #endif
-#endif
 }
-#if defined(ENABLE_UNIFIED_FIRMWARE) || !defined(PROTO_CDAC)
+#if !defined(PROTO_CDAC)
 void GetCurrentInterval(void)
 {
 	if(ServerSocket[0].SocketState != SOCKET_CONNECTED)
@@ -4741,6 +4260,7 @@ void GetCurrentInterval(void)
 }
 void SendDatatoServer0(void)
 {
+	dataBuffer[sizeof(dataBuffer) - 1] = '\0';
 	if(!TCPSocket_SendString(&ServerSocket[0],dataBuffer))
 	{
 		#ifndef HISTORY_DISABLED
@@ -4752,24 +4272,16 @@ void SendDatatoServer0(void)
 		#endif
 
 	}
-	TCPSocket_SendString(&ServerSocket[2],dataBuffer);
+	if (ServerSocket[2].SocketState == SOCKET_CONNECTED) {
+		TCPSocket_SendString(&ServerSocket[2],dataBuffer);
+	}
 	#ifdef EXTENDED_IPS
-	TCPSocket_SendString(&ServerSocket[3],dataBuffer);
+	if (ServerSocket[3].SocketState == SOCKET_CONNECTED) {
+		TCPSocket_SendString(&ServerSocket[3],dataBuffer);
+	}
 	#endif
 }
 
-// void SendSensorData(void)
-// {
-// 	if(DHT11.Status==0 && IsFuelData==0)
-// 		return;
-// 	SensorString();
-	
-// 	#ifdef EXTENDED_IPS
-// 	TCPSocket_SendString(&ServerSocket[3],dataBuffer);
-// 	#else
-// 	TCPSocket_SendString(&ServerSocket[2],dataBuffer);
-// 	#endif
-// }
 
 void MakeSMSFallbackPacket(void)
 {
@@ -5235,7 +4747,7 @@ void ProcessHistoryPacket(void)
 		return;
 	}
 	#else
-	if(Ql_strstr(dataBuffer,"$,EPB"))
+	if(Ql_strstr(dataBuffer,"$EPB"))
 	{
 		/* OLD CODE - COMMENTED OUT AS REQUESTED:
 		if(ServerSocket[1].SocketState >= SOCKET_CONNECTED)
@@ -5290,7 +4802,7 @@ void ProcessHistoryPacket(void)
 		return;
 	}
 	#elif defined(PROTO_OG)
-	if(!Ql_strstr(dataBuffer,"$,NMP") || Ql_strlen(dataBuffer)<150)
+	if(!Ql_strstr(dataBuffer,"$PVT") || Ql_strlen(dataBuffer)<150)
 	{
 		LOGData(TAG_SERVER,"\r\nInvalid Hitory Packet, deleting...");
 		#ifdef HISTORY_INTERNAL
@@ -5708,8 +5220,13 @@ static void handleProfileRequests(void) {
 
 static void handleFTPRequests(void) {
     if(GSM.GSMState==GPRS_ACTIVE && FTPState == FTP_STATE_CLOSED && IsFTPReq) {
-        FTPStart(&DownloadReq);
+        /* Clear the request BEFORE the call, not after. FTPStart() can block for
+         * a long time (UFS sweep, FTP login/download retries); if it stalls or
+         * the thread is reset mid-call, an un-consumed flag means the very same
+         * attempt is retried on the next iteration/boot and the server thread
+         * never gets past this third call in its loop to handle any packets. */
         IsFTPReq=0;
+        FTPStart(&DownloadReq);
     }
 }
 
@@ -5763,30 +5280,98 @@ static void handleLoginRequests(void) {
             LOGData(TAG_SERVER,"\r\nSending Login Packet to server 1...\r\n");
             LoginString();
             TCPSocket_SendString(&ServerSocket[0],dataBuffer);
-            SendLogin1 = 0;
         }
+        SendLogin1 = 0;
     }
-    else if (SendLogin2 == 1) {
+    if (SendLogin2 == 1) {
         if(ServerSocket[2].SocketState == SOCKET_CONNECTED) {
             LOGData(TAG_SERVER,"\r\nSending Login Packet to server 3...\r\n");
             LoginString();
             TCPSocket_SendString(&ServerSocket[2],dataBuffer);
-            SendLogin2 = 0;
         }
+        SendLogin2 = 0;
     }
     #ifdef EXTENDED_IPS
-    else if (SendLogin3 == 1) {
+    if (SendLogin3 == 1) {
         if(ServerSocket[3].SocketState == SOCKET_CONNECTED) {
             LOGData(TAG_SERVER,"\r\nSending Login Packet to server 4...\r\n");
             LoginString();
             TCPSocket_SendString(&ServerSocket[3],dataBuffer);
-            SendLogin3 = 0;
         }
+        SendLogin3 = 0;
     }
     #endif
 }
 
 static void handlePackets(void) {
+    #ifdef PROTO_OG
+    /* AMD3 sect10 - a processed OTA command is acknowledged inside a $PVT frame.
+     * When the command came in over a TCP socket, answer that socket promptly
+     * with a dedicated OA,12 frame; for every other source the reply has already
+     * gone out on its own channel (SMS/BLE/RS232/RS485), so the acknowledgement
+     * simply rides the OTAResp field of the next $PVT that InitBuffer() builds -
+     * which is exactly what section 10 specifies.
+     *
+     * FIELD FAILURE 2026-08-13, "only $LGN arrives": this block used to end in an
+     * unconditional `return`. Only "SCK1"/"SCK2" map to a socket (and "SCK3" only
+     * under EXTENDED_IPS, which is off), so a command from SMS, BLE, RS232, RS485,
+     * SCK3 or SCK4 - and any unknown command id, which ParseStandardAIS140Command()
+     * also marks Pending - left responseSocket NULL, logged nothing, and returned.
+     * Pending is only cleared by InitBuffer(), which that return made unreachable,
+     * so CheckAlerts(), history, normal and health packets were ALL starved
+     * permanently. Login survived because handleLoginRequests() runs earlier in the
+     * server loop, and the liveness watchdog stayed quiet because the loop itself
+     * was healthy. Never return from here: a pending acknowledgement must not gate
+     * unrelated traffic. LastOTAResponse only exists in the OG build. */
+    static uint16_t otaAckWait = 0;
+
+    if(LastOTAResponse.Pending) {
+        TCPSocketTypedef* responseSocket = NULL;
+
+        if(Ql_strcmp(LastOTAResponse.Source, "SCK1") == 0)
+            responseSocket = &ServerSocket[0];
+        else if(Ql_strcmp(LastOTAResponse.Source, "SCK2") == 0)
+            responseSocket = &ServerSocket[2];
+        #ifdef EXTENDED_IPS
+        else if(Ql_strcmp(LastOTAResponse.Source, "SCK3") == 0)
+            responseSocket = &ServerSocket[3];
+        #endif
+
+        if(responseSocket != NULL && responseSocket->SocketState == SOCKET_CONNECTED) {
+            InitBuffer(12);  /* OA,12,L with the OTA response field; clears Pending */
+            LOGData(TAG_SERVER, "OTA pkt send, sck%d len=%d",
+                    responseSocket->SocketNo, Ql_strlen(dataBuffer));
+            TCPSocket_SendString(responseSocket, dataBuffer);
+			/* Endpoint SET/CLR commands used to call InitSockets() during parsing,
+			 * closing this source connection before OA,12 could be queued. */
+			if (AIS140SocketReinitPending) {
+				AIS140SocketReinitPending = 0;
+				InitSockets();
+			}
+            otaAckWait = 0;
+            if (AIS140ResetPending) {
+                uint8_t r_type = AIS140ResetPending;
+                AIS140ResetPending = 0;
+                LOGData(TAG_SERVER, "OTA reply sent, executing deferred reset (%s)", AIS140ResetReason);
+                ThreadSleep(r_type == 2 ? 1000 : 500);
+                SystemRecovery_RequestReset(AIS140ResetReason);
+            }
+        }
+        else if(responseSocket != NULL && otaAckWait < OTA_ACK_WAIT_TICKS) {
+            /* Source socket is down. Hold the dedicated OA,12 frame for a bounded
+             * window, then give up on it and let the next $PVT carry OTAResp so a
+             * socket that never comes back cannot pin the acknowledgement. */
+            if((++otaAckWait % 50) == 0)
+                LOGData(TAG_SERVER, "OTA ack waiting %d: sck%d state=%d",
+                        otaAckWait, responseSocket->SocketNo, responseSocket->SocketState);
+        }
+        /* Deliberately no `return` on any path - see the note above. */
+    }
+    else {
+        otaAckWait = 0;
+    }
+    #endif
+
     // Handle alerts if any server is connected
     if(ServerSocket[0].SocketState == SOCKET_CONNECTED || ServerSocket[2].SocketState==SOCKET_CONNECTED) {
         CheckAlerts();
@@ -5805,7 +5390,7 @@ static void handlePackets(void) {
         handleNormalPackets();
     }
 
-    // Handle health packets 
+    // Handle health packets
     if(IsPacketReady.IsHealthPacket && (ServerSocket[0].SocketState == SOCKET_CONNECTED)) {
         handleHealthPackets();
     }
@@ -5814,13 +5399,16 @@ static void handlePackets(void) {
 static void handleServerResponses(void) {
     if(ServerSocket[0].isRXData) {
         LOGData(TAG_SERVER,"\r\nParsing Server 1 Data...");
-        DecodeSMS(ServerSocket[0].rxBuffer,OTA_SRC_SCK_1);
+        /* DecodeOTAData recognises AMD3 '$<IMEI>,...,GET/SET/CLR' frames.
+         * Calling DecodeSMS directly bypasses that parser completely. */
+        DecodeOTAData(ServerSocket[0].rxBuffer, OTA_SRC_SCK_1);
         ServerSocket[0].isRXData=0;
+
     }
 
     if(ServerSocket[2].isRXData) {
         LOGData(TAG_SERVER,"\r\nParsing Server 2 Data...");
-        DecodeSMS(ServerSocket[2].rxBuffer,OTA_SRC_SCK_2);
+        DecodeOTAData(ServerSocket[2].rxBuffer, OTA_SRC_SCK_2);
         ServerSocket[2].isRXData=0;
     }
 
@@ -5837,7 +5425,8 @@ static void handleNormalPackets(void) {
 
 	if(!GSM.IsTimeSet)
 	{
-		//LOGData(TAG_SERVER,"Time not set, skipping normal packet");
+		IsPacketReady.IsNormalPacket = 0;
+		LOGData(TAG_SERVER, "NR blocked: time not set");
 		return;
 	}
     if(ServerSocket[0].SocketState == SOCKET_CONNECTED) {
@@ -5873,9 +5462,11 @@ static void handleNormalPackets(void) {
 		#else
 		InitBuffer(1);  // NORMAL PACKET
 		#endif
+        LOGData(TAG_SERVER, "NR pkt send, sck0=%d len=%d", ServerSocket[0].SocketState, Ql_strlen(dataBuffer));
         SendDatatoServer0();
     }
     else if(GSM.GSMState >= SIM_DETECTED) {
+        LOGData(TAG_SERVER, "NR pkt save: sck0=%d gsm=%d", ServerSocket[0].SocketState, GSM.GSMState);
         IsPacketReady.IsNormalPacket = 0; // Save History Packet
         #ifdef SOS_FULL_EA
 		if(SOS.IsSOS)
@@ -5937,55 +5528,84 @@ static void handleHealthPackets(void) {
     #endif
 }
 
+/* Liveness instrumentation for the server thread.
+ *
+ * Field failure (2026-08-12): the device sent one login packet and then nothing
+ * — no $PVT, no health — while every other thread kept logging normally. A
+ * 3m13s capture showed 19 normal-packet triggers from SYSTIC and ZERO server or
+ * TCP log lines, so the thread was wedged somewhere that does no logging.
+ * ServerLoopPhase records how far the loop got and ServerLoopCount how many
+ * iterations completed; ProcessServerThreadTimeout() in Systic.c prints both
+ * while its hang counter climbs, which names the stuck stage from a field log
+ * instead of requiring a guess. Cheap: two stores per stage, no logging. */
+volatile uint8_t  ServerLoopPhase = SRV_PHASE_BOOT;
+volatile uint32_t ServerLoopCount = 0;
+
 // Main server thread entry point
 void ServerThreadEntry(s32 taskId) {
     server_thread_init(taskId);
+    ServerLoopPhase = SRV_PHASE_BOOT;
     ThreadSleep(8000);
-    LOGData(TAG_SERVER,"\r\nServer Thread Entry!!\r\n");
+    LOGData(TAG_SERVER,"Server Thread Entry, sck0=%d gsm=%d ts=%d",
+            ServerSocket[0].SocketState, GSM.GSMState, GSM.IsTimeSet);
 
     while(1) {
-        // Handle profile update requests	
+        if (SleepConfig.IsEnabled) {
+            ServerThreadTimeout = 0;
+            ThreadSleep(1000);
+            continue;
+        }
+
+        // Handle profile update requests
+        ServerLoopPhase = SRV_PHASE_PROFILE;
         handleProfileRequests();
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-        GetCurrentInterval();
-        ServerThreadTimeout=0;
-        handleFTPRequests();
-        handleIncomingMessages();
-        handleRFIDData();
-        handleLoginRequests();
-        handlePackets();
-        handleServerResponses();
-#else
         #ifndef PROTO_CDAC
         // Get current interval and reset timeout
+        ServerLoopPhase = SRV_PHASE_INTERVAL;
         GetCurrentInterval();
         ServerThreadTimeout=0;
+        ServerLoopCount++;
 
         // Handle FTP requests
+        ServerLoopPhase = SRV_PHASE_FTP;
         handleFTPRequests();
 
         // Handle incoming messages (SMS/BLE)
+        ServerLoopPhase = SRV_PHASE_INCOMING;
         handleIncomingMessages();
 
         // Handle RFID data
+        ServerLoopPhase = SRV_PHASE_RFID;
         handleRFIDData();
 
-        // Handle login requests
-        handleLoginRequests();
+        /* A reconnect can raise a login flag while normal/health traffic is
+         * pending.  Do not make these paths mutually exclusive: the previous
+         * exclusive branch could repeatedly service login and starve every
+         * other packet.  This follows the reference server-loop ordering. */
+        if(SendLogin1 || SendLogin2
+        #ifdef EXTENDED_IPS
+        || SendLogin3
+        #endif
+        ) {
+            ServerLoopPhase = SRV_PHASE_LOGIN;
+            handleLoginRequests();
+        }
 
-        // Handle various packet types
+        ServerLoopPhase = SRV_PHASE_PACKETS;
         handlePackets();
 
         // Handle server responses
+        ServerLoopPhase = SRV_PHASE_RESPONSES;
         handleServerResponses();
 
         #else
         // PROTO_CDAC specific handling
+        ServerLoopPhase = SRV_PHASE_CDAC;
         handleCDACProtocol();
         #endif
-#endif
 
+        ServerLoopPhase = SRV_PHASE_SLEEP;
         ThreadSleep(100);
     }
 }

@@ -61,7 +61,7 @@ static inline void SafeAppendACK(char *ack, const char *src)
 
 #else
 
-static const uint8_t VTAlertHeaderType[ALERT_COUNT] = {0,0,1,1,1,2,1,2,2,2,1,1,1,2,2,3,2,2,2};	
+static const uint8_t VTAlertHeaderType[ALERT_COUNT] = {0,0,1,1,1,2,1,2,2,2,1,1,1,2,2,3,2,2,2};
 static const char VTAlertPKT[ALERT_COUNT][3] ={"10","11","16","03","22","09","17","13","14","15","23","20","21","18","19","12","06","04","05"};
 static const uint8_t VTContType[ALERT_COUNT]= {1,0,2,0,2,0,2,0,0,0,0,0,0,0,0,0,0,0,0};
 

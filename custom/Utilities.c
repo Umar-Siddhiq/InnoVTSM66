@@ -70,7 +70,7 @@ void remove_spaces(char* restrict str_trimmed, const char* restrict str_untrimme
   *str_trimmed = '\0';
 }
 
-#if defined(ENABLE_UNIFIED_FIRMWARE) || !defined(PROTO_CDAC)
+#if !defined(PROTO_CDAC)
 void InsertIntValue(char* target,uint16_t value,const char* decimal)
 {
 	char ss[20];
@@ -219,15 +219,6 @@ void AdjustGPSTimeToIST(_RTC *dateTime)
 }
 #endif
 
-#ifdef ENABLE_UNIFIED_FIRMWARE
-const char* GetActiveProtoTag(void)
-{
-    if (IS_PROTO_NIC()) return "NI1";
-    if (IS_PROTO_MH()) return "MH1";
-    if (IS_PROTO_ODISHA()) return "OD1";
-    return "UNK";
-}
-#endif
 
 #define EARTH_RADIUS_METERS 6371000.0
 #define PI 3.14159265358979323846
