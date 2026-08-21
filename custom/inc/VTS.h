@@ -101,9 +101,9 @@ extern char FirmVer[];
 #define LOW_BAT_THRS_PER 85
 
 // #define SIMMAKE_APM
- #define SIMMAKE_IDEMIA_3P
+ //#define SIMMAKE_IDEMIA_3P
 // #define SIMMAKE_SENS
-// #define SIMMAKE_GND
+#define SIMMAKE_GND
 // #define SIMMAKE_TACHNOJACKS
 // #define SIMMAKE_COLORPLAST
 
