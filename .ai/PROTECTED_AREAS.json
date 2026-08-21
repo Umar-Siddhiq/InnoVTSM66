@@ -1,0 +1,41 @@
+{
+  "areas": [
+    {
+      "level": "high-risk",
+      "pattern": "**/*gps*",
+      "reason": "GPS/GNSS behavior is regression-sensitive. Diagnose first and require explicit scope before changing it.",
+      "source": "project-guardian-default"
+    },
+    {
+      "level": "high-risk",
+      "pattern": "**/*gnss*",
+      "reason": "GNSS enable/power/init/parser behavior is regression-sensitive.",
+      "source": "project-guardian-default"
+    },
+    {
+      "level": "high-risk",
+      "pattern": "**/*modem*",
+      "reason": "Modem registration/profile/state logic can cause field regressions.",
+      "source": "project-guardian-default"
+    },
+    {
+      "level": "high-risk",
+      "pattern": "**/*bootloader*",
+      "reason": "Bootloader changes can brick devices or alter upgrade behavior.",
+      "source": "project-guardian-default"
+    },
+    {
+      "level": "high-risk",
+      "pattern": "**/*ota*",
+      "reason": "OTA/FOTA changes can affect device recovery and production updates.",
+      "source": "project-guardian-default"
+    },
+    {
+      "level": "high-risk",
+      "pattern": "**/*fota*",
+      "reason": "FOTA changes can affect device recovery and production updates.",
+      "source": "project-guardian-default"
+    }
+  ],
+  "version": 1
+}

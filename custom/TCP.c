@@ -325,7 +325,11 @@ void TCPSocket_Process(TCPSocketTypedef* socket) {
                 }
             }
             
-            // Create socket
+            // Create socket - close existing descriptor first if any
+            if (socket->SocketIndex >= 0) {
+                Ql_SOC_Close(socket->SocketIndex);
+                socket->SocketIndex = -1;
+            }
             socket->SocketIndex = Ql_SOC_Create(0, SOC_TYPE_TCP);
             if (socket->SocketIndex < 0) {
                 LOGData(TAG_TCP, "Socket %d create failed", socket->SocketNo);

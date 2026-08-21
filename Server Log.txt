@@ -1,0 +1,2263 @@
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 35
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 36 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+GPRS: 2026-08-19 07:35:30, ts:1 csq: 18
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,18,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 36
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 37 / 250
+
+GPRS: 2026-08-19 07:35:30, ts:1 csq: 18
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073531,190826,1,1,0,1,0,0,1,12.1,4.1
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E6 01 25 08 
+MCU: 77 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E6 01 25 08 
+MCU: 77 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 486 (12.1V) BattADC: 2085
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+GPRS: 2026-08-19 07:35:31, ts:1 csq: 18
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 37
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 38 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+GPRS: 2026-08-19 07:35:32, ts:1 csq: 18
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 38
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 39 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,18,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:35:33, ts:1 csq: 18
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 C0 01 70 08 
+MCU: 77 00 EF 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 C0 01 70 08 
+MCU: 77 00 EF 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 448 (11.2V) BattADC: 2160
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 39
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 40 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+SERVER: NR pkt send, sck0=6 len=241
+TCP: Socket 0 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073533,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,11.2,4.1,0,C,18,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000004,0.00,0.00,000.0,(),()*35
+
+TCP: Socket 0 waiting for ACK, sent 241 bytes, expecting ACK: 1039 (prev: 798)
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,18,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPRS: 2026-08-19 07:35:34, ts:1 csq: 18
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+TCP: Socket 0 current ACK: 798, expected: 1039
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 40
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 41 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:35:35, ts:1 csq: 18
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073535,190826,1,1,0,1,0,0,1,11.2,4.1
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+TCP: Socket 0 current ACK: 798, expected: 1039
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E3 01 79 08 
+MCU: 77 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E3 01 79 08 
+MCU: 77 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 483 (12.0V) BattADC: 2169
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 41
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 42 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:35:36, ts:1 csq: 18
+TCP: <--Socket 0 received 5 bytes-->
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+TCP: Socket 0 ACK received, 1039 bytes total acknowledged
+TCP: Socket 2 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073533,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,11.2,4.1,0,C,18,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000004,0.00,0.00,000.0,(),()*35
+
+TCP: Socket 2 waiting for ACK, sent 241 bytes, expecting ACK: 1039 (prev: 798)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 85, Current Tick: 42
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 43 / 250
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:35:37, ts:1 csq: 18
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+TCP: Socket 2 current ACK: 798, expected: 1039
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E2 01 9C 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+SYSTIC: Sensor Interval: 85, Current Tick: 43
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 44 / 250
+
+MCU: Rx[17]:
+MCU: 26 02 01 01 E2 01 9C 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 482 (12.0V) BattADC: 2204
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,18,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:35:38, ts:1 csq: 18
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+TCP: Socket 2 current ACK: 798, expected: 1039
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 44
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 45 / 250
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,18,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+GPRS: 2026-08-19 07:35:39, ts:1 csq: 19
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+TCP: Socket 2 current ACK: 798, expected: 1039
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+TCP: Socket 2 ACK received, 1039 bytes total acknowledged
+SERVER: 
+Parsing Server 1 Data...
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+SYSTIC: Sensor Interval: 85, Current Tick: 45
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 46 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 C0 01 B2 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 C0 01 B2 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 448 (11.2V) BattADC: 2226
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073540,190826,1,1,0,1,0,0,1,11.2,4.1
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPRS: 2026-08-19 07:35:40, ts:1 csq: 19
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 46
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 47 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:35:41, ts:1 csq: 19
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 47
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 48 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E4 01 5F 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E4 01 5F 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 484 (12.0V) BattADC: 2143
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:35:42, ts:1 csq: 19
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,19,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 48
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 49 / 250
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:35:43, ts:1 csq: 19
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,19,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 49
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 50 / 250
+
+GPRS: 2026-08-19 07:35:43, ts:1 csq: 19
+SERVER: NR pkt send, sck0=6 len=241
+TCP: Socket 0 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073543,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.1,0,C,19,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000005,0.00,0.00,000.0,(),()*32
+
+TCP: Socket 0 waiting for ACK, sent 241 bytes, expecting ACK: 1280 (prev: 1039)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E3 01 2E 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E3 01 2E 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 483 (12.0V) BattADC: 2094
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073544,190826,1,1,0,1,0,0,1,12.1,4.1
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:35:44, ts:1 csq: 19
+TCP: Socket 0 current ACK: 1039, expected: 1280
+SYSTIC: Sensor Interval: 85, Current Tick: 50
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 51 / 250
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+TCP: <--Socket 0 received 5 bytes-->
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+TCP: Socket 0 ACK received, 1280 bytes total acknowledged
+TCP: Socket 2 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073543,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.1,0,C,19,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000005,0.00,0.00,000.0,(),()*32
+
+TCP: Socket 2 waiting for ACK, sent 241 bytes, expecting ACK: 1280 (prev: 1039)
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+SYSTIC: Sensor Interval: 85, Current Tick: 51
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 52 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPRS: 2026-08-19 07:35:46, ts:1 csq: 19
+TCP: Socket 2 ACK received, 1280 bytes total acknowledged
+SERVER: 
+Parsing Server 1 Data...
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E1 01 6A 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E1 01 6A 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 481 (12.0V) BattADC: 2154
+HARDWARE: BattRaw: 4.11 Rpt: 4.11 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.11 Rpt: 4.11 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 52
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 53 / 250
+
+HARDWARE: BattRaw: 4.11 Rpt: 4.11 Conn: 1
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+GPRS: 2026-08-19 07:35:47, ts:1 csq: 19
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,19,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 53
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 54 / 250
+
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+HARDWARE: BattRaw: 4.11 Rpt: 4.11 Conn: 1
+HARDWARE: BattRaw: 4.11 Rpt: 4.11 Conn: 1
+GPS: GPS Not Fixed
+
+GPRS: 2026-08-19 07:35:48, ts:1 csq: 19
+SYSTIC: Sensor Interval: 85, Current Tick: 54
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 55 / 250
+
+HARDWARE: BattRaw: 4.11 Rpt: 4.11 Conn: 1
+HARDWARE: BattRaw: 4.11 Rpt: 4.11 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,19,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E7 01 40 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E7 01 40 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 487 (12.1V) BattADC: 2112
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 55
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 56 / 250
+
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+GPRS: 2026-08-19 07:35:50, ts:1 csq: 19
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073550,190826,1,1,0,1,0,0,1,12.2,4.1
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 56
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 57 / 250
+
+GPRS: 2026-08-19 07:35:51, ts:1 csq: 19
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E2 01 2D 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E2 01 2D 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 482 (12.0V) BattADC: 2093
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPRS: 2026-08-19 07:35:51, ts:1 csq: 19
+SYSTIC: Sensor Interval: 85, Current Tick: 57
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 58 / 250
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,19,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+GPRS: 2026-08-19 07:35:52, ts:1 csq: 19
+SYSTIC: Sensor Interval: 85, Current Tick: 58
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 59 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E2 01 98 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+GPRS: 2026-08-19 07:35:53, ts:1 csq: 20
+MCU: Rx[17]:
+MCU: 26 02 01 01 E2 01 98 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 482 (12.0V) BattADC: 2200
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 59
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 60 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+SERVER: NR pkt send, sck0=6 len=241
+TCP: Socket 0 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073553,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.2,0,C,20,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000006,0.00,0.00,000.0,(),()*39
+
+TCP: Socket 0 waiting for ACK, sent 241 bytes, expecting ACK: 1521 (prev: 1280)
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,20,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+GPS: GPS Not Fixed
+
+GPRS: 2026-08-19 07:35:54, ts:1 csq: 20
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 60
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 61 / 250
+
+TCP: Socket 0 current ACK: 1280, expected: 1521
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073555,190826,1,1,0,1,0,0,1,12.1,4.2
+
+TCP: <--Socket 0 received 5 bytes-->
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+TCP: Socket 0 ACK received, 1521 bytes total acknowledged
+TCP: Socket 2 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073553,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.2,0,C,20,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000006,0.00,0.00,000.0,(),()*39
+
+TCP: Socket 2 waiting for ACK, sent 241 bytes, expecting ACK: 1521 (prev: 1280)
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+GPS: NO GGA Packet!
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+GPRS: 2026-08-19 07:35:55, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 61
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 62 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E2 01 24 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E2 01 24 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 482 (12.0V) BattADC: 2084
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+TCP: Socket 2 current ACK: 1280, expected: 1521
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 62
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 63 / 250
+
+TCP: Socket 2 ACK received, 1521 bytes total acknowledged
+SERVER: 
+Parsing Server 1 Data...
+GPRS: 2026-08-19 07:35:57, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,20,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 85, Current Tick: 63
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 64 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+GPRS: 2026-08-19 07:35:58, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E6 01 71 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E6 01 71 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 486 (12.1V) BattADC: 2161
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 64
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 65 / 250
+
+GPRS: 2026-08-19 07:35:59, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,20,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 65
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 66 / 250
+
+GPRS: 2026-08-19 07:36:00, ts:1 csq: 20
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073600,190826,1,1,0,1,0,0,1,12.1,4.1
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E3 01 65 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E3 01 65 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 483 (12.0V) BattADC: 2149
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPRS: 2026-08-19 07:36:00, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 66
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 67 / 250
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+GPRS: 2026-08-19 07:36:01, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 67
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 68 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,20,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E3 01 86 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E3 01 86 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 483 (12.0V) BattADC: 2182
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+GPRS: 2026-08-19 07:36:02, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 68
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 69 / 250
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,20,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPRS: 2026-08-19 07:36:03, ts:1 csq: 20
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 69
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 70 / 250
+
+SERVER: NR pkt send, sck0=6 len=241
+TCP: Socket 0 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073603,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.1,0,C,20,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000007,0.00,0.00,000.0,(),()*3D
+
+TCP: Socket 0 waiting for ACK, sent 241 bytes, expecting ACK: 1762 (prev: 1521)
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:04, ts:1 csq: 20
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E2 01 71 08 
+MCU: 77 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E2 01 71 08 
+MCU: 77 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 482 (12.0V) BattADC: 2161
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073604,190826,1,1,0,1,0,0,1,12.1,4.2
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 70
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 71 / 250
+
+TCP: Socket 0 current ACK: 1521, expected: 1762
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPRS: 2026-08-19 07:36:05, ts:1 csq: 20
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+SYSTIC: Sensor Interval: 85, Current Tick: 71
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 72 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+TCP: Socket 0 current ACK: 1521, expected: 1762
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+TCP: <--Socket 0 received 5 bytes-->
+TCP: Socket 0 ACK received, 1762 bytes total acknowledged
+TCP: Socket 2 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073603,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.1,0,C,20,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000007,0.00,0.00,000.0,(),()*3D
+
+TCP: Socket 2 waiting for ACK, sent 241 bytes, expecting ACK: 1762 (prev: 1521)
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPRS: 2026-08-19 07:36:06, ts:1 csq: 20
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E4 01 60 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+SYSTIC: Sensor Interval: 85, Current Tick: 72
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 73 / 250
+
+MCU: Rx[17]:
+MCU: 26 02 01 01 E4 01 60 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 484 (12.0V) BattADC: 2144
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,20,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+TCP: Socket 2 current ACK: 1521, expected: 1762
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+TCP: Socket 2 ACK received, 1762 bytes total acknowledged
+SERVER: 
+Parsing Server 1 Data...
+GPRS: 2026-08-19 07:36:07, ts:1 csq: 20
+GPS: GPS Not Fixed
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 73
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 74 / 250
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,20,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPRS: 2026-08-19 07:36:08, ts:1 csq: 20
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 74
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 75 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E3 01 B1 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E3 01 B1 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 483 (12.0V) BattADC: 2225
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073609,190826,1,1,0,1,0,0,1,12.1,4.2
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+GPRS: 2026-08-19 07:36:09, ts:1 csq: 20
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 75
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 76 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:36:10, ts:1 csq: 20
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 76
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 77 / 250
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E5 01 40 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E5 01 40 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 485 (12.1V) BattADC: 2112
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:36:11, ts:1 csq: 20
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,20,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 85, Current Tick: 77
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 78 / 250
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:36:12, ts:1 csq: 20
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,20,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+SYSTIC: Sensor Interval: 85, Current Tick: 78
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 79 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+TCP: <--Socket 0 received 39 bytes-->
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E6 01 8E 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E6 01 8E 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 486 (12.1V) BattADC: 2190
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SERVER: 
+Parsing Server 1 Data...
+OTA: AMD3 chksum WARN: exp=4E got=69
+OTA: AMD3: unknown mode 
+GPRS: 2026-08-19 07:36:13, ts:1 csq: 20
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 79
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 80 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+SERVER: NR pkt send, sck0=6 len=241
+TCP: Socket 0 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073614,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.1,0,C,20,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000008,0.00,0.00,000.0,(),()*34
+
+TCP: Socket 0 waiting for ACK, sent 241 bytes, expecting ACK: 2003 (prev: 1762)
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073614,190826,1,1,0,1,0,0,1,12.1,4.1
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:36:14, ts:1 csq: 20
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+TCP: Socket 0 current ACK: 1762, expected: 2003
+SYSTIC: Sensor Interval: 85, Current Tick: 80
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 81 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+GPRS: 2026-08-19 07:36:15, ts:1 csq: 20
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 C0 01 B1 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 C0 01 B1 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 448 (11.2V) BattADC: 2225
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+TCP: <--Socket 0 received 5 bytes-->
+TCP: Socket 0 ACK received, 2003 bytes total acknowledged
+TCP: Socket 2 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073614,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.1,0,C,20,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000008,0.00,0.00,000.0,(),()*34
+
+TCP: Socket 2 waiting for ACK, sent 241 bytes, expecting ACK: 2003 (prev: 1762)
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 81
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 82 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:16, ts:1 csq: 20
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,20,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+TCP: Socket 2 current ACK: 1762, expected: 2003
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 82
+SENSOR: Querying CLS sensor
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 83 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:17, ts:1 csq: 20
+TCP: Socket 2 ACK received, 2003 bytes total acknowledged
+SERVER: 
+Parsing Server 1 Data...
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E2 01 3A 08 
+MCU: 77 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E2 01 3A 08 
+MCU: 77 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 482 (12.0V) BattADC: 2106
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,20,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 83
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 84 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPRS: 2026-08-19 07:36:18, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073618,190826,1,1,0,1,0,0,1,12.1,4.2
+
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+GPRS: 2026-08-19 07:36:19, ts:1 csq: 20
+SYSTIC: Sensor Interval: 85, Current Tick: 84
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 85 / 250
+
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E3 01 22 08 
+MCU: 76 00 E2 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E3 01 22 08 
+MCU: 76 00 E2 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 483 (12.0V) BattADC: 2082
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPRS: 2026-08-19 07:36:20, ts:1 csq: 20
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 0
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 86 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:20, ts:1 csq: 20
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,20,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 85, Current Tick: 1
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 87 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E1 01 70 08 
+MCU: 77 00 EE 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E1 01 70 08 
+MCU: 77 00 EE 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 481 (12.0V) BattADC: 2160
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+GPRS: 2026-08-19 07:36:21, ts:1 csq: 20
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,20,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+SYSTIC: Sensor Interval: 85, Current Tick: 2
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 88 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+GPRS: 2026-08-19 07:36:22, ts:1 csq: 20
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 3
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 89 / 250
+
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073623,190826,1,1,0,1,0,0,1,12.0,4.1
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+GPRS: 2026-08-19 07:36:23, ts:1 csq: 20
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E7 01 40 08 
+MCU: 76 00 E5 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E7 01 40 08 
+MCU: 76 00 E5 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 487 (12.1V) BattADC: 2112
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+HARDWARE: BattRaw: 4.12 Rpt: 4.12 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 4
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 90 / 250
+
+SERVER: NR pkt send, sck0=6 len=241
+TCP: Socket 0 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073624,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.2,4.1,0,C,20,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000009,0.00,0.00,000.0,(),()*35
+
+TCP: Socket 0 waiting for ACK, sent 241 bytes, expecting ACK: 2244 (prev: 2003)
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:36:24, ts:1 csq: 20
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+TCP: Socket 0 current ACK: 2003, expected: 2244
+SYSTIC: Sensor Interval: 85, Current Tick: 5
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 91 / 250
+
+TCP: <--Socket 0 received 5 bytes-->
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+TCP: Socket 0 ACK received, 2244 bytes total acknowledged
+TCP: Socket 2 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073624,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.2,4.1,0,C,20,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000009,0.00,0.00,000.0,(),()*35
+
+TCP: Socket 2 waiting for ACK, sent 241 bytes, expecting ACK: 2244 (prev: 2003)
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,20,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPRS: 2026-08-19 07:36:25, ts:1 csq: 20
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E6 01 87 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E6 01 87 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 486 (12.1V) BattADC: 2183
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+TCP: Socket 2 ACK received, 2244 bytes total acknowledged
+SERVER: 
+Parsing Server 1 Data...
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 6
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 92 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:26, ts:1 csq: 19
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,19,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 7
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 93 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:36:27, ts:1 csq: 19
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073627,190826,1,1,0,1,0,0,1,12.1,4.1
+
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E5 01 40 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E5 01 40 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 485 (12.1V) BattADC: 2112
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 8
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 94 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:28, ts:1 csq: 19
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 9
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 95 / 250
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPRS: 2026-08-19 07:36:29, ts:1 csq: 19
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E3 01 B3 08 
+MCU: 76 00 E3 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E3 01 B3 08 
+MCU: 76 00 E3 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 483 (12.0V) BattADC: 2227
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,19,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 85, Current Tick: 10
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 96 / 250
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+GPRS: 2026-08-19 07:36:30, ts:1 csq: 19
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+HARDWARE: BattRaw: 4.13 Rpt: 4.13 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,19,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+SYSTIC: Sensor Interval: 85, Current Tick: 11
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 97 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPRS: 2026-08-19 07:36:31, ts:1 csq: 19
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E4 01 B2 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E4 01 B2 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 484 (12.0V) BattADC: 2226
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:32, ts:1 csq: 19
+SYSTIC: Sensor Interval: 85, Current Tick: 12
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 98 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073632,190826,1,1,0,1,0,0,1,12.1,4.1
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:33, ts:1 csq: 19
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 13
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 99 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,2,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:33, ts:1 csq: 19
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E2 01 B3 08 
+MCU: 77 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E2 01 B3 08 
+MCU: 77 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 482 (12.0V) BattADC: 2227
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 14
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 100 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+SERVER: NR pkt send, sck0=6 len=241
+TCP: Socket 0 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073634,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.1,0,C,19,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000010,0.00,0.00,000.0,(),()*35
+
+TCP: Socket 0 waiting for ACK, sent 241 bytes, expecting ACK: 2485 (prev: 2244)
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,19,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:34, ts:1 csq: 19
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+TCP: Socket 0 current ACK: 2244, expected: 2485
+SYSTIC: Sensor Interval: 85, Current Tick: 15
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 101 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,19,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+TCP: <--Socket 0 received 5 bytes-->
+GPRS: 2026-08-19 07:36:35, ts:1 csq: 19
+TCP: Socket 0 ACK received, 2485 bytes total acknowledged
+TCP: Socket 2 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073634,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.1,0,C,19,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000010,0.00,0.00,000.0,(),()*35
+
+TCP: Socket 2 waiting for ACK, sent 241 bytes, expecting ACK: 2485 (prev: 2244)
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E4 01 B3 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E4 01 B3 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 484 (12.0V) BattADC: 2227
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 16
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 102 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073636,190826,1,1,0,1,0,0,1,12.1,4.1
+
+GPRS: 2026-08-19 07:36:36, ts:1 csq: 19
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+TCP: Socket 2 current ACK: 2244, expected: 2485
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 17
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 103 / 250
+
+TCP: Socket 2 ACK received, 2485 bytes total acknowledged
+SERVER: 
+Parsing Server 1 Data...
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPRS: 2026-08-19 07:36:37, ts:1 csq: 19
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,3,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 18
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 104 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E5 01 40 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E5 01 40 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 485 (12.1V) BattADC: 2112
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:38, ts:1 csq: 19
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,19,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 19
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 105 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:39, ts:1 csq: 19
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,19,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 85, Current Tick: 20
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 106 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E5 01 8C 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E5 01 8C 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 485 (12.1V) BattADC: 2188
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:40, ts:1 csq: 19
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 21
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 107 / 250
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.17 Rpt: 4.17 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073641,190826,1,1,0,1,0,0,1,12.1,4.2
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.17 Rpt: 4.17 Conn: 1
+GPRS: 2026-08-19 07:36:41, ts:1 csq: 19
+GPS: GPS Not Fixed
+
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.17 Rpt: 4.17 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 22
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 108 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+HARDWARE: BattRaw: 4.17 Rpt: 4.17 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E3 01 38 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+GPRS: 2026-08-19 07:36:43, ts:1 csq: 19
+MCU: Rx[17]:
+MCU: 26 02 01 01 E3 01 38 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 483 (12.0V) BattADC: 2104
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,3,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 85, Current Tick: 23
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 109 / 250
+
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+GPRS: 2026-08-19 07:36:44, ts:1 csq: 19
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 24
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 110 / 250
+
+SERVER: NR pkt send, sck0=6 len=241
+TCP: Socket 0 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073644,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.2,0,C,19,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000011,0.00,0.00,000.0,(),()*30
+
+TCP: Socket 0 waiting for ACK, sent 241 bytes, expecting ACK: 2726 (prev: 2485)
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,19,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.17 Rpt: 4.17 Conn: 1
+HARDWARE: BattRaw: 4.17 Rpt: 4.17 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.17 Rpt: 4.17 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 25
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 111 / 250
+
+GPRS: 2026-08-19 07:36:45, ts:1 csq: 19
+HARDWARE: BattRaw: 4.17 Rpt: 4.17 Conn: 1
+TCP: <--Socket 0 received 5 bytes-->
+TCP: Socket 0 ACK received, 2726 bytes total acknowledged
+TCP: Socket 2 sent 241 bytes
+[1/241] $PVT,APMG,V1.5.9,NR,1,L,868329088570076,UNKNOWN,0,19082026,073644,0.000000,N,0.000000,E,000.0,000.00
+[101/241] ,00,0.0,00.0,00.0,airtel,1,1,12.1,4.2,0,C,19,404,40,371E,44A5,16,371E,4472,13,371E,D235,0,0,0,0,0,0,
+[201/241] 1110,00,000011,0.00,0.00,000.0,(),()*30
+
+TCP: Socket 2 waiting for ACK, sent 241 bytes, expecting ACK: 2726 (prev: 2485)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E2 01 A1 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E2 01 A1 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 482 (12.0V) BattADC: 2209
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,19,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 26
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 112 / 250
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPRS: 2026-08-19 07:36:46, ts:1 csq: 19
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+TCP: Socket 2 current ACK: 2485, expected: 2726
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073647,190826,1,1,0,1,0,0,1,12.1,4.1
+
+SYSTIC: Sensor Interval: 85, Current Tick: 27
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 113 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:47, ts:1 csq: 20
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+TCP: Socket 2 current ACK: 2485, expected: 2726
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E5 01 76 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+TCP: Socket 2 ACK received, 2726 bytes total acknowledged
+SERVER: 
+Parsing Server 1 Data...
+MCU: Rx[17]:
+MCU: 26 02 01 01 E5 01 76 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 485 (12.1V) BattADC: 2166
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 28
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 114 / 250
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,3,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPRS: 2026-08-19 07:36:48, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 29
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 115 / 250
+
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+GPRS: 2026-08-19 07:36:49, ts:1 csq: 20
+HARDWARE: BattRaw: 4.16 Rpt: 4.16 Conn: 1
+HARDWARE: $INF,868329088570076,FQ_OG1_1.5.9,4,20,ID3P,3,3,3,airtel,89917350630001725364,404940942675270,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 30
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 116 / 250
+
+FILE: File loaded: BkCount.bin (4 bytes)
+
+BACKUP: History CONFIG Last Packet : 0
+BACKUP: History Remaining Space : 282624
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 C0 01 2E 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 C0 01 2E 08 
+MCU: 75 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 448 (11.2V) BattADC: 2094
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:50, ts:1 csq: 20
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $CEL,868329088570076,404,40,371E,44A5,20,N1,404,40,371E,4472,16,N2,404,40,371E,D235,13,N3,,,,,,N4,,,,,
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 31
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 117 / 250
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPRS: 2026-08-19 07:36:51, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,868329088570076,1,0,073652,190826,1,1,0,1,0,0,1,11.2,4.2
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+SYSTIC: Sensor Interval: 85, Current Tick: 32
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 118 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 E6 01 92 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 E6 01 92 08 
+MCU: 76 00 C0 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 486 (12.1V) BattADC: 2194
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPRS: 2026-08-19 07:36:52, ts:1 csq: 20
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+HARDWARE: BattRaw: 4.15 Rpt: 4.15 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,868329088570076,0,3,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 85, Current Tick: 33
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 119 / 250
+
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1
+GPRS: 2026-08-19 07:36:53, ts:1 csq: 20
+HARDWARE: BattRaw: 4.14 Rpt: 4.14 Conn: 1

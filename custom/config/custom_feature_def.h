@@ -25,7 +25,7 @@
  *   - Automatically sets VTS_DEBUG_LOG_ENABLE to 0 (disables UART debug trace logs)
  *   - RS232 communication & packets remain 100% active and untouched
  ************************************************************************/
-#define FLASH_STORAGE_16MB
+// #define FLASH_STORAGE_16MB
 
 #ifdef FLASH_STORAGE_16MB
 #ifndef HISTORY_DISABLED

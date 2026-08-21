@@ -75,7 +75,7 @@
 #define HISTORY_DISABLED
 #endif
 #define PRF_AUTOSWITCH
-// #define HISTORY_INTERNAL
+//#define HISTORY_INTERNAL
 //#define AUTO_SLEEP_ENABLE  // Auto sleep after 2 min ignition off
 extern char FirmVer[];
 
@@ -89,7 +89,7 @@ extern char FirmVer[];
     "AUTO PROFILE SWITCH is disabled, device will be always in airtel profile, switch operator manually if needed"
 #endif
 
-#define FIRMWAREVERSION "1.5.8"
+#define FIRMWAREVERSION "1.5.9"
 #define DevModel "02"
 #define SDKFirm "01/V1.0"
 #define PROTOVER "AIS140"
@@ -101,9 +101,9 @@ extern char FirmVer[];
 #define LOW_BAT_THRS_PER 85
 
 // #define SIMMAKE_APM
-// #define SIMMAKE_IDEMIA_3P
+ #define SIMMAKE_IDEMIA_3P
 // #define SIMMAKE_SENS
- #define SIMMAKE_GND
+// #define SIMMAKE_GND
 // #define SIMMAKE_TACHNOJACKS
 // #define SIMMAKE_COLORPLAST
 
@@ -227,10 +227,11 @@ extern char FirmVer[];
 // #define NIC_GOA
 // #define NIC_MDP
 // #define NIC_ISLAND
- #define NIC_TAMIL
+// #define NIC_TAMIL
 // #define NIC_TRIPURA
 // #define NIC_VAHAN
 // #define NIC_HIMACHEL
+  #define NIC_UP
 
 #define NO_PARAM
 #define DBM_IN_CSQ
@@ -302,6 +303,16 @@ extern char FirmVer[];
 #define DEFAULT_PORT1 "443"
 #define DEFAULT_IP2 "NA"
 #define DEFAULT_PORT2 "0"
+#define DEFAULT_IP3 "13.234.160.106"
+#define DEFAULT_PORT3 "8224"
+
+#elif defined(NIC_UP)
+#define PRF_AUTOSWITCH
+#define PROTO_TAG "UP1"
+#define DEFAULT_IP1 "vltspvt.up.gov.in"
+#define DEFAULT_PORT1 "9031"
+#define DEFAULT_IP2 "vltsemg.up.gov.in"
+#define DEFAULT_PORT2 "9032"
 #define DEFAULT_IP3 "13.234.160.106"
 #define DEFAULT_PORT3 "8224"
 

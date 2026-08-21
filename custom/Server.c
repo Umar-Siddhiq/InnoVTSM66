@@ -4802,9 +4802,12 @@ void ProcessHistoryPacket(void)
 		return;
 	}
 	#elif defined(PROTO_OG)
-	if(!Ql_strstr(dataBuffer,"$PVT") || Ql_strlen(dataBuffer)<150)
+	if ((!Ql_strstr(dataBuffer, "$PER") && !Ql_strstr(dataBuffer, "$GPD") &&
+	     !Ql_strstr(dataBuffer, "$CEL") && !Ql_strstr(dataBuffer, "$INF") &&
+	     !Ql_strstr(dataBuffer, "$NR")  && !Ql_strstr(dataBuffer, "$PVT") &&
+	     !Ql_strstr(dataBuffer, "$EPB")) || Ql_strlen(dataBuffer) < 10)
 	{
-		LOGData(TAG_SERVER,"\r\nInvalid Hitory Packet, deleting...");
+		LOGData(TAG_SERVER, "\r\nInvalid History Packet (OG), deleting... (len=%d)", Ql_strlen(dataBuffer));
 		#ifdef HISTORY_INTERNAL
 		DeleteLastPacket();
 		#else
@@ -5365,10 +5368,30 @@ static void handlePackets(void) {
                 LOGData(TAG_SERVER, "OTA ack waiting %d: sck%d state=%d",
                         otaAckWait, responseSocket->SocketNo, responseSocket->SocketState);
         }
+        else {
+            /* Socket is NULL, disconnected, or otaAckWait reached timeout */
+            if (AIS140ResetPending) {
+                uint8_t r_type = AIS140ResetPending;
+                AIS140ResetPending = 0;
+                LOGData(TAG_SERVER, "OTA response socket unreachable/timed out (%d ticks), executing fallback reset (%s)",
+                        otaAckWait, AIS140ResetReason);
+                otaAckWait = 0;
+                ThreadSleep(r_type == 2 ? 1000 : 500);
+                SystemRecovery_RequestReset(AIS140ResetReason);
+            }
+            otaAckWait = 0;
+        }
         /* Deliberately no `return` on any path - see the note above. */
     }
     else {
         otaAckWait = 0;
+        if (AIS140ResetPending) {
+            uint8_t r_type = AIS140ResetPending;
+            AIS140ResetPending = 0;
+            LOGData(TAG_SERVER, "Executing pending reset without OTA ack (%s)", AIS140ResetReason);
+            ThreadSleep(r_type == 2 ? 1000 : 500);
+            SystemRecovery_RequestReset(AIS140ResetReason);
+        }
     }
     #endif
 

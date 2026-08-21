@@ -1,0 +1,947 @@
+=== COMMIT 4e319dca2f9706f7b166b39189547358b3dd8e49 ===
+Author: Umar-Siddhiq
+Date: Tue Aug 18 19:46:33 2026 +0530
+Message: Add main.c file for OpenCPU application demonstrating AT command usage
+- Implemented functions for UART initialization, system setup, and AT command handling.
+- Added logging functionality with mutex protection for concurrent access.
+- Included support for handling various URC indications and SMS reception.
+- Integrated watchdog timer initialization to ensure system reliability.
+- Enhanced diagnostic logging to track boot and operational states.
+
+ AMD3_PROTOCOL_IMPLEMENTATION.md                    |   832 +
+ APMQuectelSCH.pdf                                  |   Bin 0 -> 210067 bytes
+ LOGS.txt                                           |  5057 +---
+ QuectelM031-main/.gitignore                        |    68 +
+ QuectelM031-main/Application/Header/Boot.h         |    59 +
+ QuectelM031-main/Application/Header/FMCUser.h      |    13 +
+ QuectelM031-main/Application/Header/Hardware.h     |   101 +
+ QuectelM031-main/Application/Header/MComm.h        |   164 +
+ QuectelM031-main/Application/Header/MOTA.h         |    62 +
+ QuectelM031-main/Application/Header/NMEAParser.h   |   202 +
+ QuectelM031-main/Application/Header/Utilities.h    |    27 +
+ QuectelM031-main/Application/Header/W25Qxx.h       |    50 +
+ .../Application/KEIL/Application.uvopt             |   629 +
+ .../Application/KEIL/Application.uvproj            |   596 +
+ .../Application/KEIL/EventRecorderStub.scvd        |     9 +
+ QuectelM031-main/Application/KEIL/LSM6DSOX.c       |   147 +
+ QuectelM031-main/Application/KEIL/LSM6DSOX.h       |    38 +
+ QuectelM031-main/Application/KEIL/MAIN.TXT         |   126 +
+ QuectelM031-main/Application/KEIL/build.log        |    78 +
+ QuectelM031-main/Application/KEIL/build_app.bat    |    17 +
+ .../Application/NuCodeGenProj/clk_conf.c           |   210 +
+ .../Application/NuCodeGenProj/clk_conf.h           |    42 +
+ .../Application/NuCodeGenProj/periph_conf.h        |  1879 ++
+ .../Application/NuCodeGenProj/pin_conf.c           |   324 +
+ .../Application/NuCodeGenProj/pin_conf.h           |    46 +
+ QuectelM031-main/Application/Source/Boot.c         |    88 +
+ QuectelM031-main/Application/Source/FMCUser.c      |   107 +
+ QuectelM031-main/Application/Source/Hardware.c     |   302 +
+ QuectelM031-main/Application/Source/MComm.c        |   333 +
+ QuectelM031-main/Application/Source/MOTA.c         |   120 +
+ QuectelM031-main/Application/Source/Main.c         |   122 +
+ QuectelM031-main/Application/Source/Utilities.c    |   170 +
+ QuectelM031-main/Application/Source/W25Qxx.c       |   226 +
+ QuectelM031-main/BootLoader/Header/Boot.h          |    54 +
+ QuectelM031-main/BootLoader/Header/FMCUser.h       |    14 +
+ QuectelM031-main/BootLoader/Header/Hardware.h      |    22 +
+ QuectelM031-main/BootLoader/Header/W25Qxx.h        |    54 +
+ .../BootLoader/Keil/EventRecorderStub.scvd         |     9 +
+ QuectelM031-main/BootLoader/Keil/M031Boot.bat      |    17 +
+ QuectelM031-main/BootLoader/Keil/M031Boot.uvopt    |   458 +
+ QuectelM031-main/BootLoader/Keil/M031Boot.uvproj   |   536 +
+ QuectelM031-main/BootLoader/Source/Boot.c          |   144 +
+ QuectelM031-main/BootLoader/Source/FMCUser.c       |    69 +
+ QuectelM031-main/BootLoader/Source/Hardware.c      |    86 +
+ QuectelM031-main/BootLoader/Source/W25Qxx.c        |   223 +
+ QuectelM031-main/BootLoader/Source/main.c          |   179 +
+ QuectelM031-main/InnovateM031.uvmpw                |    21 +
+ .../Library/CMSIS/DAP/Firmware/Config/DAP_config.h |   390 +
+ .../Library/CMSIS/DAP/Firmware/Include/DAP.h       |   264 +
+ .../Library/CMSIS/DAP/Firmware/Source/DAP.c        |  1591 ++
+ .../Library/CMSIS/DAP/Firmware/Source/DAP_vendor.c |    95 +
+ .../Library/CMSIS/DAP/Firmware/Source/JTAG_DP.c    |   358 +
+ .../Library/CMSIS/DAP/Firmware/Source/SWO.c        |   603 +
+ .../Library/CMSIS/DAP/Firmware/Source/SW_DP.c      |   237 +
+ .../DSP_Lib/Source/ARM/arm_cortexM_math.uvoptx     |  5530 ++++
+ .../DSP_Lib/Source/ARM/arm_cortexM_math.uvprojx    | 25466 +++++++++++++++++
+ .../DSP_Lib/Source/ARM/arm_cortexM_math_Build.bat  |    57 +
+ .../CMSIS/DSP_Lib/Source/ARM/getSizeInfo.bat       |    17 +
+ .../Source/BasicMathFunctions/arm_abs_f32.c        |   165 +
+ .../Source/BasicMathFunctions/arm_abs_q15.c        |   179 +
+ .../Source/BasicMathFunctions/arm_abs_q31.c        |   130 +
+ .../DSP_Lib/Source/BasicMathFunctions/arm_abs_q7.c |   157 +
+ .../Source/BasicMathFunctions/arm_add_f32.c        |   150 +
+ .../Source/BasicMathFunctions/arm_add_q15.c        |   140 +
+ .../Source/BasicMathFunctions/arm_add_q31.c        |   148 +
+ .../DSP_Lib/Source/BasicMathFunctions/arm_add_q7.c |   134 +
+ .../Source/BasicMathFunctions/arm_dot_prod_f32.c   |   135 +
+ .../Source/BasicMathFunctions/arm_dot_prod_q15.c   |   140 +
+ .../Source/BasicMathFunctions/arm_dot_prod_q31.c   |   143 +
+ .../Source/BasicMathFunctions/arm_dot_prod_q7.c    |   159 +
+ .../Source/BasicMathFunctions/arm_mult_f32.c       |   174 +
+ .../Source/BasicMathFunctions/arm_mult_q15.c       |   154 +
+ .../Source/BasicMathFunctions/arm_mult_q31.c       |   160 +
+ .../Source/BasicMathFunctions/arm_mult_q7.c        |   127 +
+ .../Source/BasicMathFunctions/arm_negate_f32.c     |   146 +
+ .../Source/BasicMathFunctions/arm_negate_q15.c     |   142 +
+ .../Source/BasicMathFunctions/arm_negate_q31.c     |   129 +
+ .../Source/BasicMathFunctions/arm_negate_q7.c      |   125 +
+ .../Source/BasicMathFunctions/arm_offset_f32.c     |   165 +
+ .../Source/BasicMathFunctions/arm_offset_q15.c     |   136 +
+ .../Source/BasicMathFunctions/arm_offset_q31.c     |   140 +
+ .../Source/BasicMathFunctions/arm_offset_q7.c      |   135 +
+ .../Source/BasicMathFunctions/arm_scale_f32.c      |   169 +
+ .../Source/BasicMathFunctions/arm_scale_q15.c      |   162 +
+ .../Source/BasicMathFunctions/arm_scale_q31.c      |   239 +
+ .../Source/BasicMathFunctions/arm_scale_q7.c       |   149 +
+ .../Source/BasicMathFunctions/arm_shift_q15.c      |   248 +
+ .../Source/BasicMathFunctions/arm_shift_q31.c      |   203 +
+ .../Source/BasicMathFunctions/arm_shift_q7.c       |   220 +
+ .../Source/BasicMathFunctions/arm_sub_f32.c        |   150 +
+ .../Source/BasicMathFunctions/arm_sub_q15.c        |   140 +
+ .../Source/BasicMathFunctions/arm_sub_q31.c        |   146 +
+ .../DSP_Lib/Source/BasicMathFunctions/arm_sub_q7.c |   131 +
+ .../Source/CommonTables/arm_common_tables.c        | 27251 +++++++++++++++++++
+ .../Source/CommonTables/arm_const_structs.c        |   156 +
+ .../ComplexMathFunctions/arm_cmplx_conj_f32.c      |   182 +
+ .../ComplexMathFunctions/arm_cmplx_conj_q15.c      |   161 +
+ .../ComplexMathFunctions/arm_cmplx_conj_q31.c      |   180 +
+ .../ComplexMathFunctions/arm_cmplx_dot_prod_f32.c  |   203 +
+ .../ComplexMathFunctions/arm_cmplx_dot_prod_q15.c  |   189 +
+ .../ComplexMathFunctions/arm_cmplx_dot_prod_q31.c  |   187 +
+ .../ComplexMathFunctions/arm_cmplx_mag_f32.c       |   165 +
+ .../ComplexMathFunctions/arm_cmplx_mag_q15.c       |   153 +
+ .../ComplexMathFunctions/arm_cmplx_mag_q31.c       |   185 +
+ .../arm_cmplx_mag_squared_f32.c                    |   215 +
+ .../arm_cmplx_mag_squared_q15.c                    |   148 +
+ .../arm_cmplx_mag_squared_q31.c                    |   161 +
+ .../arm_cmplx_mult_cmplx_f32.c                     |   207 +
+ .../arm_cmplx_mult_cmplx_q15.c                     |   193 +
+ .../arm_cmplx_mult_cmplx_q31.c                     |   326 +
+ .../ComplexMathFunctions/arm_cmplx_mult_real_f32.c |   225 +
+ .../ComplexMathFunctions/arm_cmplx_mult_real_q15.c |   203 +
+ .../ComplexMathFunctions/arm_cmplx_mult_real_q31.c |   223 +
+ .../Source/ControllerFunctions/arm_pid_init_f32.c  |    87 +
+ .../Source/ControllerFunctions/arm_pid_init_q15.c  |   122 +
+ .../Source/ControllerFunctions/arm_pid_init_q31.c  |   107 +
+ .../Source/ControllerFunctions/arm_pid_reset_f32.c |    65 +
+ .../Source/ControllerFunctions/arm_pid_reset_q15.c |    64 +
+ .../Source/ControllerFunctions/arm_pid_reset_q31.c |    65 +
+ .../Source/ControllerFunctions/arm_sin_cos_f32.c   |   149 +
+ .../Source/ControllerFunctions/arm_sin_cos_q31.c   |   122 +
+ .../DSP_Lib/Source/FastMathFunctions/arm_cos_f32.c |   127 +
+ .../DSP_Lib/Source/FastMathFunctions/arm_cos_q15.c |    96 +
+ .../DSP_Lib/Source/FastMathFunctions/arm_cos_q31.c |    96 +
+ .../DSP_Lib/Source/FastMathFunctions/arm_sin_f32.c |   133 +
+ .../DSP_Lib/Source/FastMathFunctions/arm_sin_q15.c |    88 +
+ .../DSP_Lib/Source/FastMathFunctions/arm_sin_q31.c |    87 +
+ .../Source/FastMathFunctions/arm_sqrt_q15.c        |   155 +
+ .../Source/FastMathFunctions/arm_sqrt_q31.c        |   153 +
+ .../arm_biquad_cascade_df1_32x64_init_q31.c        |   110 +
+ .../arm_biquad_cascade_df1_32x64_q31.c             |   561 +
+ .../arm_biquad_cascade_df1_f32.c                   |   425 +
+ .../arm_biquad_cascade_df1_fast_q15.c              |   286 +
+ .../arm_biquad_cascade_df1_fast_q31.c              |   305 +
+ .../arm_biquad_cascade_df1_init_f32.c              |   109 +
+ .../arm_biquad_cascade_df1_init_q15.c              |   111 +
+ .../arm_biquad_cascade_df1_init_q31.c              |   111 +
+ .../arm_biquad_cascade_df1_q15.c                   |   411 +
+ .../arm_biquad_cascade_df1_q31.c                   |   405 +
+ .../arm_biquad_cascade_df2T_f32.c                  |   603 +
+ .../arm_biquad_cascade_df2T_f64.c                  |   603 +
+ .../arm_biquad_cascade_df2T_init_f32.c             |   102 +
+ .../arm_biquad_cascade_df2T_init_f64.c             |   102 +
+ .../arm_biquad_cascade_stereo_df2T_f32.c           |   683 +
+ .../arm_biquad_cascade_stereo_df2T_init_f32.c      |   102 +
+ .../Source/FilteringFunctions/arm_conv_f32.c       |   647 +
+ .../FilteringFunctions/arm_conv_fast_opt_q15.c     |   543 +
+ .../Source/FilteringFunctions/arm_conv_fast_q15.c  |  1410 +
+ .../Source/FilteringFunctions/arm_conv_fast_q31.c  |   577 +
+ .../Source/FilteringFunctions/arm_conv_opt_q15.c   |   545 +
+ .../Source/FilteringFunctions/arm_conv_opt_q7.c    |   435 +
+ .../FilteringFunctions/arm_conv_partial_f32.c      |   669 +
+ .../arm_conv_partial_fast_opt_q15.c                |   768 +
+ .../FilteringFunctions/arm_conv_partial_fast_q15.c |  1492 +
+ .../FilteringFunctions/arm_conv_partial_fast_q31.c |   611 +
+ .../FilteringFunctions/arm_conv_partial_opt_q15.c  |   765 +
+ .../FilteringFunctions/arm_conv_partial_opt_q7.c   |   803 +
+ .../FilteringFunctions/arm_conv_partial_q15.c      |   786 +
+ .../FilteringFunctions/arm_conv_partial_q31.c      |   607 +
+ .../FilteringFunctions/arm_conv_partial_q7.c       |   741 +
+ .../Source/FilteringFunctions/arm_conv_q15.c       |   734 +
+ .../Source/FilteringFunctions/arm_conv_q31.c       |   565 +
+ .../Source/FilteringFunctions/arm_conv_q7.c        |   690 +
+ .../Source/FilteringFunctions/arm_correlate_f32.c  |   739 +
+ .../arm_correlate_fast_opt_q15.c                   |   512 +
+ .../FilteringFunctions/arm_correlate_fast_q15.c    |  1319 +
+ .../FilteringFunctions/arm_correlate_fast_q31.c    |   612 +
+ .../FilteringFunctions/arm_correlate_opt_q15.c     |   513 +
+ .../FilteringFunctions/arm_correlate_opt_q7.c      |   464 +
+ .../Source/FilteringFunctions/arm_correlate_q15.c  |   719 +
+ .../Source/FilteringFunctions/arm_correlate_q31.c  |   665 +
+ .../Source/FilteringFunctions/arm_correlate_q7.c   |   790 +
+ .../FilteringFunctions/arm_fir_decimate_f32.c      |   524 +
+ .../FilteringFunctions/arm_fir_decimate_fast_q15.c |   598 +
+ .../FilteringFunctions/arm_fir_decimate_fast_q31.c |   351 +
+ .../FilteringFunctions/arm_fir_decimate_init_f32.c |   117 +
+ .../FilteringFunctions/arm_fir_decimate_init_q15.c |   119 +
+ .../FilteringFunctions/arm_fir_decimate_init_q31.c |   117 +
+ .../FilteringFunctions/arm_fir_decimate_q15.c      |   696 +
+ .../FilteringFunctions/arm_fir_decimate_q31.c      |   311 +
+ .../Source/FilteringFunctions/arm_fir_f32.c        |   997 +
+ .../Source/FilteringFunctions/arm_fir_fast_q15.c   |   345 +
+ .../Source/FilteringFunctions/arm_fir_fast_q31.c   |   305 +
+ .../Source/FilteringFunctions/arm_fir_init_f32.c   |    96 +
+ .../Source/FilteringFunctions/arm_fir_init_q15.c   |   154 +
+ .../Source/FilteringFunctions/arm_fir_init_q31.c   |    96 +
+ .../Source/FilteringFunctions/arm_fir_init_q7.c    |    94 +
+ .../FilteringFunctions/arm_fir_interpolate_f32.c   |   581 +
+ .../arm_fir_interpolate_init_f32.c                 |   121 +
+ .../arm_fir_interpolate_init_q15.c                 |   120 +
+ .../arm_fir_interpolate_init_q31.c                 |   121 +
+ .../FilteringFunctions/arm_fir_interpolate_q15.c   |   508 +
+ .../FilteringFunctions/arm_fir_interpolate_q31.c   |   504 +
+ .../FilteringFunctions/arm_fir_lattice_f32.c       |   506 +
+ .../FilteringFunctions/arm_fir_lattice_init_f32.c  |    83 +
+ .../FilteringFunctions/arm_fir_lattice_init_q15.c  |    83 +
+ .../FilteringFunctions/arm_fir_lattice_init_q31.c  |    83 +
+ .../FilteringFunctions/arm_fir_lattice_q15.c       |   536 +
+ .../FilteringFunctions/arm_fir_lattice_q31.c       |   353 +
+ .../Source/FilteringFunctions/arm_fir_q15.c        |   691 +
+ .../Source/FilteringFunctions/arm_fir_q31.c        |   365 +
+ .../DSP_Lib/Source/FilteringFunctions/arm_fir_q7.c |   397 +
+ .../Source/FilteringFunctions/arm_fir_sparse_f32.c |   444 +
+ .../FilteringFunctions/arm_fir_sparse_init_f32.c   |   107 +
+ .../FilteringFunctions/arm_fir_sparse_init_q15.c   |   107 +
+ .../FilteringFunctions/arm_fir_sparse_init_q31.c   |   106 +
+ .../FilteringFunctions/arm_fir_sparse_init_q7.c    |   107 +
+ .../Source/FilteringFunctions/arm_fir_sparse_q15.c |   481 +
+ .../Source/FilteringFunctions/arm_fir_sparse_q31.c |   461 +
+ .../Source/FilteringFunctions/arm_fir_sparse_q7.c  |   480 +
+ .../FilteringFunctions/arm_iir_lattice_f32.c       |   447 +
+ .../FilteringFunctions/arm_iir_lattice_init_f32.c  |    91 +
+ .../FilteringFunctions/arm_iir_lattice_init_q15.c  |    91 +
+ .../FilteringFunctions/arm_iir_lattice_init_q31.c  |    91 +
+ .../FilteringFunctions/arm_iir_lattice_q15.c       |   464 +
+ .../FilteringFunctions/arm_iir_lattice_q31.c       |   350 +
+ .../Source/FilteringFunctions/arm_lms_f32.c        |   442 +
+ .../Source/FilteringFunctions/arm_lms_init_f32.c   |    95 +
+ .../Source/FilteringFunctions/arm_lms_init_q15.c   |   105 +
+ .../Source/FilteringFunctions/arm_lms_init_q31.c   |   105 +
+ .../Source/FilteringFunctions/arm_lms_norm_f32.c   |   466 +
+ .../FilteringFunctions/arm_lms_norm_init_f32.c     |   105 +
+ .../FilteringFunctions/arm_lms_norm_init_q15.c     |   112 +
+ .../FilteringFunctions/arm_lms_norm_init_q31.c     |   111 +
+ .../Source/FilteringFunctions/arm_lms_norm_q15.c   |   440 +
+ .../Source/FilteringFunctions/arm_lms_norm_q31.c   |   431 +
+ .../Source/FilteringFunctions/arm_lms_q15.c        |   380 +
+ .../Source/FilteringFunctions/arm_lms_q31.c        |   369 +
+ .../DSP_Lib/Source/GCC/arm_cortexM_math.uvoptx     |  5258 ++++
+ .../DSP_Lib/Source/GCC/arm_cortexM_math.uvprojx    | 24049 ++++++++++++++++
+ .../DSP_Lib/Source/GCC/arm_cortexM_math_Build.bat  |    57 +
+ .../CMSIS/DSP_Lib/Source/GCC/getSizeInfo.bat       |    17 +
+ .../Source/MatrixFunctions/arm_mat_add_f32.c       |   208 +
+ .../Source/MatrixFunctions/arm_mat_add_q15.c       |   163 +
+ .../Source/MatrixFunctions/arm_mat_add_q31.c       |   207 +
+ .../MatrixFunctions/arm_mat_cmplx_mult_f32.c       |   283 +
+ .../MatrixFunctions/arm_mat_cmplx_mult_q15.c       |   424 +
+ .../MatrixFunctions/arm_mat_cmplx_mult_q31.c       |   293 +
+ .../Source/MatrixFunctions/arm_mat_init_f32.c      |    88 +
+ .../Source/MatrixFunctions/arm_mat_init_q15.c      |    80 +
+ .../Source/MatrixFunctions/arm_mat_init_q31.c      |    84 +
+ .../Source/MatrixFunctions/arm_mat_inverse_f32.c   |   703 +
+ .../Source/MatrixFunctions/arm_mat_inverse_f64.c   |   703 +
+ .../Source/MatrixFunctions/arm_mat_mult_f32.c      |   286 +
+ .../Source/MatrixFunctions/arm_mat_mult_fast_q15.c |   369 +
+ .../Source/MatrixFunctions/arm_mat_mult_fast_q31.c |   226 +
+ .../Source/MatrixFunctions/arm_mat_mult_q15.c      |   469 +
+ .../Source/MatrixFunctions/arm_mat_mult_q31.c      |   294 +
+ .../Source/MatrixFunctions/arm_mat_scale_f32.c     |   181 +
+ .../Source/MatrixFunctions/arm_mat_scale_q15.c     |   183 +
+ .../Source/MatrixFunctions/arm_mat_scale_q31.c     |   202 +
+ .../Source/MatrixFunctions/arm_mat_sub_f32.c       |   209 +
+ .../Source/MatrixFunctions/arm_mat_sub_q15.c       |   160 +
+ .../Source/MatrixFunctions/arm_mat_sub_q31.c       |   208 +
+ .../Source/MatrixFunctions/arm_mat_trans_f32.c     |   218 +
+ .../Source/MatrixFunctions/arm_mat_trans_q15.c     |   284 +
+ .../Source/MatrixFunctions/arm_mat_trans_q31.c     |   210 +
+ .../Source/StatisticsFunctions/arm_max_f32.c       |   186 +
+ .../Source/StatisticsFunctions/arm_max_q15.c       |   176 +
+ .../Source/StatisticsFunctions/arm_max_q31.c       |   177 +
+ .../Source/StatisticsFunctions/arm_max_q7.c        |   177 +
+ .../Source/StatisticsFunctions/arm_mean_f32.c      |   139 +
+ .../Source/StatisticsFunctions/arm_mean_q15.c      |   133 +
+ .../Source/StatisticsFunctions/arm_mean_q31.c      |   136 +
+ .../Source/StatisticsFunctions/arm_mean_q7.c       |   133 +
+ .../Source/StatisticsFunctions/arm_min_f32.c       |   183 +
+ .../Source/StatisticsFunctions/arm_min_q15.c       |   177 +
+ .../Source/StatisticsFunctions/arm_min_q31.c       |   176 +
+ .../Source/StatisticsFunctions/arm_min_q7.c        |   178 +
+ .../Source/StatisticsFunctions/arm_power_f32.c     |   143 +
+ .../Source/StatisticsFunctions/arm_power_q15.c     |   152 +
+ .../Source/StatisticsFunctions/arm_power_q31.c     |   143 +
+ .../Source/StatisticsFunctions/arm_power_q7.c      |   141 +
+ .../Source/StatisticsFunctions/arm_rms_f32.c       |   141 +
+ .../Source/StatisticsFunctions/arm_rms_q15.c       |   153 +
+ .../Source/StatisticsFunctions/arm_rms_q31.c       |   150 +
+ .../Source/StatisticsFunctions/arm_std_f32.c       |   208 +
+ .../Source/StatisticsFunctions/arm_std_q15.c       |   195 +
+ .../Source/StatisticsFunctions/arm_std_q31.c       |   186 +
+ .../Source/StatisticsFunctions/arm_var_f32.c       |   204 +
+ .../Source/StatisticsFunctions/arm_var_q15.c       |   195 +
+ .../Source/StatisticsFunctions/arm_var_q31.c       |   187 +
+ .../DSP_Lib/Source/SupportFunctions/arm_copy_f32.c |   135 +
+ .../DSP_Lib/Source/SupportFunctions/arm_copy_q15.c |   114 +
+ .../DSP_Lib/Source/SupportFunctions/arm_copy_q31.c |   123 +
+ .../DSP_Lib/Source/SupportFunctions/arm_copy_q7.c  |   115 +
+ .../DSP_Lib/Source/SupportFunctions/arm_fill_f32.c |   134 +
+ .../DSP_Lib/Source/SupportFunctions/arm_fill_q15.c |   120 +
+ .../DSP_Lib/Source/SupportFunctions/arm_fill_q31.c |   121 +
+ .../DSP_Lib/Source/SupportFunctions/arm_fill_q7.c  |   118 +
+ .../Source/SupportFunctions/arm_float_to_q15.c     |   204 +
+ .../Source/SupportFunctions/arm_float_to_q31.c     |   211 +
+ .../Source/SupportFunctions/arm_float_to_q7.c      |   203 +
+ .../Source/SupportFunctions/arm_q15_to_float.c     |   134 +
+ .../Source/SupportFunctions/arm_q15_to_q31.c       |   156 +
+ .../Source/SupportFunctions/arm_q15_to_q7.c        |   154 +
+ .../Source/SupportFunctions/arm_q31_to_float.c     |   131 +
+ .../Source/SupportFunctions/arm_q31_to_q15.c       |   145 +
+ .../Source/SupportFunctions/arm_q31_to_q7.c        |   136 +
+ .../Source/SupportFunctions/arm_q7_to_float.c      |   131 +
+ .../Source/SupportFunctions/arm_q7_to_q15.c        |   157 +
+ .../Source/SupportFunctions/arm_q7_to_q31.c        |   142 +
+ .../Source/TransformFunctions/arm_bitreversal.c    |   242 +
+ .../Source/TransformFunctions/arm_bitreversal2.S   |   211 +
+ .../Source/TransformFunctions/arm_cfft_f32.c       |   632 +
+ .../Source/TransformFunctions/arm_cfft_q15.c       |   357 +
+ .../Source/TransformFunctions/arm_cfft_q31.c       |   264 +
+ .../TransformFunctions/arm_cfft_radix2_f32.c       |   485 +
+ .../TransformFunctions/arm_cfft_radix2_init_f32.c  |   205 +
+ .../TransformFunctions/arm_cfft_radix2_init_q15.c  |   189 +
+ .../TransformFunctions/arm_cfft_radix2_init_q31.c  |   187 +
+ .../TransformFunctions/arm_cfft_radix2_q15.c       |   742 +
+ .../TransformFunctions/arm_cfft_radix2_q31.c       |   351 +
+ .../TransformFunctions/arm_cfft_radix4_f32.c       |  1210 +
+ .../TransformFunctions/arm_cfft_radix4_init_f32.c  |   165 +
+ .../TransformFunctions/arm_cfft_radix4_init_q15.c  |   152 +
+ .../TransformFunctions/arm_cfft_radix4_init_q31.c  |   148 +
+ .../TransformFunctions/arm_cfft_radix4_q15.c       |  1924 ++
+ .../TransformFunctions/arm_cfft_radix4_q31.c       |  1404 +
+ .../TransformFunctions/arm_cfft_radix8_f32.c       |   384 +
+ .../Source/TransformFunctions/arm_dct4_f32.c       |   461 +
+ .../Source/TransformFunctions/arm_dct4_init_f32.c  | 16519 +++++++++++
+ .../Source/TransformFunctions/arm_dct4_init_q15.c  |  4284 +++
+ .../Source/TransformFunctions/arm_dct4_init_q31.c  |  8364 ++++++
+ .../Source/TransformFunctions/arm_dct4_q15.c       |   394 +
+ .../Source/TransformFunctions/arm_dct4_q31.c       |   395 +
+ .../Source/TransformFunctions/arm_rfft_f32.c       |   329 +
+ .../Source/TransformFunctions/arm_rfft_fast_f32.c  |   353 +
+ .../TransformFunctions/arm_rfft_fast_init_f32.c    |   143 +
+ .../Source/TransformFunctions/arm_rfft_init_f32.c  |  8376 ++++++
+ .../Source/TransformFunctions/arm_rfft_init_q15.c  |  2235 ++
+ .../Source/TransformFunctions/arm_rfft_init_q31.c  |  4285 +++
+ .../Source/TransformFunctions/arm_rfft_q15.c       |   439 +
+ .../Source/TransformFunctions/arm_rfft_q31.c       |   296 +
+ .../Library/CMSIS/Include/arm_common_tables.h      |   136 +
+ .../Library/CMSIS/Include/arm_const_structs.h      |    79 +
+ QuectelM031-main/Library/CMSIS/Include/arm_math.h  |  7154 +++++
+ .../Library/CMSIS/Include/cmsis_armcc.h            |   734 +
+ .../Library/CMSIS/Include/cmsis_armcc_V6.h         |  1800 ++
+ QuectelM031-main/Library/CMSIS/Include/cmsis_gcc.h |  1373 +
+ QuectelM031-main/Library/CMSIS/Include/core_cm0.h  |   798 +
+ .../Library/CMSIS/Include/core_cm0plus.h           |   914 +
+ QuectelM031-main/Library/CMSIS/Include/core_cm3.h  |  1763 ++
+ QuectelM031-main/Library/CMSIS/Include/core_cm4.h  |  1937 ++
+ QuectelM031-main/Library/CMSIS/Include/core_cm7.h  |  2512 ++
+ .../Library/CMSIS/Include/core_cmFunc.h            |    87 +
+ .../Library/CMSIS/Include/core_cmInstr.h           |    87 +
+ .../Library/CMSIS/Include/core_cmSimd.h            |    96 +
+ .../Library/CMSIS/Include/core_sc000.h             |   926 +
+ .../Library/CMSIS/Include/core_sc300.h             |  1745 ++
+ .../Library/CMSIS/Lib/ARM/arm_cortexM4lf_math.lib  |   Bin 0 -> 13943636 bytes
+ .../Library/CMSIS/Lib/GCC/libarm_cortexM4lf_math.a |   Bin 0 -> 2990804 bytes
+ .../Device/Nuvoton/M031/Include/M031Series.h       |   590 +
+ .../Library/Device/Nuvoton/M031/Include/NuMicro.h  |    16 +
+ .../Library/Device/Nuvoton/M031/Include/acmp_reg.h |   255 +
+ .../Library/Device/Nuvoton/M031/Include/adc_reg.h  |   400 +
+ .../Library/Device/Nuvoton/M031/Include/bpwm_reg.h |  1743 ++
+ .../Library/Device/Nuvoton/M031/Include/clk_reg.h  |   918 +
+ .../Library/Device/Nuvoton/M031/Include/crc_reg.h  |   151 +
+ .../Library/Device/Nuvoton/M031/Include/ebi_reg.h  |   224 +
+ .../Library/Device/Nuvoton/M031/Include/fmc_reg.h  |   320 +
+ .../Library/Device/Nuvoton/M031/Include/gpio_reg.h |   710 +
+ .../Library/Device/Nuvoton/M031/Include/hdiv_reg.h |   130 +
+ .../Library/Device/Nuvoton/M031/Include/i2c_reg.h  |   750 +
+ .../Library/Device/Nuvoton/M031/Include/pdma_reg.h |   675 +
+ .../Library/Device/Nuvoton/M031/Include/pwm_reg.h  |  2294 ++
+ .../Library/Device/Nuvoton/M031/Include/qspi_reg.h |   586 +
+ .../Library/Device/Nuvoton/M031/Include/rtc_reg.h  |   419 +
+ .../Library/Device/Nuvoton/M031/Include/spi_reg.h  |   784 +
+ .../Library/Device/Nuvoton/M031/Include/sys_reg.h  |  1484 +
+ .../Nuvoton/M031/Include/system_M031Series.h       |   105 +
+ .../Device/Nuvoton/M031/Include/timer_reg.h        |   336 +
+ .../Library/Device/Nuvoton/M031/Include/uart_reg.h |  1085 +
+ .../Library/Device/Nuvoton/M031/Include/ui2c_reg.h |   570 +
+ .../Library/Device/Nuvoton/M031/Include/usbd_reg.h |   570 +
+ .../Library/Device/Nuvoton/M031/Include/uspi_reg.h |   673 +
+ .../Device/Nuvoton/M031/Include/uuart_reg.h        |   666 +
+ .../Library/Device/Nuvoton/M031/Include/wdt_reg.h  |   174 +
+ .../Library/Device/Nuvoton/M031/Include/wwdt_reg.h |   148 +
+ .../Nuvoton/M031/Source/ARM/startup_M031Series.s   |   260 +
+ .../Device/Nuvoton/M031/Source/GCC/_syscalls.c     |  1168 +
+ .../Device/Nuvoton/M031/Source/GCC/gcc_arm.ld      |   195 +
+ .../Device/Nuvoton/M031/Source/GCC/gcc_arm_128k.ld |   195 +
+ .../Device/Nuvoton/M031/Source/GCC/gcc_arm_256k.ld |   195 +
+ .../Device/Nuvoton/M031/Source/GCC/gcc_arm_32K.ld  |   195 +
+ .../Nuvoton/M031/Source/GCC/gcc_arm_freertos.ld    |   195 +
+ .../Device/Nuvoton/M031/Source/GCC/semihosting.h   |   125 +
+ .../Nuvoton/M031/Source/GCC/startup_M031Series.S   |   334 +
+ .../Nuvoton/M031/Source/IAR/startup_M031Series.s   |   197 +
+ .../Device/Nuvoton/M031/Source/system_M031Series.c |   130 +
+ QuectelM031-main/Library/StdDriver/inc/acmp.h      |   401 +
+ QuectelM031-main/Library/StdDriver/inc/adc.h       |   423 +
+ QuectelM031-main/Library/StdDriver/inc/bpwm.h      |   379 +
+ QuectelM031-main/Library/StdDriver/inc/clk.h       |   620 +
+ QuectelM031-main/Library/StdDriver/inc/crc.h       |   117 +
+ QuectelM031-main/Library/StdDriver/inc/ebi.h       |   260 +
+ QuectelM031-main/Library/StdDriver/inc/fmc.h       |   353 +
+ QuectelM031-main/Library/StdDriver/inc/gpio.h      |   481 +
+ QuectelM031-main/Library/StdDriver/inc/hdiv.h      |    88 +
+ QuectelM031-main/Library/StdDriver/inc/i2c.h       |   547 +
+ QuectelM031-main/Library/StdDriver/inc/pdma.h      |   358 +
+ QuectelM031-main/Library/StdDriver/inc/pwm.h       |   514 +
+ QuectelM031-main/Library/StdDriver/inc/qspi.h      |   412 +
+ QuectelM031-main/Library/StdDriver/inc/rtc.h       |   300 +
+ QuectelM031-main/Library/StdDriver/inc/spi.h       |   542 +
+ QuectelM031-main/Library/StdDriver/inc/sys.h       |  1391 +
+ QuectelM031-main/Library/StdDriver/inc/timer.h     |   568 +
+ QuectelM031-main/Library/StdDriver/inc/uart.h      |   495 +
+ QuectelM031-main/Library/StdDriver/inc/usbd.h      |   699 +
+ QuectelM031-main/Library/StdDriver/inc/usci_i2c.h  |   332 +
+ QuectelM031-main/Library/StdDriver/inc/usci_spi.h  |   428 +
+ QuectelM031-main/Library/StdDriver/inc/usci_uart.h |   523 +
+ QuectelM031-main/Library/StdDriver/inc/wdt.h       |   220 +
+ QuectelM031-main/Library/StdDriver/inc/wwdt.h      |   155 +
+ QuectelM031-main/Library/StdDriver/src/acmp.c      |    82 +
+ QuectelM031-main/Library/StdDriver/src/adc.c       |   223 +
+ QuectelM031-main/Library/StdDriver/src/bpwm.c      |   751 +
+ QuectelM031-main/Library/StdDriver/src/clk.c       |   847 +
+ QuectelM031-main/Library/StdDriver/src/crc.c       |    99 +
+ QuectelM031-main/Library/StdDriver/src/ebi.c       |   182 +
+ QuectelM031-main/Library/StdDriver/src/fmc.c       |   819 +
+ QuectelM031-main/Library/StdDriver/src/gpio.c      |   108 +
+ QuectelM031-main/Library/StdDriver/src/i2c.c       |  1862 ++
+ QuectelM031-main/Library/StdDriver/src/pdma.c      |   412 +
+ QuectelM031-main/Library/StdDriver/src/pwm.c       |  1063 +
+ QuectelM031-main/Library/StdDriver/src/qspi.c      |   813 +
+ QuectelM031-main/Library/StdDriver/src/retarget.c  |   779 +
+ QuectelM031-main/Library/StdDriver/src/rtc.c       |   782 +
+ QuectelM031-main/Library/StdDriver/src/spi.c       |   934 +
+ QuectelM031-main/Library/StdDriver/src/sys.c       |   205 +
+ QuectelM031-main/Library/StdDriver/src/timer.c     |   389 +
+ QuectelM031-main/Library/StdDriver/src/uart.c      |   722 +
+ QuectelM031-main/Library/StdDriver/src/usbd.c      |   705 +
+ QuectelM031-main/Library/StdDriver/src/usci_i2c.c  |  1689 ++
+ QuectelM031-main/Library/StdDriver/src/usci_spi.c  |   635 +
+ QuectelM031-main/Library/StdDriver/src/usci_uart.c |   729 +
+ QuectelM031-main/Library/StdDriver/src/wdt.c       |    73 +
+ QuectelM031-main/Library/StdDriver/src/wwdt.c      |    73 +
+ QuectelM031-main/NuPinConfig/InnovateM031.c        |    47 +
+ QuectelM031-main/NuPinConfig/InnovateM031.h        |    46 +
+ QuectelM031-main/NuPinConfig/InnovateM031.ncfg     |    81 +
+ RS232_INTERFACE_SPEC.md                            |  1258 +
+ RS232_PROTOCOL.md                                  |  1030 +
+ custom/Alert.c                                     |     2 +-
+ custom/BLE.c                                       |    10 +
+ custom/FTP.c                                       |    29 +-
+ custom/File.c                                      |   121 +-
+ custom/File.c.bak_unified                          |  1009 +
+ custom/GPRS.c                                      |    33 +-
+ custom/GPS.c                                       |    54 +-
+ custom/Hardware.c                                  |   301 +-
+ custom/MCU.c                                       |    65 +-
+ custom/PktSave.c                                   |    90 +-
+ custom/SMS.c                                       |   734 +-
+ custom/SOS.c                                       |    16 +-
+ custom/SOS.c.bak_unified                           |   301 +
+ custom/Server.c                                    |  1906 +-
+ custom/Server.c.bak_unified                        |  6431 +++++
+ custom/SystemRecovery.c                            |     5 +-
+ custom/Systic.c                                    |    96 +-
+ custom/TCP.c                                       |   126 +-
+ custom/Utilities.c                                 |    11 +-
+ custom/Utilities.c.bak_unified                     |   307 +
+ custom/config/custom_feature_def.h                 |    58 +-
+ custom/config/custom_feature_def.h.bak_unified     |    83 +
+ custom/config/custom_proto_cfg.h                   |     4 +-
+ custom/config/custom_sys_cfg.c                     |    16 +-
+ custom/inc/Alert.h                                 |     2 +-
+ custom/inc/File.h                                  |     3 -
+ custom/inc/File.h.bak_unified                      |    98 +
+ custom/inc/GPS.h                                   |     1 +
+ custom/inc/Hardware.h                              |    36 +-
+ custom/inc/SMS.h                                   |    27 +-
+ custom/inc/Server.h                                |    41 +-
+ custom/inc/Server.h.bak_unified                    |   168 +
+ custom/inc/Systic.h                                |    12 +-
+ custom/inc/TCP.h                                   |     7 +-
+ custom/inc/VTS.h                                   |   121 +-
+ custom/inc/VTS.h.bak_unified                       |   863 +
+ custom/main.c                                      |    74 +-
+ custom/main.c.bak_unified                          |   413 +
+ 481 files changed, 305051 insertions(+), 6614 deletions(-)
+
+=== COMMIT 65cb8c401a7f22d4b00e43512f958d24a3d3c595 ===
+Author: Umar-Siddhiq
+Date: Mon Aug 10 17:17:39 2026 +0530
+Message: Refactor FTP/FOTA Cleanup System and Enhance RAM Filesystem Support
+- Updated `VTS.h` to enable `SIMMAKE_GND` and ensure consistent preprocessor definitions.
+- Revised `ftp_fota_cleanup_doc.md` to reflect changes in the FTP/FOTA firmware download process, including:
+  - Clarification of the firmware codebase name from `InnoVTSM66-AI` to `InnoVTSM66`.
+  - Detailed revision history documenting phases of fixes and enhancements.
+  - Improved descriptions of the two-stage UFS cleanup process and RAM filesystem integration.
+  - Added comprehensive error handling and logging for FTP download failures.
+  - Implemented a new RAM filesystem strategy for FOTA downloads to bypass UFS size limitations.
+  - Corrected file handling in `FOTAUpdate()` to use `Ql_FS_OpenRAMFile` for RAM paths.
+  - Ensured robust cleanup routines to prevent UFS full errors during firmware updates.
+
+ LOGS.txt                | 6530 ++++++++++++++++++++++++++++++++---------------
+ custom/FTP.c            |  172 +-
+ custom/inc/VTS.h        |    6 +-
+ ftp_fota_cleanup_doc.md |  573 +++--
+ 4 files changed, 4983 insertions(+), 2298 deletions(-)
+
+=== COMMIT 5249dea384e7cc9da7ad8cb66b394ffbe0426cf8 ===
+Author: Umar-Siddhiq
+Date: Sat Aug 8 20:20:16 2026 +0530
+Message: feat: implement improved FTP FOTA storage cleanup logic and establish new project-specific documentation and development tools.
+
+ .claude/skills/engineering-secretary/SKILL.md      |  204 ++
+ .../engineering-secretary/agents/openai.yaml       |    3 +
+ .../references/evidence-rules.md                   |   32 +
+ .../references/firmware-notes.md                   |   32 +
+ .../references/issue-record.md                     |   75 +
+ .../references/project-records.md                  |   29 +
+ .../references/report-format.md                    |   32 +
+ .../scripts/collect_git_context.py                 |   41 +
+ .claude/skills/firmware-engineer/SKILL.md          |  114 +
+ .../skills/firmware-engineer/agents/openai.yaml    |   12 +
+ .claude/skills/firmware-engineer/assets/icon.svg   |    6 +
+ .../references/bootloader-fota.md                  |   19 +
+ .../firmware-engineer/references/communications.md |   31 +
+ .../firmware-engineer/references/debugging.md      |   36 +
+ .../firmware-engineer/references/embedded-c-cpp.md |   41 +
+ .../firmware-engineer/references/project-memory.md |   15 +
+ .../references/protocol-compliance.md              |   33 +
+ .../firmware-engineer/references/review-testing.md |   30 +
+ .../firmware-engineer/references/rtos-drivers.md   |   35 +
+ CDAC_CURRENT_VS_REFERENCE_COMPARISON.md            |  154 ++
+ CDAC_DEEP_TECHNICAL_DOCUMENTATION.md               |  528 ++++
+ FIRMWARE_DOCUMENTATION.md                          |    4 +-
+ LOGS.txt                                           | 2722 ++++++++++++++++++++
+ Phase 5.pdf                                        |  Bin 0 -> 2390867 bytes
+ cdac_complete_implementation_guide.md              |  520 ++++
+ custom/Alert.c                                     |   28 +-
+ custom/Batch.c                                     |   75 +-
+ custom/FTP.c                                       |   26 +-
+ custom/File.c                                      | 1191 +++++++--
+ custom/GPRS.c                                      | 1652 ++++++++++--
+ custom/GPS.c                                       |   51 +-
+ custom/HTTP.c                                      |  244 +-
+ custom/{HTTPS.c => HTTPS.c.old}                    |    0
+ custom/Hardware.c                                  |  153 +-
+ custom/HttpQueue.c                                 |  156 +-
+ custom/LEDManager.c                                |   36 +-
+ custom/MCU.c                                       |   22 +-
+ custom/PktSave.c                                   |   11 +-
+ custom/SMS.c                                       |  430 ++--
+ custom/SOS.c                                       |  283 +-
+ custom/Server.c                                    | 2273 +++++++++-------
+ custom/SystemRecovery.c                            | 1145 ++++++++
+ custom/Systic.c                                    |   76 +-
+ custom/Utilities.c                                 |  146 +-
+ custom/config/custom_feature_def.h                 |   33 +-
+ custom/config/custom_proto_cfg.h                   |    4 +-
+ custom/config/custom_task_cfg.h                    |    9 +-
+ custom/inc/Alert.h                                 |    5 +
+ custom/inc/Batch.h                                 |    2 +
+ custom/inc/Diag.h                                  |   96 +
+ custom/inc/FTP.h                                   |    2 +-
+ custom/inc/File.h                                  |   67 +-
+ custom/inc/GPRS.h                                  |   24 +-
+ custom/inc/HTTP.h                                  |   12 +-
+ custom/inc/Hardware.h                              |    1 +
+ custom/inc/HttpQueue.h                             |   18 +-
+ custom/inc/LEDManager.h                            |    3 +-
+ custom/inc/LOG.h                                   |   96 +-
+ custom/inc/SOS.h                                   |   18 +-
+ custom/inc/Server.h                                |   36 +-
+ custom/inc/SystemRecovery.h                        |   57 +
+ custom/inc/VTS.h                                   | 1338 +++++-----
+ custom/main.c                                      |  166 +-
+ ftp_fota_cleanup_doc.md                            |   19 +
+ ril/src/ril_http.c                                 |    5 +-
+ 65 files changed, 12192 insertions(+), 2565 deletions(-)
+
+=== COMMIT 0b199e717ba7fba19979f45a3042702de74d7511 ===
+Author: Umar-Siddhiq
+Date: Sat Jul 25 15:11:37 2026 +0530
+Message: Merge branch 'OG-FIRMWARE' of https://github.com/Umar-Siddhiq/InnoVTSM66 into OG-FIRMWARE
+
+=== COMMIT a2921bef6419c7b65abea164b426d316f2769243 ===
+Author: Umar-Siddhiq
+Date: Sat Jul 25 15:11:06 2026 +0530
+Message: feat: Implement Sensors Subsystem and FTP/FOTA Storage Cleanup
+- Added Sensors subsystem with support for RFID, Fuel, and CLS sensors.
+- Created Sensors.h to define sensor types, configurations, and APIs.
+- Implemented sensor data handling in Sensors.c, including parsing and packet creation.
+- Integrated FTP/FOTA storage management with automated pre-download cleanup.
+- Added SMS commands for remote diagnostics and manual disk cleanup.
+- Updated SMS.c to handle incoming sensor data and commands.
+- Modified system initialization to load sensor configurations at boot.
+- Ensured clean compilation of the project with no errors.
+
+ ALERTS.txt                            | 28846 ++++++++++++++++++++++++++++++++
+ FIRMWARE_DOCUMENTATION.md             |   264 +
+ GEOFENCE_AND_HISTORY_DOCUMENTATION.md |   123 +
+ SOS_SMS_FEATURE_DOCUMENTATION.md      |   169 +
+ custom/Batch.c                        |    35 +-
+ custom/FTP.c                          |   140 +-
+ custom/File.c                         |    43 +-
+ custom/GPS.c                          |    11 +-
+ custom/Geofence.c                     |     2 +
+ custom/Hardware.c                     |     2 +-
+ custom/PktSave.c                      |   117 +-
+ custom/SMS.c                          |   272 +-
+ custom/SMSLib.c                       |     3 +
+ custom/SOS.c                          |    14 +-
+ custom/Sensors.c                      |   785 +
+ custom/Server.c                       |   262 +-
+ custom/Systic.c                       |    56 +-
+ custom/fota/src/fota_ftp.c            |    12 +-
+ custom/fota/src/fota_main.c           |     3 +-
+ custom/inc/Batch.h                    |     4 +-
+ custom/inc/FTP.h                      |    26 +-
+ custom/inc/File.h                     |     2 +-
+ custom/inc/PktSave.h                  |     8 +-
+ custom/inc/SMS.h                      |     3 +-
+ custom/inc/Sensors.h                  |   108 +
+ custom/inc/VTS.h                      |    45 +-
+ custom/main.c                         |     5 +
+ ftp_fota_cleanup_doc.md               |   243 +
+ ril/inc/ril_ftp.h                     |     2 +-
+ walkthrough.md                        |    60 +
+ 30 files changed, 31476 insertions(+), 189 deletions(-)
+
+=== COMMIT 7bc2bbaa9deccb0d7ec6826f38902a558b295766 ===
+Author: Umar-Siddhiq
+Date: Mon Jul 6 07:18:32 2026 +0530
+Message: Add release notes for OpenCPU GS3 SDK versions
+
+ README.md | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
+
+=== COMMIT 3ef8697496f530b86d1b1625f4fafd5fc01ba28b ===
+Author: Umar-Siddhiq
+Date: Fri Jun 26 16:55:23 2026 +0530
+Message: Update firmware documentation and refactor IMEI handling logic
+
+ FIRMWARE_DOCUMENTATION.md |  38 +++++
+ custom/File.c             | 379 ++++++++++++++++++++++------------------------
+ custom/GPRS.c             |  40 ++++-
+ custom/SMS.c              | 106 +++++++++++++
+ custom/inc/GPRS.h         |   1 +
+ custom/inc/VTS.h          |  10 ++
+ 6 files changed, 371 insertions(+), 203 deletions(-)
+
+=== COMMIT 5dac1ddab6f6f21908ad76f3e0b5c82d70900cd6 ===
+Author: Umar-Siddhiq
+Date: Wed Jun 24 21:46:02 2026 +0530
+Message: Merge branch 'OG-FIRMWARE' of https://github.com/Umar-Siddhiq/InnoVTSM66 into OG-FIRMWARE
+
+=== COMMIT 3b62ad4681565acccb15758c992a52e08b80e4ca ===
+Author: Umar-Siddhiq
+Date: Wed Jun 24 21:45:56 2026 +0530
+Message: Update firmware documentation and implement FOTA/MOTA improvements
+- Added new section in documentation for ACTVR format, VDETAIL version prefix, and FOTA/MOTA watchdog reset protection.
+- Enhanced FOTA and MOTA processes to prevent failures due to watchdog timeouts and software resets.
+- Updated GPS simulation modes to allow developers to override real GPS coordinates for testing.
+- Modified packet generation formats and response handling for improved data accuracy.
+
+ FIRMWARE_DOCUMENTATION.md |  49 +++++++++++++++++++
+ custom/FTP.c              |  38 +++++++++++----
+ custom/GPRS.c             |  11 ++++-
+ custom/GPS.c              | 120 ++++++++++++++++++++++++++++++++++++++++++++--
+ custom/SMS.c              |  45 ++++++++++-------
+ custom/Server.c           |   6 +--
+ custom/inc/GPS.h          |   2 +
+ custom/inc/MOTA.h         |   1 +
+ custom/inc/Server.h       |   2 +-
+ custom/inc/VTS.h          |   2 +-
+ 10 files changed, 241 insertions(+), 35 deletions(-)
+
+=== COMMIT 4f69062a219a221779f882d84dced5faf39f46d7 ===
+Author: Umar-Siddhiq
+Date: Fri Jun 19 16:11:04 2026 +0530
+Message: Rename REAMD ME.txt to REAMD ME.md
+
+ REAMD ME.txt => REAMD ME.md | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+=== COMMIT 198e9dd0a200c3a94dbdb75fa53f2c0ac5914207 ===
+Author: Umar-Siddhiq
+Date: Fri Jun 19 15:19:23 2026 +0530
+Message: Initial commit
+
+ .gitignore                                         |    17 +
+ .vscode/c_cpp_properties.json                      |    45 +
+ .vscode/settings.json                              |    21 +
+ .vscode/tasks.json                                 |    51 +
+ FIRMWARE_DOCUMENTATION.md                          |   429 +
+ MS-DOS.lnk                                         |   Bin 0 -> 1297 bytes
+ Make.bat                                           |     7 +
+ ...tel_M66_QuecOpen_GS3_SDK_Release_Notes_V2.6.pdf |   Bin 0 -> 714822 bytes
+ REAMD ME.txt                                       |    19 +
+ RELEASE NOTES.txt                                  |    76 +
+ SIM PROFILE SWITCHING.txt                          |  2205 ++
+ custom/Alert.c                                     |   281 +
+ custom/BLE.c                                       |   741 +
+ custom/Batch.c                                     |   360 +
+ custom/EPO.c                                       |   595 +
+ custom/FTP.c                                       |   809 +
+ custom/File.c                                      |   222 +
+ custom/GPRS.c                                      |  1292 ++
+ custom/GPS.c                                       |  1089 +
+ custom/Geofence.c                                  |   544 +
+ custom/HTTP.c                                      |   376 +
+ custom/HTTPS.c                                     |   578 +
+ custom/Hardware.c                                  |  1233 ++
+ custom/HttpQueue.c                                 |   278 +
+ custom/LEDManager.c                                |   386 +
+ custom/MCU.c                                       |   555 +
+ custom/MOTA.c                                      |   214 +
+ custom/NMeaParser.c                                |   621 +
+ custom/PktSave.c                                   |   449 +
+ custom/SMS.c                                       |  3113 +++
+ custom/SMSLib.c                                    |   644 +
+ custom/SOS.c                                       |   270 +
+ custom/STK.c                                       |     0
+ custom/Server.c                                    |  5725 ++++++
+ custom/Systic.c                                    |   435 +
+ custom/TCP.c                                       |   614 +
+ custom/Utilities.c                                 |   229 +
+ custom/config/custom_feature_def.h                 |    54 +
+ custom/config/custom_gpio_cfg.h                    |    71 +
+ custom/config/custom_heap_cfg.h                    |    57 +
+ custom/config/custom_proto_cfg.h                   |    14 +
+ custom/config/custom_sys_cfg.c                     |   115 +
+ custom/config/custom_task_cfg.h                    |   114 +
+ custom/config/sys_config.c                         |    93 +
+ custom/fota/inc/fota_ftp.h                         |    40 +
+ custom/fota/inc/fota_http.h                        |   115 +
+ custom/fota/inc/fota_http_code.h                   |    84 +
+ custom/fota/inc/fota_main.h                        |   134 +
+ custom/fota/src/fota_ftp.c                         |   553 +
+ custom/fota/src/fota_http.c                        |   766 +
+ custom/fota/src/fota_http_code.c                   |   416 +
+ custom/fota/src/fota_main.c                        |   176 +
+ custom/inc/Alert.h                                 |   158 +
+ custom/inc/BLE.h                                   |    73 +
+ custom/inc/Batch.h                                 |    42 +
+ custom/inc/EPO.h                                   |    54 +
+ custom/inc/FTP.h                                   |   116 +
+ custom/inc/File.h                                  |    35 +
+ custom/inc/GPRS.h                                  |   180 +
+ custom/inc/GPS.h                                   |   106 +
+ custom/inc/Geofence.h                              |    41 +
+ custom/inc/HTTP.h                                  |    39 +
+ custom/inc/HTTPS.h                                 |   112 +
+ custom/inc/Hardware.h                              |   203 +
+ custom/inc/HttpQueue.h                             |    46 +
+ custom/inc/LEDManager.h                            |    62 +
+ custom/inc/LOG.h                                   |    61 +
+ custom/inc/MCU.h                                   |   149 +
+ custom/inc/MOTA.h                                  |    22 +
+ custom/inc/NMeaParser.h                            |   205 +
+ custom/inc/PktSave.h                               |    56 +
+ custom/inc/SMS.h                                   |    43 +
+ custom/inc/SMSlib.h                                |    53 +
+ custom/inc/SOS.h                                   |    54 +
+ custom/inc/Server.h                                |   158 +
+ custom/inc/Systic.h                                |    54 +
+ custom/inc/TCP.h                                   |    70 +
+ custom/inc/Utilities.h                             |    74 +
+ custom/inc/VTS.h                                   |   648 +
+ custom/main.c                                      |   274 +
+ custom/syscalls.c                                  |    26 +
+ example/Example_gps_iic.c                          |   316 +
+ example/example_adc.c                              |   149 +
+ example/example_alarm.c                            |   311 +
+ example/example_audio.c                            | 20035 +++++++++++++++++++
+ example/example_bluetooth.c                        |   962 +
+ example/example_call.c                             |   268 +
+ example/example_clk.c                              |   136 +
+ example/example_csd.c                              |   327 +
+ example/example_download_epo.c                     |   886 +
+ example/example_dtmf.c                             |   368 +
+ example/example_eint.c                             |   192 +
+ example/example_file.c                             |   716 +
+ example/example_float_math.c                       |   151 +
+ example/example_fota_ftp.c                         |   210 +
+ example/example_fota_http.c                        |   194 +
+ example/example_ftp.c                              |   359 +
+ example/example_gpio.c                             |   153 +
+ example/example_http.c                             |   269 +
+ example/example_iic.c                              |   347 +
+ example/example_location.c                         |   284 +
+ example/example_location2.c                        |   298 +
+ example/example_memory.c                           |   196 +
+ example/example_mqtt.c                             |   563 +
+ example/example_multitask.c                        |   805 +
+ example/example_multitask_port.c                   |   306 +
+ example/example_pwm.c                              |   228 +
+ example/example_sms.c                              |  1091 +
+ example/example_spi.c                              |   656 +
+ example/example_system.c                           |   528 +
+ example/example_tcp_demo.c                         |   514 +
+ example/example_tcpclient.c                        |   940 +
+ example/example_tcpserver.c                        |  1031 +
+ example/example_time.c                             |   158 +
+ example/example_timer.c                            |   191 +
+ example/example_transpass.c                        |   154 +
+ example/example_udpclient.c                        |   825 +
+ example/example_udpserver.c                        |   874 +
+ example/example_watchdog.c                         |   240 +
+ example/nema_pro.c                                 |   414 +
+ example/utility.c                                  |   147 +
+ include/nema_pro.h                                 |    57 +
+ include/ql_adc.h                                   |   126 +
+ include/ql_clock.h                                 |   106 +
+ include/ql_common.h                                |   156 +
+ include/ql_eint.h                                  |   225 +
+ include/ql_error.h                                 |   198 +
+ include/ql_fota.h                                  |   158 +
+ include/ql_fs.h                                    |   722 +
+ include/ql_gpio.h                                  |   244 +
+ include/ql_gprs.h                                  |   600 +
+ include/ql_iic.h                                   |   194 +
+ include/ql_memory.h                                |    67 +
+ include/ql_power.h                                 |   159 +
+ include/ql_pwm.h                                   |   119 +
+ include/ql_socket.h                                |   557 +
+ include/ql_spi.h                                   |   235 +
+ include/ql_stdlib.h                                |    70 +
+ include/ql_system.h                                |   784 +
+ include/ql_time.h                                  |   125 +
+ include/ql_timer.h                                 |   164 +
+ include/ql_trace.h                                 |    73 +
+ include/ql_type.h                                  |    65 +
+ include/ql_uart.h                                  |   510 +
+ include/ql_wtd.h                                   |   125 +
+ libs/app_image_bin.cfg                             |     1 +
+ libs/gcc/app_start.lib                             |   Bin 0 -> 130624 bytes
+ libs/gcc/linkscript.ld                             |    37 +
+ make/GFH_Generator.exe                             |   Bin 0 -> 8192 bytes
+ make/gcc/gcc_make.bat                              |    41 +
+ make/gcc/gcc_makefile                              |    88 +
+ make/gcc/gcc_makefiledef                           |    85 +
+ make/header.dat                                    |   Bin 0 -> 64 bytes
+ make/make.exe                                      |   Bin 0 -> 180736 bytes
+ make/rm.bat                                        |    19 +
+ reference/inc/Alert.h                              |   157 +
+ reference/inc/Batch.h                              |    54 +
+ reference/inc/CDAC_Protocol.h                      |   260 +
+ reference/inc/DHT11.h                              |    28 +
+ reference/inc/FTP.h                                |    88 +
+ reference/inc/GPRS.h                               |   159 +
+ reference/inc/Geofence.h                           |    37 +
+ reference/inc/HTTP.h                               |    49 +
+ reference/inc/Hardware.h                           |    91 +
+ reference/inc/HttpQueue.h                          |   144 +
+ reference/inc/MCU.h                                |   271 +
+ reference/inc/NTP_custom.h                         |    20 +
+ reference/inc/PktSave.h                            |    32 +
+ reference/inc/SMS.h                                |    34 +
+ reference/inc/SOS.h                                |    46 +
+ reference/inc/Sensors.h                            |   124 +
+ reference/inc/Server.h                             |   135 +
+ reference/inc/Systic.h                             |    34 +
+ reference/inc/TCP.h                                |   100 +
+ reference/inc/UDP.h                                |    54 +
+ reference/inc/Utilities.h                          |    35 +
+ reference/inc/VTS.h                                |   602 +
+ reference/inc/nwy_test_cli_adpt.h                  |   125 +
+ reference/inc/nwy_test_cli_func_def.h              |   345 +
+ reference/inc/nwy_test_cli_utils.h                 |    30 +
+ reference/inc/project.h                            |    91 +
+ reference/src/Alert.c                              |   277 +
+ reference/src/Batch.c                              |   394 +
+ reference/src/DHT11.c                              |    99 +
+ reference/src/FTP.c                                |   775 +
+ reference/src/GPRS.c                               |  1413 ++
+ reference/src/Geofence.c                           |   648 +
+ reference/src/HTTP.c                               |   537 +
+ reference/src/Hardware.c                           |   317 +
+ reference/src/HttpQueue.c                          |   499 +
+ reference/src/MCU.c                                |  1724 ++
+ reference/src/NTP_custom.c                         |   145 +
+ reference/src/PktSave.c                            |   268 +
+ reference/src/SMS.c                                |  2601 +++
+ reference/src/SOS.c                                |   240 +
+ reference/src/Sensors.c                            |   876 +
+ reference/src/Server.c                             |  5602 ++++++
+ reference/src/Systic.c                             |  1062 +
+ reference/src/TCP.c                                |  1144 ++
+ reference/src/UDP.c                                |   354 +
+ reference/src/Utilities.c                          |   226 +
+ reference/src/nwy_test_cli_adpt.c                  |   894 +
+ reference/src/nwy_test_cli_driver.c                |  2887 +++
+ reference/src/nwy_test_cli_iot.c                   |  1207 ++
+ reference/src/nwy_test_cli_lbs.c                   |   336 +
+ reference/src/nwy_test_cli_menu.c                  |   761 +
+ reference/src/nwy_test_cli_mobile.c                |  2329 +++
+ reference/src/nwy_test_cli_os.c                    |   495 +
+ reference/src/nwy_test_cli_utils.c                 |   237 +
+ ril/inc/lib_ril_sms.h                              |   613 +
+ ril/inc/ril.h                                      |   263 +
+ ril/inc/ril_alarm.h                                |    87 +
+ ril/inc/ril_audio.h                                |   280 +
+ ril/inc/ril_bluetooth.h                            |   725 +
+ ril/inc/ril_custom.h                               |    16 +
+ ril/inc/ril_dtmf.h                                 |   203 +
+ ril/inc/ril_ftp.h                                  |    86 +
+ ril/inc/ril_http.h                                 |    33 +
+ ril/inc/ril_https.h                                |    64 +
+ ril/inc/ril_location.h                             |    63 +
+ ril/inc/ril_location2.h                            |   133 +
+ ril/inc/ril_mqtt.h                                 |   361 +
+ ril/inc/ril_network.h                              |   252 +
+ ril/inc/ril_ntp.h                                  |    62 +
+ ril/inc/ril_sim.h                                  |   112 +
+ ril/inc/ril_sms.h                                  |   380 +
+ ril/inc/ril_system.h                               |   191 +
+ ril/inc/ril_telephony.h                            |   124 +
+ ril/inc/ril_util.h                                 |    94 +
+ ril/src/ril_alarm.c                                |   204 +
+ ril/src/ril_atResponse.c                           |    95 +
+ ril/src/ril_audio.c                                |   436 +
+ ril/src/ril_bluetooth.c                            |  2122 ++
+ ril/src/ril_custom.c                               |   308 +
+ ril/src/ril_dtmf.c                                 |   397 +
+ ril/src/ril_ftp.c                                  |   613 +
+ ril/src/ril_http.c                                 |   232 +
+ ril/src/ril_https.c                                |   352 +
+ ril/src/ril_init.c                                 |    77 +
+ ril/src/ril_location.c                             |   208 +
+ ril/src/ril_location2.c                            |   222 +
+ ril/src/ril_mqtt.c                                 |   358 +
+ ril/src/ril_network.c                              |   555 +
+ ril/src/ril_ntp.c                                  |    74 +
+ ril/src/ril_sim.c                                  |   300 +
+ ril/src/ril_sms.c                                  |  2443 +++
+ ril/src/ril_system.c                               |   460 +
+ ril/src/ril_telephony.c                            |   147 +
+ ril/src/ril_urc.c                                  |   928 +
+ ril/src/ril_util.c                                 |   254 +
+ tatus                                              |     6 +
+ 251 files changed, 119866 insertions(+)

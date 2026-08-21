@@ -1,0 +1,11 @@
+interface:
+  display_name: Project Guardian Engineer
+  short_description: Evidence-first engineering with durable memory and anti-regression
+    guardrails
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
