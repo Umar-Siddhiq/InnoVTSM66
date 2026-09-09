@@ -679,6 +679,7 @@ void LoadDefault(void)
     VTSData.DisableHistory=0;
     VTSData.EnableHTTPS=0; // Default: plain HTTP
     VTSData.DisableGPSFaultReset=0;
+    VTSData.DisableSOSTamper=DEFAULT_DISABLE_SOS_TAMPER;
     ClearGeofence();
     UpdateConfigInFlash();
     InitSockets();
@@ -699,6 +700,11 @@ void LoadConfig(void)
         LOGData(TAG_FILE, "CONFIG file Def Mismatch! Loading Default...");
         LoadDefault();
         return;
+    }
+
+    if (VTSData.DisableSOSTamper != 0 && VTSData.DisableSOSTamper != 1)
+    {
+        VTSData.DisableSOSTamper = DEFAULT_DISABLE_SOS_TAMPER;
     }
 
     InitGeoState();

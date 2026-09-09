@@ -25,7 +25,7 @@
  *   - Automatically sets VTS_DEBUG_LOG_ENABLE to 0 (disables UART debug trace logs)
  *   - RS232 communication & packets remain 100% active and untouched
  ************************************************************************/
- #define FLASH_STORAGE_16MB
+// #define FLASH_STORAGE_16MB
 
 #ifdef FLASH_STORAGE_16MB
 #ifndef HISTORY_DISABLED
@@ -39,7 +39,7 @@
  * Logging (disable to save flash)
  ************************************************************************/
 #ifndef VTS_DEBUG_LOG_ENABLE
-#define VTS_DEBUG_LOG_ENABLE 1
+#define VTS_DEBUG_LOG_ENABLE 0
 #endif
 
 /************************************************************************
@@ -65,6 +65,20 @@
  * GNSS / EPO Feature Definition
  ************************************************************************/
 #define EOP_USE
+
+/************************************************************************
+ * GPS Last Fixed Location Fallback Configuration
+ * When enabled (1):
+ *   - Remembers the last valid GPS fix (Location, Speed, Altitude,
+ *     Heading, PDOP, HDOP).
+ *   - When GPS fix is lost, transmits and displays the last known fixed
+ *     location data instead of zeros.
+ *   - When GPS acquires a new fix, automatically updates to recent details.
+ * Set to 0 to disable and revert to original behavior.
+ ************************************************************************/
+#ifndef FEATURE_GPS_LAST_FIX_FALLBACK
+#define FEATURE_GPS_LAST_FIX_FALLBACK 1
+#endif
 /************************************************************************
  * Protocol Specific Feature Controls
  ************************************************************************/

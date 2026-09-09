@@ -5,6 +5,7 @@
 #include "SMS.h"
 #include "Geofence.h"
 #include "EPO.h"
+#include "File.h"
 
 // Define a simple LCG random number generator to avoid unsupported Ql_rand() log flood
 static uint32_t s_rand_seed = 12345;
@@ -50,6 +51,7 @@ char sPDOP[20] = {0};
 char sHDOP[20] = {0};
 char sHeading[20]  = {0};
 _RTC GPSDateTime = {0};
+LastFixedGPS_Typedef LastFixedGPS = {0};
 
 // Store last valid NMEA data for RS232 forwarding - moved to dynamic allocation
 static char *last_nmea_data = NULL;
@@ -458,6 +460,61 @@ void gps_uart_cb(Enum_SerialPort port, Enum_UARTEventType msg, bool level, void*
     }
 }
 
+#if FEATURE_GPS_LAST_FIX_FALLBACK
+void GPS_LoadLastFixedFromFlash(void)
+{
+    Ql_memset(&LastFixedGPS, 0, sizeof(LastFixedGPS_Typedef));
+    if (LoadFromFlash(LAST_GPS_FILE_PATH, &LastFixedGPS, sizeof(LastFixedGPS_Typedef), NULL))
+    {
+        if (LastFixedGPS.Magic == LAST_GPS_MAGIC && LastFixedGPS.Valid == 1 &&
+            LastFixedGPS.Latitude != 0.0 && LastFixedGPS.Longitude != 0.0)
+        {
+            LOGData(TAG_GPS, "Loaded Last Fixed GPS from Flash: %s %c, %s %c, Alt: %s, Spd: %s",
+                    LastFixedGPS.sLatitude, LastFixedGPS.LatDir,
+                    LastFixedGPS.sLongitude, LastFixedGPS.LngDir,
+                    LastFixedGPS.sAltitude, LastFixedGPS.sSpeed);
+
+            GPS.Latitude = LastFixedGPS.Latitude;
+            GPS.Longitude = LastFixedGPS.Longitude;
+            GPS.Altitude = LastFixedGPS.Altitude;
+            GPS.LatDir = LastFixedGPS.LatDir;
+            GPS.LngDir = LastFixedGPS.LngDir;
+            GPS.Speed = LastFixedGPS.Speed;
+            GPS.Heading = LastFixedGPS.Heading;
+            GPS.PDOP = LastFixedGPS.PDOP;
+            GPS.HDOP = LastFixedGPS.HDOP;
+            GPS.NoOfSatalite = LastFixedGPS.NoOfSatalite;
+            Ql_strncpy(sLatitude, LastFixedGPS.sLatitude, sizeof(sLatitude) - 1);
+            sLatitude[sizeof(sLatitude) - 1] = '\0';
+            Ql_strncpy(sLongitude, LastFixedGPS.sLongitude, sizeof(sLongitude) - 1);
+            sLongitude[sizeof(sLongitude) - 1] = '\0';
+            Ql_strncpy(sAltitude, LastFixedGPS.sAltitude, sizeof(sAltitude) - 1);
+            sAltitude[sizeof(sAltitude) - 1] = '\0';
+            Ql_strncpy(sSpeed, LastFixedGPS.sSpeed, sizeof(sSpeed) - 1);
+            sSpeed[sizeof(sSpeed) - 1] = '\0';
+            Ql_strncpy(sHeading, LastFixedGPS.sHeading, sizeof(sHeading) - 1);
+            sHeading[sizeof(sHeading) - 1] = '\0';
+            Ql_strncpy(sPDOP, LastFixedGPS.sPDOP, sizeof(sPDOP) - 1);
+            sPDOP[sizeof(sPDOP) - 1] = '\0';
+            Ql_strncpy(sHDOP, LastFixedGPS.sHDOP, sizeof(sHDOP) - 1);
+            sHDOP[sizeof(sHDOP) - 1] = '\0';
+            return;
+        }
+    }
+    Ql_memset(&LastFixedGPS, 0, sizeof(LastFixedGPS_Typedef));
+    LOGData(TAG_GPS, "No valid Last Fixed GPS in Flash");
+}
+
+void GPS_SaveLastFixedToFlash(void)
+{
+    if (LastFixedGPS.Valid && LastFixedGPS.Latitude != 0.0 && LastFixedGPS.Longitude != 0.0)
+    {
+        LastFixedGPS.Magic = LAST_GPS_MAGIC;
+        SaveToFlash(LAST_GPS_FILE_PATH, &LastFixedGPS, sizeof(LastFixedGPS_Typedef));
+    }
+}
+#endif
+
 void gps_parameter_init(void)
 {
     Ql_memset(&GPS, 0, sizeof(GPS_Typedef));
@@ -472,7 +529,10 @@ void gps_parameter_init(void)
     Ql_sprintf(sHDOP,"%3.2f", GPS.HDOP);
     Ql_sprintf(sPDOP,"%3.2f", GPS.PDOP);
     Ql_sprintf(sHeading,"%3.1f", GPS.Heading);
-    
+
+#if FEATURE_GPS_LAST_FIX_FALLBACK
+    GPS_LoadLastFixedFromFlash();
+#endif
 }
 
 // Send UART configuration command and wait for response
@@ -780,6 +840,13 @@ void gps_gga_update(GGATypedef *GGA)
         fix = 1;
     if(fix != GPS.GPSFix)
     {
+#if FEATURE_GPS_LAST_FIX_FALLBACK
+        if (GPS.GPSFix == 1 && fix == 0)
+        {
+            // Transition from Fixed to Unfixed -> commit last fix to flash immediately
+            GPS_SaveLastFixedToFlash();
+        }
+#endif
         GPS.GPSFix=fix;
         LOGData(TAG_GPS,"!! Fix State Changed to %d", GGA->Fix_Quality);
         // LED Manager will automatically update based on GPS fix state
@@ -791,24 +858,143 @@ void gps_gga_update(GGATypedef *GGA)
     }
     
     GPS.NoOfSatalite=GGA->Satellites_Tracked;
-    GPS.Latitude = nmea_tocoord(&GGA->Latitude);
-    GPS.Longitude = nmea_tocoord(&GGA->Longitude);
-    GPS.Altitude = nmea_tofloat(&GGA->Altitude);
-    GPS.LatDir='N';
-    GPS.LngDir='E';
-    Ql_sprintf(sLatitude,"%3.6f",GPS.Latitude);   
-    Ql_sprintf(sLongitude,"%3.6f",GPS.Longitude);
-    Ql_sprintf(sAltitude,"%4.2f",GPS.Altitude);
-    Ql_sprintf(sSpeed,"%3.2f",GPS.Speed);
-    Ql_sprintf(sHeading,"%3.1f",GPS.Heading);
-    
 
+    if (GPS.GPSFix)
+    {
+        GPS.Latitude = nmea_tocoord(&GGA->Latitude);
+        GPS.Longitude = nmea_tocoord(&GGA->Longitude);
+        GPS.Altitude = nmea_tofloat(&GGA->Altitude);
+        GPS.LatDir = (GGA->LatDir == 'S' || GGA->LatDir == 's') ? 'S' : 'N';
+        GPS.LngDir = (GGA->LngDir == 'W' || GGA->LngDir == 'w') ? 'W' : 'E';
+        Ql_sprintf(sLatitude,"%3.6f",GPS.Latitude);   
+        Ql_sprintf(sLongitude,"%3.6f",GPS.Longitude);
+        Ql_sprintf(sAltitude,"%4.2f",GPS.Altitude);
+        Ql_sprintf(sSpeed,"%3.2f",GPS.Speed);
+        Ql_sprintf(sHeading,"%3.1f",GPS.Heading);
+
+#if FEATURE_GPS_LAST_FIX_FALLBACK
+        if (GPS.Latitude != 0.0 && GPS.Longitude != 0.0)
+        {
+            static uint32_t s_lastGpsFlashSaveSec = 0;
+            uint32_t curSec = (uint32_t)(Ql_GetMsSincePwrOn() / 1000ULL);
+
+            LastFixedGPS.Valid = 1;
+            LastFixedGPS.Latitude = GPS.Latitude;
+            LastFixedGPS.Longitude = GPS.Longitude;
+            LastFixedGPS.Altitude = GPS.Altitude;
+            LastFixedGPS.LatDir = GPS.LatDir;
+            LastFixedGPS.LngDir = GPS.LngDir;
+            LastFixedGPS.Speed = GPS.Speed;
+            LastFixedGPS.Heading = GPS.Heading;
+            LastFixedGPS.PDOP = GPS.PDOP;
+            LastFixedGPS.HDOP = GPS.HDOP;
+            LastFixedGPS.NoOfSatalite = GPS.NoOfSatalite;
+            Ql_strncpy(LastFixedGPS.sLatitude, sLatitude, sizeof(LastFixedGPS.sLatitude) - 1);
+            LastFixedGPS.sLatitude[sizeof(LastFixedGPS.sLatitude) - 1] = '\0';
+            Ql_strncpy(LastFixedGPS.sLongitude, sLongitude, sizeof(LastFixedGPS.sLongitude) - 1);
+            LastFixedGPS.sLongitude[sizeof(LastFixedGPS.sLongitude) - 1] = '\0';
+            Ql_strncpy(LastFixedGPS.sAltitude, sAltitude, sizeof(LastFixedGPS.sAltitude) - 1);
+            LastFixedGPS.sAltitude[sizeof(LastFixedGPS.sAltitude) - 1] = '\0';
+            Ql_strncpy(LastFixedGPS.sSpeed, sSpeed, sizeof(LastFixedGPS.sSpeed) - 1);
+            LastFixedGPS.sSpeed[sizeof(LastFixedGPS.sSpeed) - 1] = '\0';
+            Ql_strncpy(LastFixedGPS.sHeading, sHeading, sizeof(LastFixedGPS.sHeading) - 1);
+            LastFixedGPS.sHeading[sizeof(LastFixedGPS.sHeading) - 1] = '\0';
+            Ql_strncpy(LastFixedGPS.sPDOP, sPDOP, sizeof(LastFixedGPS.sPDOP) - 1);
+            LastFixedGPS.sPDOP[sizeof(LastFixedGPS.sPDOP) - 1] = '\0';
+            Ql_strncpy(LastFixedGPS.sHDOP, sHDOP, sizeof(LastFixedGPS.sHDOP) - 1);
+            LastFixedGPS.sHDOP[sizeof(LastFixedGPS.sHDOP) - 1] = '\0';
+
+            // Periodically persist fix to flash (every 30 seconds; SaveToFlash skips if unchanged)
+            if (s_lastGpsFlashSaveSec == 0 || (curSec - s_lastGpsFlashSaveSec) >= 30)
+            {
+                s_lastGpsFlashSaveSec = curSec;
+                GPS_SaveLastFixedToFlash();
+            }
+        }
+#endif
+    }
+    else
+    {
+#if FEATURE_GPS_LAST_FIX_FALLBACK
+        if (LastFixedGPS.Valid)
+        {
+            GPS.Latitude = LastFixedGPS.Latitude;
+            GPS.Longitude = LastFixedGPS.Longitude;
+            GPS.Altitude = LastFixedGPS.Altitude;
+            GPS.LatDir = LastFixedGPS.LatDir;
+            GPS.LngDir = LastFixedGPS.LngDir;
+            GPS.Speed = LastFixedGPS.Speed;
+            GPS.Heading = LastFixedGPS.Heading;
+            GPS.PDOP = LastFixedGPS.PDOP;
+            GPS.HDOP = LastFixedGPS.HDOP;
+            Ql_strcpy(sLatitude, LastFixedGPS.sLatitude);
+            Ql_strcpy(sLongitude, LastFixedGPS.sLongitude);
+            Ql_strcpy(sAltitude, LastFixedGPS.sAltitude);
+            Ql_strcpy(sSpeed, LastFixedGPS.sSpeed);
+            Ql_strcpy(sHeading, LastFixedGPS.sHeading);
+            Ql_strcpy(sPDOP, LastFixedGPS.sPDOP);
+            Ql_strcpy(sHDOP, LastFixedGPS.sHDOP);
+        }
+        else
+        {
+            GPS.Latitude = 0.0;
+            GPS.Longitude = 0.0;
+            GPS.Altitude = 0.0;
+            GPS.LatDir = 'N';
+            GPS.LngDir = 'E';
+            Ql_strcpy(sLatitude, "0.000000");
+            Ql_strcpy(sLongitude, "0.000000");
+            Ql_strcpy(sAltitude, "0.00");
+            Ql_strcpy(sSpeed, "0.00");
+            Ql_strcpy(sHeading, "0.0");
+        }
+#else
+        GPS.Latitude = nmea_tocoord(&GGA->Latitude);
+        GPS.Longitude = nmea_tocoord(&GGA->Longitude);
+        GPS.Altitude = nmea_tofloat(&GGA->Altitude);
+        GPS.LatDir='N';
+        GPS.LngDir='E';
+        Ql_sprintf(sLatitude,"%3.6f",GPS.Latitude);   
+        Ql_sprintf(sLongitude,"%3.6f",GPS.Longitude);
+        Ql_sprintf(sAltitude,"%4.2f",GPS.Altitude);
+        Ql_sprintf(sSpeed,"%3.2f",GPS.Speed);
+        Ql_sprintf(sHeading,"%3.1f",GPS.Heading);
+#endif
+    }
 }
 
 void gps_vtg_update(VTGTypedef *VTG)
 {
-    GPS.Speed = nmea_tofloat(&VTG->speed_kph);
-    GPS.Heading=nmea_tofloat(&VTG->true_track_degrees);
+    if (GPS.GPSFix)
+    {
+        GPS.Speed = nmea_tofloat(&VTG->speed_kph);
+        GPS.Heading=nmea_tofloat(&VTG->true_track_degrees);
+        Ql_sprintf(sSpeed,"%3.2f",GPS.Speed);
+        Ql_sprintf(sHeading,"%3.1f",GPS.Heading);
+#if FEATURE_GPS_LAST_FIX_FALLBACK
+        if (LastFixedGPS.Valid)
+        {
+            LastFixedGPS.Speed = GPS.Speed;
+            LastFixedGPS.Heading = GPS.Heading;
+            Ql_strncpy(LastFixedGPS.sSpeed, sSpeed, sizeof(LastFixedGPS.sSpeed) - 1);
+            LastFixedGPS.sSpeed[sizeof(LastFixedGPS.sSpeed) - 1] = '\0';
+            Ql_strncpy(LastFixedGPS.sHeading, sHeading, sizeof(LastFixedGPS.sHeading) - 1);
+            LastFixedGPS.sHeading[sizeof(LastFixedGPS.sHeading) - 1] = '\0';
+        }
+#endif
+    }
+    else
+    {
+#if FEATURE_GPS_LAST_FIX_FALLBACK
+        if (LastFixedGPS.Valid)
+        {
+            GPS.Speed = LastFixedGPS.Speed;
+            GPS.Heading = LastFixedGPS.Heading;
+            Ql_strcpy(sSpeed, LastFixedGPS.sSpeed);
+            Ql_strcpy(sHeading, LastFixedGPS.sHeading);
+        }
+#endif
+    }
 }
 
 void gps_rmc_update(RMCTypedef *RMC)
@@ -830,35 +1016,78 @@ void gps_rmc_update(RMCTypedef *RMC)
 
 void gps_gsa_update(GSATypedef *GSA)
 {
-    // Only update PDOP/HDOP if valid (non-zero scale means data was present)
-    if (GSA->PDOP.Scale != 0) {
-        double pdop_val = nmea_tofloat(&GSA->PDOP);
-        // Check if value is invalid (99.9 or 99.99 indicates no valid data)
-        if (pdop_val >= 99.0) {
+    if (GPS.GPSFix)
+    {
+        // Only update PDOP/HDOP if valid (non-zero scale means data was present)
+        if (GSA->PDOP.Scale != 0) {
+            double pdop_val = nmea_tofloat(&GSA->PDOP);
+            // Check if value is invalid (99.9 or 99.99 indicates no valid data)
+            if (pdop_val >= 99.0) {
+                GPS.PDOP = 0.0;
+                Ql_sprintf(sPDOP, "0.00");
+            } else {
+                GPS.PDOP = pdop_val;
+                Ql_sprintf(sPDOP,"%3.2f", GPS.PDOP);
+            }
+        } else {
             GPS.PDOP = 0.0;
             Ql_sprintf(sPDOP, "0.00");
-        } else {
-            GPS.PDOP = pdop_val;
-            Ql_sprintf(sPDOP,"%3.2f", GPS.PDOP);
         }
-    } else {
-        GPS.PDOP = 0.0;
-        Ql_sprintf(sPDOP, "0.00");
-    }
-    
-    if (GSA->HDOP.Scale != 0) {
-        double hdop_val = nmea_tofloat(&GSA->HDOP);
-        // Check if value is invalid (99.9 or 99.99 indicates no valid data)
-        if (hdop_val >= 99.0) {
+        
+        if (GSA->HDOP.Scale != 0) {
+            double hdop_val = nmea_tofloat(&GSA->HDOP);
+            // Check if value is invalid (99.9 or 99.99 indicates no valid data)
+            if (hdop_val >= 99.0) {
+                GPS.HDOP = 0.0;
+                Ql_sprintf(sHDOP, "0.00");
+            } else {
+                GPS.HDOP = hdop_val;
+                Ql_sprintf(sHDOP,"%3.2f", GPS.HDOP);
+            }
+        } else {
             GPS.HDOP = 0.0;
             Ql_sprintf(sHDOP, "0.00");
-        } else {
-            GPS.HDOP = hdop_val;
-            Ql_sprintf(sHDOP,"%3.2f", GPS.HDOP);
         }
-    } else {
+
+#if FEATURE_GPS_LAST_FIX_FALLBACK
+        if (LastFixedGPS.Valid)
+        {
+            if (GPS.PDOP > 0.0) {
+                LastFixedGPS.PDOP = GPS.PDOP;
+                Ql_strncpy(LastFixedGPS.sPDOP, sPDOP, sizeof(LastFixedGPS.sPDOP) - 1);
+                LastFixedGPS.sPDOP[sizeof(LastFixedGPS.sPDOP) - 1] = '\0';
+            }
+            if (GPS.HDOP > 0.0) {
+                LastFixedGPS.HDOP = GPS.HDOP;
+                Ql_strncpy(LastFixedGPS.sHDOP, sHDOP, sizeof(LastFixedGPS.sHDOP) - 1);
+                LastFixedGPS.sHDOP[sizeof(LastFixedGPS.sHDOP) - 1] = '\0';
+            }
+        }
+#endif
+    }
+    else
+    {
+#if FEATURE_GPS_LAST_FIX_FALLBACK
+        if (LastFixedGPS.Valid)
+        {
+            GPS.PDOP = LastFixedGPS.PDOP;
+            GPS.HDOP = LastFixedGPS.HDOP;
+            Ql_strcpy(sPDOP, LastFixedGPS.sPDOP);
+            Ql_strcpy(sHDOP, LastFixedGPS.sHDOP);
+        }
+        else
+        {
+            GPS.PDOP = 0.0;
+            GPS.HDOP = 0.0;
+            Ql_strcpy(sPDOP, "0.00");
+            Ql_strcpy(sHDOP, "0.00");
+        }
+#else
+        GPS.PDOP = 0.0;
         GPS.HDOP = 0.0;
+        Ql_sprintf(sPDOP, "0.00");
         Ql_sprintf(sHDOP, "0.00");
+#endif
     }
 }
 

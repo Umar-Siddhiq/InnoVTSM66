@@ -265,7 +265,7 @@ void SendSOSAlertSMS(uint8_t AlertNum)
 		SendSMS(VTSData.PhoneNumber.Mob4, message);
 }
 
-void SendSMS(char* ph, char* msg)
+uint8_t SendSMS(char* ph, char* msg)
 {
     char cleanPh[25] = {0};
     uint16_t len = 0;
@@ -274,7 +274,7 @@ void SendSMS(char* ph, char* msg)
     if (ph == NULL || msg == NULL || Ql_strlen(ph) == 0 || Ql_strlen(msg) == 0)
     {
         LOGData(TAG_OTA, "Invalid phone number or message.\n");
-        return;
+        return 0;
     }
 
     len = Ql_strlen(ph);
@@ -300,7 +300,7 @@ void SendSMS(char* ph, char* msg)
 
     LOGData(TAG_OTA, "SMS Sending to %s: %s\n", formattedPh, msg);
     bool isUCS2 = false;
-    SMS_SendTextMessage(formattedPh, msg, isUCS2);
+    return SMS_SendTextMessage(formattedPh, msg, isUCS2) ? 1 : 0;
 }
 
 uint8_t ParseFOTAPacket(char *buf, char *IP, uint16_t *port, char *User, char *pass, char *Filepath)
@@ -602,7 +602,7 @@ void SRDecode(char* msg, uint8_t IsServer)
 			UpdateConfigInFlash();
 			Ql_sprintf(CMD_Buff,"%s,%s",VTSData.ServerData.IP1,VTSData.ServerData.Port1);
 			SendResponce(SMSSender,"SET:GIP",IsServer,1);
-			InitSockets();
+			ReinitSingleSocket(0);
 			return;
 		}
 		if(type == 3)
@@ -612,7 +612,7 @@ void SRDecode(char* msg, uint8_t IsServer)
 			UpdateConfigInFlash();
 			Ql_sprintf(CMD_Buff,"1");
 			SendResponce(SMSSender,"CLR:GIP",IsServer,1);
-			InitSockets();
+			ReinitSingleSocket(0);
 			return;
 		}
 	}
@@ -740,7 +740,7 @@ void SRDecode(char* msg, uint8_t IsServer)
 			UpdateConfigInFlash();
 			Ql_sprintf(CMD_Buff,"%s,%s",VTSData.ServerData.IP2,VTSData.ServerData.Port2);
 			SendResponce(SMSSender,"SET:EIP",IsServer,1);
-			InitSockets();
+			ReinitSingleSocket(1);
 			return;
 		}
 		if(type == 3)
@@ -750,7 +750,7 @@ void SRDecode(char* msg, uint8_t IsServer)
 			UpdateConfigInFlash();
 			Ql_sprintf(CMD_Buff,"1");
 			SendResponce(SMSSender,"CLR:EIP",IsServer,1);
-			InitSockets();
+			ReinitSingleSocket(1);
 			return;
 		}
 	}
@@ -787,7 +787,7 @@ void SRDecode(char* msg, uint8_t IsServer)
 			UpdateConfigInFlash();
 			Ql_sprintf(CMD_Buff,"%s,%s",VTSData.ServerData.IP3,VTSData.ServerData.Port3);
 			SendResponce(SMSSender,"SET:PIP",IsServer,1);
-			InitSockets();
+			ReinitSingleSocket(2);
 			return;
 		}
 		if(type == 3)
@@ -797,7 +797,7 @@ void SRDecode(char* msg, uint8_t IsServer)
 			UpdateConfigInFlash();
 			Ql_sprintf(CMD_Buff,"1");
 			SendResponce(SMSSender,"CLR:PIP",IsServer,1);
-			InitSockets();
+			ReinitSingleSocket(2);
 			return;
 		}
 	}
@@ -2006,16 +2006,18 @@ void ParseStandardAIS140Command(const char* raw, uint8_t src)
 #endif /* PROTO_OG */
 
 /* SOS SMS fallback is shared by every non-CDAC protocol. */
-void SendSOSSMS(uint8_t isFall)
+uint8_t SendSOSSMS(uint8_t isFall)
 {
     char msg[160];
     char ss[12];
     uint8_t cs;
+    uint8_t sent = 0;
 
     (void)isFall;
 
-    if (GSM.GSMState < SIM_DETECTED) return;
-    if (!IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob0)) return;
+    if (GSM.GSMState < SIM_DETECTED) return 0;
+    if (!IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob0) &&
+        !IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob1)) return 0;
 
     Ql_memset(msg, 0, sizeof(msg));
     Ql_strcat(msg, "$EPB,EMR,");
@@ -2043,8 +2045,92 @@ void SendSOSSMS(uint8_t isFall)
     Ql_sprintf(ss, "*%02X\r\n", cs);
     Ql_strcat(msg, ss);
 
-    SendSMS(VTSData.PhoneNumber.Mob0, msg);
-    LOGData(TAG_OTA, "AMD3 SOS SMS -> %s", VTSData.PhoneNumber.Mob0);
+    if (IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob0)) {
+        if (SendSMS(VTSData.PhoneNumber.Mob0, msg)) {
+            sent = 1;
+            LOGData(TAG_OTA, "AMD3 SOS SMS -> Mob0: %s", VTSData.PhoneNumber.Mob0);
+        }
+    }
+    if (IsValidSOSMobileNumber(VTSData.PhoneNumber.Mob1)) {
+        if (SendSMS(VTSData.PhoneNumber.Mob1, msg)) {
+            sent = 1;
+            LOGData(TAG_OTA, "AMD3 SOS SMS -> Mob1: %s", VTSData.PhoneNumber.Mob1);
+        }
+    }
+
+    return sent;
+}
+
+static void QueueVResetResponse(char* sender, uint8_t IsServer)
+{
+#if FEATURE_GPS_LAST_FIX_FALLBACK
+	GPS_SaveLastFixedToFlash();
+#endif
+#ifdef PROTO_OG
+	if (IsServer == OTA_SRC_SMS)
+	{
+		SendSMS(sender, "Device Restarting...");
+	}
+	else if (IsServer == OTA_SRC_RS232)
+	{
+		SendRS232Response("Device Restarting...\r\n");
+	}
+	else if (IsServer == OTA_SRC_RS485)
+	{
+		SendRS485Response("Device Restarting...\r\n");
+	}
+	else if (IsServer == OTA_SRC_BLE)
+	{
+		BLE_SendReply((uint8_t*)"Device Restarting...\r\n", 22);
+	}
+
+	Ql_memset(&LastOTAResponse, 0, sizeof(LastOTAResponse));
+	LastOTAResponse.Channel = IsServer;
+	switch (IsServer)
+	{
+	case OTA_SRC_SMS:
+		Ql_strncpy(LastOTAResponse.Source, (sender && sender[0]) ? sender : "SMS", sizeof(LastOTAResponse.Source) - 1);
+		break;
+	case OTA_SRC_SCK_1:
+		Ql_sprintf(LastOTAResponse.Source, "%s:%s", VTSData.ServerData.IP1, VTSData.ServerData.Port1);
+		break;
+	case OTA_SRC_SCK_2:
+		Ql_sprintf(LastOTAResponse.Source, "%s:%s", VTSData.ServerData.IP3, VTSData.ServerData.Port3);
+		break;
+	case OTA_SRC_SCK_3:
+		Ql_sprintf(LastOTAResponse.Source, "%s:%s", VTSData.ServerData.IP4, VTSData.ServerData.Port4);
+		break;
+	case OTA_SRC_SCK_4:
+		Ql_sprintf(LastOTAResponse.Source, "%s:%s", VTSData.ServerData.IP4, VTSData.ServerData.Port4);
+		break;
+	case OTA_SRC_BLE:
+		Ql_strncpy(LastOTAResponse.Source, "BLE", sizeof(LastOTAResponse.Source) - 1);
+		break;
+	case OTA_SRC_RS232:
+		Ql_strncpy(LastOTAResponse.Source, "RS232", sizeof(LastOTAResponse.Source) - 1);
+		break;
+	case OTA_SRC_RS485:
+		Ql_strncpy(LastOTAResponse.Source, "RS485", sizeof(LastOTAResponse.Source) - 1);
+		break;
+	default:
+		Ql_sprintf(LastOTAResponse.Source, "%s:%s", VTSData.ServerData.IP1, VTSData.ServerData.Port1);
+		break;
+	}
+	LastOTAResponse.Source[sizeof(LastOTAResponse.Source) - 1] = '\0';
+	Ql_strncpy(LastOTAResponse.Mode, "SET", sizeof(LastOTAResponse.Mode) - 1);
+	Ql_strncpy(LastOTAResponse.CmdId, "VRESET", sizeof(LastOTAResponse.CmdId) - 1);
+	Ql_strncpy(LastOTAResponse.Value, "System Restarting", sizeof(LastOTAResponse.Value) - 1);
+	LastOTAResponse.Status = 1;
+	LastOTAResponse.Pending = 1;
+	AddAlert(CONF_CHANGE_ALERT);
+
+	AIS140ResetPending = 2;
+	Ql_strncpy(AIS140ResetReason, "VRESET", sizeof(AIS140ResetReason) - 1);
+#else
+	SendResponce(sender, "Device Restarting...", IsServer, 1);
+	ThreadSleep(6000);
+	Ql_Reset(0);
+#endif
 }
 
 
@@ -2389,7 +2475,9 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			else
 				Ql_strcat(SimData,"G.TR NC, ");
 			#else
-			if(ServerSocket[0].SocketState == SOCKET_CONNECTED)
+			if(VTSData.ServerData.IP1[0] == 'N' && VTSData.ServerData.IP1[1] == 'A')
+				Ql_strcat(SimData,"G.TR NA, ");
+			else if(ServerSocket[0].SocketState == SOCKET_CONNECTED)
 				Ql_strcat(SimData,"G.TR OK, ");
 			else
 				Ql_strcat(SimData,"G.TR NC, ");
@@ -2397,19 +2485,25 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			#endif
 
 			#ifndef PROTO_CDAC
-			if(ServerSocket[1].SocketState == SOCKET_CONNECTED)
+			if(VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A')
+				Ql_strcat(SimData,"G.EM NA, ");
+			else if(ServerSocket[1].SocketState == SOCKET_CONNECTED)
 				Ql_strcat(SimData,"G.EM OK, ");
 			else
 				Ql_strcat(SimData,"G.EM NC, ");
 			#endif
 
-			if(ServerSocket[2].SocketState == SOCKET_CONNECTED)
+			if(VTSData.ServerData.IP3[0] == 'N' && VTSData.ServerData.IP3[1] == 'A')
+				Ql_strcat(SimData,"P.TR NA");
+			else if(ServerSocket[2].SocketState == SOCKET_CONNECTED)
 				Ql_strcat(SimData,"P.TR OK");
 			else
 				Ql_strcat(SimData,"P.TR NC");
 			
 			#ifdef EXTENDED_IPS
-			if(ServerSocket[3].SocketState == SOCKET_CONNECTED)
+			if(VTSData.ServerData.IP4[0] == 'N' && VTSData.ServerData.IP4[1] == 'A')
+				Ql_strcat(SimData,", E.IP NA");
+			else if(ServerSocket[3].SocketState == SOCKET_CONNECTED)
 				Ql_strcat(SimData,", E.IP OK");
 			else
 				Ql_strcat(SimData,", E.IP NC");
@@ -2686,6 +2780,11 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			SendResponce(SMSSender,SimData,IsServer,0);
 			return 1;
 		}
+	}
+	if(Ql_strstr(msg,"VRESET"))
+	{
+		QueueVResetResponse(SMSSender, IsServer);
+		return 1;
 	}
 	fn = Ql_strstr(msg,"SET");
 	if(fn)
@@ -3141,12 +3240,14 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 		ls=Ql_strstr(fn,"SERVER");
 		if(ls)
 		{
+			uint8_t s1_changed = 0, s2_changed = 0, s3_changed = 0, s4_changed = 0;
 			memset(ss,0,sizeof(ss));
 			i=GetValueFromData(ls,"SERVER1",' ',0,',',ss);// SETSERVER1 ip,port[,SERVER2 ip,port]
 			if(i)
 			{
 				Ql_strncpy(VTSData.ServerData.IP1, ss, sizeof(VTSData.ServerData.IP1) - 1);
 				VTSData.ServerData.IP1[sizeof(VTSData.ServerData.IP1) - 1] = '\0';
+				s1_changed = 1;
 			}
 			memset(ss,0,sizeof(ss));
 			i=GetValueFromData(ls,"SERVER1",',',1,',',ss);
@@ -3154,6 +3255,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			{
 				Ql_strncpy(VTSData.ServerData.Port1, ss, sizeof(VTSData.ServerData.Port1) - 1);
 				VTSData.ServerData.Port1[sizeof(VTSData.ServerData.Port1) - 1] = '\0';
+				s1_changed = 1;
 			}
 			else
 			{
@@ -3163,6 +3265,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 				{
 					Ql_strncpy(VTSData.ServerData.Port1, ss, sizeof(VTSData.ServerData.Port1) - 1);
 					VTSData.ServerData.Port1[sizeof(VTSData.ServerData.Port1) - 1] = '\0';
+				s1_changed = 1;
 				}
 			}
 			memset(ss,0,sizeof(ss));
@@ -3171,6 +3274,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			{
 				Ql_strncpy(VTSData.ServerData.IP2, ss, sizeof(VTSData.ServerData.IP2) - 1);
 				VTSData.ServerData.IP2[sizeof(VTSData.ServerData.IP2) - 1] = '\0';
+				s2_changed = 1;
 			}
 			memset(ss,0,sizeof(ss));
 			i=GetValueFromData(ls,"SERVER2",',',1,',',ss);
@@ -3178,6 +3282,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			{
 				Ql_strncpy(VTSData.ServerData.Port2, ss, sizeof(VTSData.ServerData.Port2) - 1);
 				VTSData.ServerData.Port2[sizeof(VTSData.ServerData.Port2) - 1] = '\0';
+				s2_changed = 1;
 			}
 			else
 			{
@@ -3187,6 +3292,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 				{
 					Ql_strncpy(VTSData.ServerData.Port2, ss, sizeof(VTSData.ServerData.Port2) - 1);
 					VTSData.ServerData.Port2[sizeof(VTSData.ServerData.Port2) - 1] = '\0';
+				s2_changed = 1;
 				}
 			}
 
@@ -3196,6 +3302,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			{
 				Ql_strncpy(VTSData.ServerData.IP3, ss, sizeof(VTSData.ServerData.IP3) - 1);
 				VTSData.ServerData.IP3[sizeof(VTSData.ServerData.IP3) - 1] = '\0';
+				s3_changed = 1;
 			}
 			memset(ss,0,sizeof(ss));
 			i=GetValueFromData(ls,"SERVER3",',',1,',',ss);
@@ -3203,6 +3310,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			{
 				Ql_strncpy(VTSData.ServerData.Port3, ss, sizeof(VTSData.ServerData.Port3) - 1);
 				VTSData.ServerData.Port3[sizeof(VTSData.ServerData.Port3) - 1] = '\0';
+				s3_changed = 1;
 			}
 			else
 			{
@@ -3212,6 +3320,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 				{
 					Ql_strncpy(VTSData.ServerData.Port3, ss, sizeof(VTSData.ServerData.Port3) - 1);
 					VTSData.ServerData.Port3[sizeof(VTSData.ServerData.Port3) - 1] = '\0';
+				s3_changed = 1;
 				}
 			}
 
@@ -3222,6 +3331,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			{
 				Ql_strncpy(VTSData.ServerData.IP4, ss, sizeof(VTSData.ServerData.IP4) - 1);
 				VTSData.ServerData.IP4[sizeof(VTSData.ServerData.IP4) - 1] = '\0';
+				s4_changed = 1;
 			}
 			memset(ss,0,sizeof(ss));
 			i=GetValueFromData(ls,"SERVER4",',',1,',',ss);
@@ -3229,6 +3339,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			{
 				Ql_strncpy(VTSData.ServerData.Port4, ss, sizeof(VTSData.ServerData.Port4) - 1);
 				VTSData.ServerData.Port4[sizeof(VTSData.ServerData.Port4) - 1] = '\0';
+				s4_changed = 1;
 			}
 			else
 			{
@@ -3238,6 +3349,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 				{
 					Ql_strncpy(VTSData.ServerData.Port4, ss, sizeof(VTSData.ServerData.Port4) - 1);
 					VTSData.ServerData.Port4[sizeof(VTSData.ServerData.Port4) - 1] = '\0';
+				s4_changed = 1;
 				}
 			}
 			Ql_sprintf(SimData,"Update IP1: %s, %s\nIP2: %s,%s\nIP3: %s,%s\n,IP4: %s,%s",VTSData.ServerData.IP1,VTSData.ServerData.Port1,VTSData.ServerData.IP2,VTSData.ServerData.Port2,VTSData.ServerData.IP3,VTSData.ServerData.Port3,VTSData.ServerData.IP4,VTSData.ServerData.Port4);
@@ -3246,7 +3358,12 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			#endif
 			SendResponce(SMSSender,SimData,IsServer,1);
 			UpdateConfigInFlash();
-			InitSockets();
+			if(s1_changed) ReinitSingleSocket(0);
+			if(s2_changed) ReinitSingleSocket(1);
+			if(s3_changed) ReinitSingleSocket(2);
+			#ifdef EXTENDED_IPS
+			if(s4_changed) ReinitSingleSocket(3);
+			#endif
 
 			return 1;
 		}
@@ -3492,9 +3609,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 		ls=Ql_strstr(fn,"VRESET");
 		if(ls)
 		{
-			SendResponce(SMSSender,"Device Restarting...",IsServer,1);
-			ThreadSleep(6000);
-			Ql_Reset(0);//Restart
+			QueueVResetResponse(SMSSender, IsServer);
 			return 1;
 		}
 		

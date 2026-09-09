@@ -580,7 +580,7 @@ bool SMS_Initialize(void)
 #define MAX_GSM_SEG_LEN     153
 #define MAX_UCS2_SEG_LEN    67
 
-void SMS_SendTextMessage(char* phoneNumber, const char* message, bool isUCS2)
+bool SMS_SendTextMessage(char* phoneNumber, const char* message, bool isUCS2)
 {
     s32 iResult;
     u32 nMsgRef;
@@ -632,7 +632,7 @@ void SMS_SendTextMessage(char* phoneNumber, const char* message, bool isUCS2)
         if (iResult != RIL_AT_SUCCESS) {
             LOGData(TAG_SMS, "< SMS Seg %d/%d Failed, cause=%d >\r\n",
                 i + 1, totalSeg, Ql_RIL_AT_GetErrCode());
-            return;
+            return FALSE;
         }
 
         LOGData(TAG_SMS, "< SMS Seg %d/%d Sent, MsgRef=%u >\r\n",
@@ -640,6 +640,7 @@ void SMS_SendTextMessage(char* phoneNumber, const char* message, bool isUCS2)
 
         Ql_Sleep(500); // optional wait
     }
+    return totalSeg > 0;
 }
 
 

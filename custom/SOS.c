@@ -146,10 +146,17 @@ void ProcessSOS(void)
 			LOGData(TAG_SOS,"********************SOS TAMPERED / WIRECUT!! (Code 02) ***********************");
 			SOS.IsSOSTamper=1;
 			SOS.RequireRelease=1; // Latch until button returns to idle level to prevent false triggers
-			VAlert[SOS_TMP_ALERT].Enable=1;
-			AddAlert(SOS_TMP_ALERT);
-			IsPacketReady.IsCriticalPacket=1;
-			SMSAlert(16);
+			if(!VTSData.DisableSOSTamper)
+			{
+				VAlert[SOS_TMP_ALERT].Enable=1;
+				AddAlert(SOS_TMP_ALERT);
+				IsPacketReady.IsCriticalPacket=1;
+				SMSAlert(16);
+			}
+			else
+			{
+				LOGData(TAG_SOS, "SOS Tamper Alert to server is DISABLED");
+			}
 			return;
 		}
 	}
@@ -237,8 +244,15 @@ void ProcessSOS(void)
 			LOGData(TAG_SOS,"********************\nSOS Temper Alert ON********************\n");
 			SOS.IsSOSTamper=1;
 			SOS.RequireRelease=1; // Latch until button returns to idle level to prevent false triggers
-			AddAlert(SOS_TMP_ALERT);
-			IsPacketReady.IsCriticalPacket=1;
+			if(!VTSData.DisableSOSTamper)
+			{
+				AddAlert(SOS_TMP_ALERT);
+				IsPacketReady.IsCriticalPacket=1;
+			}
+			else
+			{
+				LOGData(TAG_SOS, "SOS Tamper Alert to server is DISABLED");
+			}
 			return;
 		}
 	}
@@ -252,6 +266,10 @@ void ProcessSOS(void)
 				if((SOS.SOSPushCount >= PUSH_MIN_DELAY) && !SOS.IsSOS)
 				{
 					SOS.IsSOS=1;
+					#ifdef PROTO_OG
+					SOS.IsSOSSMS = 0;
+					IsPacketReady.IsNormalPacket = 1;
+					#else
 					uint8_t isServer2Disabled = (VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A');
 					uint8_t isEmergencyConnected = isServer2Disabled ?
 						(ServerSocket[0].SocketState == SOCKET_CONNECTED) :
@@ -260,6 +278,7 @@ void ProcessSOS(void)
 					if (!isEmergencyConnected) {
 						SendSOSSMS(1);
 					}
+					#endif
 
 					SOS.SOSTimeLasped=0;
 					VAlert[SOS_ON_ALERT].Enable=1;
@@ -284,4 +303,3 @@ void ProcessSOS(void)
 	}
 }
 #endif
-

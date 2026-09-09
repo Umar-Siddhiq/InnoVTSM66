@@ -49,6 +49,35 @@ typedef struct
 	
 }GPS_Typedef;
 
+#define LAST_GPS_MAGIC 0x47505331UL /* 'GPS1' */
+
+typedef struct
+{
+    uint32_t Magic;
+    uint8_t  Valid;          // 1 if at least one valid fix has been captured
+    double   Latitude;
+    char     LatDir;
+    double   Longitude;
+    char     LngDir;
+    double   Speed;
+    double   Heading;
+    double   Altitude;
+    double   PDOP;
+    double   HDOP;
+    uint8_t  NoOfSatalite;
+    char     sLatitude[20];
+    char     sLongitude[20];
+    char     sAltitude[20];
+    char     sSpeed[20];
+    char     sHeading[20];
+    char     sPDOP[20];
+    char     sHDOP[20];
+} LastFixedGPS_Typedef;
+
+extern LastFixedGPS_Typedef LastFixedGPS;
+void GPS_LoadLastFixedFromFlash(void);
+void GPS_SaveLastFixedToFlash(void);
+
 extern char	sLatitude[];
 extern char sLongitude[];
 extern char sAltitude[];

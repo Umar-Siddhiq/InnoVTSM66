@@ -19,15 +19,13 @@ UartExchangetypedef RS232_Buffer = {0};
 
 float mcu_mainsadc_to_voltage(int adc_value)
 {
-
     const float VREF = 3.3f;           // ADC reference voltage
     const float DIODE_DROP = 0.67f;    // Constant diode voltage drop
-    const float DIVIDER_RATIO = 7.32f; // From your setup
+    const float DIVIDER_RATIO = 7.32f; // From setup
 
-    
     float adc_voltage = ((float)adc_value / 1023.0f) * VREF;
     float input_voltage = (adc_voltage * DIVIDER_RATIO) + DIODE_DROP;
-    if(input_voltage<3.0f)
+    if(input_voltage < 3.0f)
     {
         input_voltage = 0; 
     }

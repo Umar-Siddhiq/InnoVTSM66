@@ -1,5 +1,6 @@
 #include "Server.h"
 #include "File.h"
+#include "SystemRecovery.h"
 #if defined(PROTO_CDAC)
 #include "HttpQueue.h"
 #endif
@@ -321,68 +322,101 @@ void DisConnectedCallback(int socketno)
     
 }
 
+void ReinitSingleSocket(uint8_t socketIndex)
+{
+    if (socketIndex >= TCP_MAX_SOCKETS) return;
+
+    if (ServerSocket[socketIndex].SocketIndex >= 0) {
+        Ql_SOC_Close(ServerSocket[socketIndex].SocketIndex);
+        ServerSocket[socketIndex].SocketIndex = -1;
+    }
+    ServerSocket[socketIndex].SocketState = SOCKET_CLOSED;
+
+    switch (socketIndex)
+    {
+        case 0:
+#ifdef PROTO_CDAC
+            UpdateURL(VTSData.ServerData.IP1);
+#endif
+            if(VTSData.ServerData.IPConfig[0])
+                ServerSocket[0].isEnabled = 1;
+            else
+                ServerSocket[0].isEnabled = 0;
+            ServerSocket[0].SocketNo = 0;
+            Ql_strncpy(ServerSocket[0].DNSorIP, VTSData.ServerData.IP1, sizeof(ServerSocket[0].DNSorIP) - 1);
+            ServerSocket[0].DNSorIP[sizeof(ServerSocket[0].DNSorIP) - 1] = '\0';
+            ServerSocket[0].Port = Ql_atoi(VTSData.ServerData.Port1);
+            ServerSocket[0].OnConnect = &ConnectedCallback;
+            ServerSocket[0].Connected = &whileConnected;
+            ServerSocket[0].OnDisconnect = &DisConnectedCallback;
+            ServerSocket[0].rxSizeMAX = RECV_BUFFER_LEN;
+            ServerSocket[0].rxBuffer = Server1RxData;
+            break;
+
+        case 1:
+            if(VTSData.ServerData.IPConfig[1])
+                ServerSocket[1].isEnabled = 1;
+            else
+                ServerSocket[1].isEnabled = 0;
+            ServerSocket[1].SocketNo = 1;
+            Ql_strncpy(ServerSocket[1].DNSorIP, VTSData.ServerData.IP2, sizeof(ServerSocket[1].DNSorIP) - 1);
+            ServerSocket[1].DNSorIP[sizeof(ServerSocket[1].DNSorIP) - 1] = '\0';
+            ServerSocket[1].Port = Ql_atoi(VTSData.ServerData.Port2);
+            ServerSocket[1].OnConnect = NULL;
+            ServerSocket[1].Connected = NULL;
+            ServerSocket[1].OnDisconnect = NULL;
+            ServerSocket[1].rxSizeMAX = 0;
+            ServerSocket[1].rxBuffer = NULL;
+            break;
+
+        case 2:
+#ifdef PROTO_CDAC
+            UpdateSecondaryURL(VTSData.ServerData.IP3);
+#endif
+            /* ServerSocket[2] (Server 3): TCP if bare IP:port, HTTP if http(s):// URL */
+            if(VTSData.ServerData.IPConfig[2] && !IsHttpUrl(VTSData.ServerData.IP3))
+                ServerSocket[2].isEnabled = 1;
+            else
+                ServerSocket[2].isEnabled = 0;
+            ServerSocket[2].SocketNo = 2;
+            Ql_strncpy(ServerSocket[2].DNSorIP, VTSData.ServerData.IP3, sizeof(ServerSocket[2].DNSorIP) - 1);
+            ServerSocket[2].DNSorIP[sizeof(ServerSocket[2].DNSorIP) - 1] = '\0';
+            ServerSocket[2].Port = Ql_atoi(VTSData.ServerData.Port3);
+            ServerSocket[2].OnConnect = ServerSocket[2].isEnabled ? &ConnectedCallback : NULL;
+            ServerSocket[2].OnDisconnect = ServerSocket[2].isEnabled ? &DisConnectedCallback : NULL;
+            ServerSocket[2].rxSizeMAX = RECV_BUFFER_LEN;
+            ServerSocket[2].rxBuffer = Server2RxData;
+            break;
+
+#ifdef EXTENDED_IPS
+        case 3:
+#ifdef PROTO_CDAC
+            UpdateTertiaryURL(VTSData.ServerData.IP4);
+#endif
+            /* ServerSocket[3] (Server 4): TCP if bare IP:port, HTTP if http(s):// URL */
+            ServerSocket[3].isEnabled = !IsHttpUrl(VTSData.ServerData.IP4) ? 1 : 0;
+            ServerSocket[3].SocketNo = 3;
+            Ql_strncpy(ServerSocket[3].DNSorIP, VTSData.ServerData.IP4, sizeof(ServerSocket[3].DNSorIP) - 1);
+            ServerSocket[3].DNSorIP[sizeof(ServerSocket[3].DNSorIP) - 1] = '\0';
+            ServerSocket[3].Port = Ql_atoi(VTSData.ServerData.Port4);
+            ServerSocket[3].OnConnect = NULL;
+            ServerSocket[3].OnDisconnect = NULL;
+            ServerSocket[3].rxSizeMAX = RECV_BUFFER_LEN;
+            ServerSocket[3].rxBuffer = Server3RxData;
+            break;
+#endif
+        default:
+            break;
+    }
+}
+
 void InitSockets(void)
 {
-#ifdef PROTO_CDAC
-    UpdateURL(VTSData.ServerData.IP1);
-    UpdateSecondaryURL(VTSData.ServerData.IP3);
-    #ifdef EXTENDED_IPS
-    UpdateTertiaryURL(VTSData.ServerData.IP4);
-    #endif
-#endif
-    if(VTSData.ServerData.IPConfig[0])
-        ServerSocket[0].isEnabled=1;
-    ServerSocket[0].SocketNo = 0;
-    ServerSocket[0].SocketIndex = -1;
-    ServerSocket[0].SocketState = SOCKET_CLOSED;
-    Ql_strncpy(ServerSocket[0].DNSorIP, VTSData.ServerData.IP1, sizeof(ServerSocket[0].DNSorIP) - 1);
-    ServerSocket[0].DNSorIP[sizeof(ServerSocket[0].DNSorIP) - 1] = '\0';
-    ServerSocket[0].Port = Ql_atoi(VTSData.ServerData.Port1);
-    ServerSocket[0].OnConnect = &ConnectedCallback;
-    ServerSocket[0].Connected = &whileConnected;
-    ServerSocket[0].OnDisconnect = &DisConnectedCallback;
-    ServerSocket[0].rxSizeMAX = RECV_BUFFER_LEN;
-    ServerSocket[0].rxBuffer = Server1RxData;
-    
-    if(VTSData.ServerData.IPConfig[1])
-        ServerSocket[1].isEnabled=1;
-    ServerSocket[1].SocketNo = 1;
-    ServerSocket[1].SocketIndex = -1;
-    ServerSocket[1].SocketState = SOCKET_CLOSED;
-    Ql_strncpy(ServerSocket[1].DNSorIP, VTSData.ServerData.IP2, sizeof(ServerSocket[1].DNSorIP) - 1);
-    ServerSocket[1].DNSorIP[sizeof(ServerSocket[1].DNSorIP) - 1] = '\0';
-    ServerSocket[1].Port = Ql_atoi(VTSData.ServerData.Port2);
-
-    /* ServerSocket[2] (Server 3): TCP if bare IP:port, HTTP if http(s):// URL */
-    if(VTSData.ServerData.IPConfig[2] && !IsHttpUrl(VTSData.ServerData.IP3))
-        ServerSocket[2].isEnabled = 1;
-    else
-        ServerSocket[2].isEnabled = 0;
-    ServerSocket[2].SocketNo = 2;
-    ServerSocket[2].SocketIndex = -1;
-    ServerSocket[2].SocketState = SOCKET_CLOSED;
-    Ql_strncpy(ServerSocket[2].DNSorIP, VTSData.ServerData.IP3, sizeof(ServerSocket[2].DNSorIP) - 1);
-    ServerSocket[2].DNSorIP[sizeof(ServerSocket[2].DNSorIP) - 1] = '\0';
-    ServerSocket[2].Port = Ql_atoi(VTSData.ServerData.Port3);
-    ServerSocket[2].OnConnect = ServerSocket[2].isEnabled ? &ConnectedCallback : NULL;
-    ServerSocket[2].OnDisconnect = ServerSocket[2].isEnabled ? &DisConnectedCallback : NULL;
-    ServerSocket[2].rxSizeMAX = RECV_BUFFER_LEN;
-    ServerSocket[2].rxBuffer = Server2RxData;
-    #ifdef EXTENDED_IPS
-    /* ServerSocket[3] (Server 4): TCP if bare IP:port, HTTP if http(s):// URL */
-    ServerSocket[3].isEnabled = !IsHttpUrl(VTSData.ServerData.IP4) ? 1 : 0;
-    ServerSocket[3].SocketNo = 3;
-    ServerSocket[3].SocketIndex = -1;
-    ServerSocket[3].SocketState = SOCKET_CLOSED;
-    Ql_strncpy(ServerSocket[3].DNSorIP, VTSData.ServerData.IP4, sizeof(ServerSocket[3].DNSorIP) - 1);
-    ServerSocket[3].DNSorIP[sizeof(ServerSocket[3].DNSorIP) - 1] = '\0';
-    ServerSocket[3].Port = Ql_atoi(VTSData.ServerData.Port4);
-    ServerSocket[3].OnConnect = NULL;
-    ServerSocket[3].OnDisconnect = NULL;
-    ServerSocket[3].rxSizeMAX = RECV_BUFFER_LEN;
-    ServerSocket[3].rxBuffer = Server3RxData;
-    
-    #endif  
+    int i;
+    for (i = 0; i < TCP_MAX_SOCKETS; i++)
+    {
+        ReinitSingleSocket(i);
+    }
 }
 
 
@@ -1383,7 +1417,7 @@ void InitBuffer(uint8_t alt)
 	if (!PVTAppendFloat(dd, "%05.1f") || !PVTAppendChar(',')) goto packet_overflow;
 
 	/* OTA response - AMD3 sect10 */
-	if (LastOTAResponse.Pending)
+	if (LastOTAResponse.Pending && alt == 12)
 	{
 		if (!PVTAppendBounded("(", 2) || !PVTAppendBounded(LastOTAResponse.Source, sizeof(LastOTAResponse.Source)) ||
 			!PVTAppendBounded("|", 2) || !PVTAppendBounded(LastOTAResponse.Mode, sizeof(LastOTAResponse.Mode)) ||
@@ -1391,7 +1425,6 @@ void InitBuffer(uint8_t alt)
 			!PVTAppendBounded(":", 2) || !PVTAppendBounded(LastOTAResponse.Value, sizeof(LastOTAResponse.Value)) ||
 			!PVTAppendBounded(":", 2) || !PVTAppendUInt(LastOTAResponse.Status, "%d") || !PVTAppendBounded(")", 2))
 			goto packet_overflow;
-		LastOTAResponse.Pending = 0;
 	}
 	else
 	{
@@ -1422,6 +1455,7 @@ void InitBuffer(uint8_t alt)
 	lastcrc = cs;
 	if (!PVTAppendBounded(ss, sizeof(ss))) goto packet_overflow;
 	FrameNumber++;
+	if (alt == 12) LastOTAResponse.Pending = 0;
 	return;
 
 packet_overflow:
@@ -2410,27 +2444,55 @@ void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 {
 	OTAResponseTypeDef saved;
-	const char* src_str = "SCK1";
-	const char* id      = param ? param : "";
+	char src_buf[64] = {0};
+	const char* id   = param ? param : "";
 	uint8_t n;
-
-	(void)Sender;
 
 	/* InitBuffer(12) consumes LastOTAResponse and clears Pending, so keep any
 	 * AMD3 acknowledgement that has not been transmitted yet. */
 	saved = LastOTAResponse;
 
-	if      (IsServer == OTA_SRC_SMS)   src_str = "SMS";
-	else if (IsServer == OTA_SRC_SCK_1) src_str = "SCK1";
-	else if (IsServer == OTA_SRC_SCK_2) src_str = "SCK2";
-	else if (IsServer == OTA_SRC_SCK_3) src_str = "SCK3";
-	else if (IsServer == OTA_SRC_SCK_4) src_str = "SCK4";
-	else if (IsServer == OTA_SRC_BLE)   src_str = "BLE";
-	else if (IsServer == OTA_SRC_RS232) src_str = "RS232";
-	else if (IsServer == OTA_SRC_RS485) src_str = "RS485";
+	/* Populate SOURCE with the actual originating address per the AMD3 spec's
+	 * worked examples (IP:port for a server socket, sender phone number for
+	 * SMS), mirroring ParseStandardAIS140Command(). Built from IsServer
+	 * directly rather than trusting the caller's Sender argument. Logical
+	 * SCK_2 uses socket[2]/IP3; SCK_3 uses socket[3]/IP4. Socket[1]/IP2 is
+	 * the emergency endpoint, not the second command channel. */
+	switch (IsServer)
+	{
+	case OTA_SRC_SMS:
+		Ql_strncpy(src_buf, (Sender && Sender[0]) ? Sender : "SMS", sizeof(src_buf) - 1);
+		break;
+	case OTA_SRC_SCK_1:
+		Ql_sprintf(src_buf, "%s:%s", VTSData.ServerData.IP1, VTSData.ServerData.Port1);
+		break;
+	case OTA_SRC_SCK_2:
+		Ql_sprintf(src_buf, "%s:%s", VTSData.ServerData.IP3, VTSData.ServerData.Port3);
+		break;
+	case OTA_SRC_SCK_3:
+		Ql_sprintf(src_buf, "%s:%s", VTSData.ServerData.IP4, VTSData.ServerData.Port4);
+		break;
+	case OTA_SRC_SCK_4:
+		Ql_sprintf(src_buf, "%s:%s", VTSData.ServerData.IP4, VTSData.ServerData.Port4);
+		break;
+	case OTA_SRC_BLE:
+		Ql_strncpy(src_buf, "BLE", sizeof(src_buf) - 1);
+		break;
+	case OTA_SRC_RS232:
+		Ql_strncpy(src_buf, "RS232", sizeof(src_buf) - 1);
+		break;
+	case OTA_SRC_RS485:
+		Ql_strncpy(src_buf, "RS485", sizeof(src_buf) - 1);
+		break;
+	default:
+		Ql_sprintf(src_buf, "%s:%s", VTSData.ServerData.IP1, VTSData.ServerData.Port1);
+		break;
+	}
+	src_buf[sizeof(src_buf) - 1] = '\0';
 
 	Ql_memset(&LastOTAResponse, 0, sizeof(LastOTAResponse));
-	Ql_strncpy(LastOTAResponse.Source, src_str, sizeof(LastOTAResponse.Source) - 1);
+	LastOTAResponse.Channel = IsServer;
+	Ql_strncpy(LastOTAResponse.Source, src_buf, sizeof(LastOTAResponse.Source) - 1);
 
 	/* Legacy replies arrive as "SET:PIP" / "GET:APN" / "CLR:VRN", or as a bare
 	 * action mnemonic ("RST", "FOTA", "IMON") which is always a write. */
@@ -4126,15 +4188,18 @@ void SendResponce(char *Sender, char* Resp, uint8_t IsServer, uint8_t IsSET)
             MakeParamChangeString(VTSData.ServerData.IP1,Resp,IsServer);
         }
         else if(IsServer==OTA_SRC_SCK_2) {
-            MakeParamChangeString(VTSData.ServerData.IP3,Resp,IsServer);
+            MakeParamChangeString(VTSData.ServerData.IP2,Resp,IsServer);
         }
         else if(IsServer==OTA_SRC_SCK_3) {
-            MakeParamChangeString(VTSData.ServerData.IP4,Resp,IsServer); 
+            MakeParamChangeString(VTSData.ServerData.IP3,Resp,IsServer);
+        }
+        else if(IsServer==OTA_SRC_SCK_4) {
+            MakeParamChangeString(VTSData.ServerData.IP4,Resp,IsServer);
         }
         else if(IsServer==OTA_SRC_RS232) {
 			SendRS232Response(Resp);  // Send response to RS232 source
             MakeParamChangeString("RS232",Resp,IsServer);
-           
+
         }
         else if(IsServer==OTA_SRC_RS485) {
 			SendRS485Response(Resp);  // Send response to RS485 source
@@ -4143,7 +4208,7 @@ void SendResponce(char *Sender, char* Resp, uint8_t IsServer, uint8_t IsSET)
 		else
 		{
 			BLE_SendReply((uint8_t*)Resp,strlen(Resp));
-			MakeParamChangeString("BLE",Resp,IsServer);	
+			MakeParamChangeString("BLE",Resp,IsServer);
 		}
         
         // Send to all connected servers
@@ -4321,8 +4386,9 @@ void CheckAlerts(void)
 		TCPSocket_SendString(&ServerSocket[1],dataBuffer);
 		*/
 		// NEW CODE: Dynamic routing based on Server 2 state
-		if (VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A') {
-			TCPSocket_SendString(&ServerSocket[0],dataBuffer); // Send EPB to Server 1
+		if ((VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A') ||
+		    ServerSocket[1].SocketState != SOCKET_CONNECTED) {
+			TCPSocket_SendString(&ServerSocket[0],dataBuffer); // Fallback to Server 1
 		} else {
 			TCPSocket_SendString(&ServerSocket[1],dataBuffer); // Send EPB to Server 2
 		}
@@ -4345,7 +4411,11 @@ void CheckAlerts(void)
 
 	if(VAlert[SOS_TMP_ALERT].Enable)
 	{
-		if(IsEMRTSend==0)  // SOS Temper
+		if(VTSData.DisableSOSTamper)
+		{
+			VAlert[SOS_TMP_ALERT].Enable = 0;
+		}
+		else if(IsEMRTSend==0)  // SOS Temper
 		{
 			InitBuffer(16);
 			IsEMRTSend = 1;
@@ -4570,6 +4640,20 @@ void CheckAlerts(void)
 void ChangeToHistoryPacket(char *buf)
 {
 	char *fn;
+	#ifdef PROTO_OG
+	char *star = Ql_strstr(buf, "*");
+	char checksum[3];
+	if (!star || Ql_strlen(star) < 3) return;
+	fn = Ql_strstr(buf, ",NR,1,");
+	if (fn) fn[4] = '2';
+	fn = Ql_strstr(buf, ",NR,01,");
+	if (fn) fn[5] = '2';
+	fn = Ql_strstr(buf, ",L,");
+	if (fn && fn < star) fn[1] = 'H';
+	Ql_sprintf(checksum, "%02X", GetXORChecksum(buf + 1, star - buf - 1));
+	Ql_memcpy(star + 1, checksum, 2);
+	return;
+	#endif
 	fn = Ql_strstr(buf,",NR,01");
 	if(!fn)
 	{
@@ -4603,6 +4687,16 @@ void ChangeToHistoryEPB(char *buf)
 
 	fn[1] = 'S';
 	fn[2] = 'P';
+	#ifdef PROTO_OG
+	{
+		char *star = Ql_strstr(buf, "*");
+		char checksum[3];
+		if (star && Ql_strlen(star) >= 3) {
+			Ql_sprintf(checksum, "%02X", GetXORChecksum(buf + 1, star - buf - 1));
+			Ql_memcpy(star + 1, checksum, 2);
+		}
+	}
+	#endif
 }
 
 uint16_t GetMemeryPercentage(void)
@@ -4635,7 +4729,8 @@ uint16_t GetMemeryPercentage(void)
 void ProcessHistoryPacket(void)
 {
 	int size;
-	if(ServerSocket[0].SocketState != SOCKET_CONNECTED)
+	if(ServerSocket[0].SocketState != SOCKET_CONNECTED &&
+	   ServerSocket[1].SocketState != SOCKET_CONNECTED)
 		return;
 
 	#ifdef HISTORY_DISABLED
@@ -4684,9 +4779,9 @@ void ProcessHistoryPacket(void)
 	#endif
 	size = Ql_strlen(dataBuffer);
 	LOGData(TAG_SERVER,"\r\nHistorty Packet Read Len: %d ",size);
-	if(size > 256)
+	if(size >= DATA_MAX_BUFF - 1)
 	{
-		LOGData(TAG_SERVER,"\r\nERROR History Packet Size > 256!!!!!");
+		LOGData(TAG_SERVER,"\r\nERROR History Packet exceeds buffer capacity");
 		#ifdef HISTORY_INTERNAL
 		DeleteLastPacket();
 		#else
@@ -4728,7 +4823,14 @@ void ProcessHistoryPacket(void)
 		*/
 		// NEW CODE: Dynamic routing for history emergency packets based on Server 2 state
 		uint8_t isServer2Disabled = (VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A');
-		uint8_t socketToCheck = isServer2Disabled ? 0 : 1;
+		uint8_t socketToCheck = 1;
+		if (isServer2Disabled || ServerSocket[1].SocketState != SOCKET_CONNECTED)
+		{
+			if (ServerSocket[0].SocketState == SOCKET_CONNECTED)
+				socketToCheck = 0;
+			else
+				socketToCheck = isServer2Disabled ? 0 : 1;
+		}
 		if(ServerSocket[socketToCheck].SocketState >= SOCKET_CONNECTED)
 		{
 			LOGData(TAG_SERVER,"\r\nSending History EMG Packet to Server %d...", socketToCheck + 1);
@@ -4771,7 +4873,14 @@ void ProcessHistoryPacket(void)
 		*/
 		// NEW CODE: Dynamic routing for history emergency packets based on Server 2 state
 		uint8_t isServer2Disabled = (VTSData.ServerData.IP2[0] == 'N' && VTSData.ServerData.IP2[1] == 'A');
-		uint8_t socketToCheck = isServer2Disabled ? 0 : 1;
+		uint8_t socketToCheck = 1;
+		if (isServer2Disabled || ServerSocket[1].SocketState != SOCKET_CONNECTED)
+		{
+			if (ServerSocket[0].SocketState == SOCKET_CONNECTED)
+				socketToCheck = 0;
+			else
+				socketToCheck = isServer2Disabled ? 0 : 1;
+		}
 		if(ServerSocket[socketToCheck].SocketState >= SOCKET_CONNECTED)
 		{
 			LOGData(TAG_SERVER,"\r\nSending History EMG Packet to Server %d...", socketToCheck + 1);
@@ -4828,6 +4937,7 @@ void ProcessHistoryPacket(void)
 	}
 	
 	#endif
+	if (ServerSocket[0].SocketState != SOCKET_CONNECTED) return;
 	ChangeToHistoryPacket(dataBuffer);
 
 	LOGData(TAG_SERVER,"\r\nSending Packet...");
@@ -5308,43 +5418,30 @@ static void handleLoginRequests(void) {
 
 static void handlePackets(void) {
     #ifdef PROTO_OG
-    /* AMD3 sect10 - a processed OTA command is acknowledged inside a $PVT frame.
-     * When the command came in over a TCP socket, answer that socket promptly
-     * with a dedicated OA,12 frame; for every other source the reply has already
-     * gone out on its own channel (SMS/BLE/RS232/RS485), so the acknowledgement
-     * simply rides the OTAResp field of the next $PVT that InitBuffer() builds -
-     * which is exactly what section 10 specifies.
-     *
-     * FIELD FAILURE 2026-08-13, "only $LGN arrives": this block used to end in an
-     * unconditional `return`. Only "SCK1"/"SCK2" map to a socket (and "SCK3" only
-     * under EXTENDED_IPS, which is off), so a command from SMS, BLE, RS232, RS485,
-     * SCK3 or SCK4 - and any unknown command id, which ParseStandardAIS140Command()
-     * also marks Pending - left responseSocket NULL, logged nothing, and returned.
-     * Pending is only cleared by InitBuffer(), which that return made unreachable,
-     * so CheckAlerts(), history, normal and health packets were ALL starved
-     * permanently. Login survived because handleLoginRequests() runs earlier in the
-     * server loop, and the liveness watchdog stayed quiet because the loop itself
-     * was healthy. Never return from here: a pending acknowledgement must not gate
-     * unrelated traffic. LastOTAResponse only exists in the OG build. */
+    /* Route by Channel, never by the displayed address. Pending replies use
+     * OA/12 only and must never block alerts, history or periodic packets. */
     static uint16_t otaAckWait = 0;
 
     if(LastOTAResponse.Pending) {
         TCPSocketTypedef* responseSocket = NULL;
 
-        if(Ql_strcmp(LastOTAResponse.Source, "SCK1") == 0)
+        if(LastOTAResponse.Channel == OTA_SRC_SCK_1)
             responseSocket = &ServerSocket[0];
-        else if(Ql_strcmp(LastOTAResponse.Source, "SCK2") == 0)
+        else if(LastOTAResponse.Channel == OTA_SRC_SCK_2)
             responseSocket = &ServerSocket[2];
         #ifdef EXTENDED_IPS
-        else if(Ql_strcmp(LastOTAResponse.Source, "SCK3") == 0)
+        else if(LastOTAResponse.Channel == OTA_SRC_SCK_3)
             responseSocket = &ServerSocket[3];
         #endif
+		else if (LastOTAResponse.Channel < OTA_SRC_SCK_1 ||
+		         LastOTAResponse.Channel > OTA_SRC_SCK_4)
+			responseSocket = &ServerSocket[0];
 
         if(responseSocket != NULL && responseSocket->SocketState == SOCKET_CONNECTED) {
             InitBuffer(12);  /* OA,12,L with the OTA response field; clears Pending */
             LOGData(TAG_SERVER, "OTA pkt send, sck%d len=%d",
                     responseSocket->SocketNo, Ql_strlen(dataBuffer));
-            TCPSocket_SendString(responseSocket, dataBuffer);
+            if (!LastOTAResponse.Pending && TCPSocket_SendString(responseSocket, dataBuffer)) {
 			/* Endpoint SET/CLR commands used to call InitSockets() during parsing,
 			 * closing this source connection before OA,12 could be queued. */
 			if (AIS140SocketReinitPending) {
@@ -5359,17 +5456,24 @@ static void handlePackets(void) {
                 ThreadSleep(r_type == 2 ? 1000 : 500);
                 SystemRecovery_RequestReset(AIS140ResetReason);
             }
+			} else {
+				LastOTAResponse.Pending = 1;
+			}
         }
         else if(responseSocket != NULL && otaAckWait < OTA_ACK_WAIT_TICKS) {
-            /* Source socket is down. Hold the dedicated OA,12 frame for a bounded
-             * window, then give up on it and let the next $PVT carry OTAResp so a
-             * socket that never comes back cannot pin the acknowledgement. */
+            /* Wait briefly for the source, then send/store an OA/12 frame. */
             if((++otaAckWait % 50) == 0)
                 LOGData(TAG_SERVER, "OTA ack waiting %d: sck%d state=%d",
                         otaAckWait, responseSocket->SocketNo, responseSocket->SocketState);
         }
         else {
             /* Socket is NULL, disconnected, or otaAckWait reached timeout */
+			InitBuffer(12);
+			SendDatatoServer0();
+			if (AIS140SocketReinitPending) {
+				AIS140SocketReinitPending = 0;
+				InitSockets();
+			}
             if (AIS140ResetPending) {
                 uint8_t r_type = AIS140ResetPending;
                 AIS140ResetPending = 0;
@@ -5445,6 +5549,45 @@ static void handleServerResponses(void) {
 }
 
 static void handleNormalPackets(void) {
+	#ifdef PROTO_OG
+	/* Emergency delivery depends on its own endpoint, not the PVT socket. */
+	IsPacketReady.IsNormalPacket = 0;
+	if (SOS.IsSOS) {
+		uint8_t target = (VTSData.ServerData.IP2[0] == 'N' &&
+			VTSData.ServerData.IP2[1] == 'A') ? 0 : 1;
+		uint8_t sent = 0;
+		if (GSM.IsTimeSet) {
+			EmergencyPacket(1);
+			sent = TCPSocket_SendString(&ServerSocket[target], dataBuffer);
+			if (!sent && target == 1 && ServerSocket[0].SocketState == SOCKET_CONNECTED) {
+				sent = TCPSocket_SendString(&ServerSocket[0], dataBuffer);
+			}
+			if (!sent) {
+				#ifndef HISTORY_DISABLED
+				#ifdef HISTORY_INTERNAL
+				SavePacket();
+				#else
+				WriteHistoryData(dataBuffer);
+				#endif
+				#endif
+			}
+		}
+		if (!sent && !SOS.IsSOSSMS) {
+			/* Retry on the SOS interval until the modem accepts the SMS.
+			 * A later TCP failure must also trigger fallback after SOS began. */
+			SOS.IsSOSSMS = SendSOSSMS(1);
+		}
+	}
+	if (GSM.IsTimeSet) {
+		#ifdef SOS_FULL_EA
+		InitBuffer(SOS.IsSOS ? 10 : 1);
+		#else
+		InitBuffer(1);
+		#endif
+		SendDatatoServer0();
+	}
+	return;
+	#endif
 
 	if(!GSM.IsTimeSet)
 	{

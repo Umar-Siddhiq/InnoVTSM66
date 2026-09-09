@@ -277,10 +277,18 @@ void UpdateTick(void)
     #ifdef PRF_AUTOSWITCH 
     #ifndef PROTO_CDAC
     if(ServerSocket[0].SocketState != SOCKET_CONNECTED && !SleepConfig.IsEnabled && ServerSocket[1].SocketState!=SOCKET_CONNECTED 
-        && ServerSocket[2].SocketState!=SOCKET_CONNECTED && FTPState != FTP_STATE_CONNECTED && GSM.GSMState>=SIM_DETECTED)
+        && ServerSocket[2].SocketState!=SOCKET_CONNECTED
+        #ifdef EXTENDED_IPS
+        && ServerSocket[3].SocketState!=SOCKET_CONNECTED
+        #endif
+        && FTPState != FTP_STATE_CONNECTED && GSM.GSMState>=SIM_DETECTED)
     #else
     if(HTTPState!=HTTP_STATE_SET && !SleepConfig.IsEnabled && ServerSocket[1].SocketState!=SOCKET_CONNECTED 
-        && ServerSocket[2].SocketState!=SOCKET_CONNECTED && FTPState != FTP_STATE_CONNECTED && GSM.GSMState>=SIM_DETECTED)
+        && ServerSocket[2].SocketState!=SOCKET_CONNECTED
+        #ifdef EXTENDED_IPS
+        && ServerSocket[3].SocketState!=SOCKET_CONNECTED
+        #endif
+        && FTPState != FTP_STATE_CONNECTED && GSM.GSMState>=SIM_DETECTED)
     #endif
     {
         uint32_t current_timeout = PRF_TIMEOUT; // Default to 10 minutes (600s)

@@ -166,7 +166,7 @@ void system_init(void)
     #ifndef PROTO_OG
     strcpy(FirmVer,FIRMWAREVERSION);
     #else
-    Ql_sprintf(FirmVer,"V%s",FIRMWAREVERSION);
+    Ql_sprintf(FirmVer,"%s",FIRMWAREVERSION);
     #endif
     LOGData(TAG_MAIN,"OpenCPU: APM %s Firware Version %s, State/Proto: %s\r\n", PROTOVER, FirmVer, PROTO_TAG);
     InitSystic();

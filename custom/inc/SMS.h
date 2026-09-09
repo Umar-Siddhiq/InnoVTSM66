@@ -26,12 +26,13 @@ extern char CMD_Buff[];
 
 #ifdef PROTO_OG
 typedef struct {
-    char    Source[8];   /* "SCK1", "SMS", "BLE", "RS232", "RS485" */
+    char    Source[64];  /* Origin address (host:port / phone), or local channel. */
+    uint8_t Channel;     /* OTA_SRC_* routing identity, independent of Source. */
     char    Mode[8];     /* "GET", "SET", "CLR" */
     char    CmdId[128];  /* "001" or multiple "001,002,003,019,022" */
     char    Value[256];  /* returned/set value or multiple "val1,val2,val3" */
     uint8_t Status;      /* 1=success, 0=failure */
-    uint8_t Pending;     /* 1=waiting to embed in next PVT, cleared after send */
+    uint8_t Pending;     /* 1=waiting for OA/12; restored if socket send fails */
 } OTAResponseTypeDef;
 
 extern OTAResponseTypeDef LastOTAResponse;
@@ -46,12 +47,12 @@ extern char AIS140ResetReason[32];
 void ParseStandardAIS140Command(const char* raw, uint8_t src);
 #endif
 
-void SendSOSSMS(uint8_t isFall);
+uint8_t SendSOSSMS(uint8_t isFall);
 #ifndef PROTO_CDAC
 void SendGeoData(uint8_t index, uint8_t OTASource);
 #endif
 void SendSOSAlertSMS(uint8_t AlertNum);
-void SendSMS(char* ph,char* msg);
+uint8_t SendSMS(char* ph,char* msg);
 
 uint8_t DecodeSMS(char* msg,uint8_t IsServer);
 void MakeACTMessage(uint8_t mode, char* code);

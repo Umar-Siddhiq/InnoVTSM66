@@ -25,17 +25,16 @@
 #include <string.h>
 // #include "Geofence.h"
 
-
 #ifdef PROTO_CDAC
-#define IS_PROTO_CDAC()   (1)
+#define IS_PROTO_CDAC() (1)
 #else
-#define IS_PROTO_CDAC()   (0)
+#define IS_PROTO_CDAC() (0)
 #endif
 
 #ifdef PROTO_NIC1
-#define IS_PROTO_NIC()    (1)
+#define IS_PROTO_NIC() (1)
 #else
-#define IS_PROTO_NIC()    (0)
+#define IS_PROTO_NIC() (0)
 #endif
 
 #ifdef PROTO_ODISA1
@@ -45,17 +44,16 @@
 #endif
 
 #ifdef PROTO_MAHARASHTRA1
-#define IS_PROTO_MH()     (1)
+#define IS_PROTO_MH() (1)
 #else
-#define IS_PROTO_MH()     (0)
+#define IS_PROTO_MH() (0)
 #endif
 
 #ifdef PROTO_OG
-#define IS_PROTO_OG()     (1)
+#define IS_PROTO_OG() (1)
 #else
-#define IS_PROTO_OG()     (0)
+#define IS_PROTO_OG() (0)
 #endif
-
 
 #if !defined(PROTO_MAHARASHTRA1) && !defined(PROTO_NIC1) &&                    \
     !defined(PROTO_CDAC) && !defined(PROTO_ODISA1) && !defined(PROTO_OG)
@@ -72,24 +70,24 @@
 //
 
 #ifndef PROTO_CDAC
-#define HISTORY_DISABLED
+// #define HISTORY_DISABLED
 #endif
 #define PRF_AUTOSWITCH
-//#define HISTORY_INTERNAL
-//#define AUTO_SLEEP_ENABLE  // Auto sleep after 2 min ignition off
+#define HISTORY_INTERNAL
+//#define AUTO_SLEEP_ENABLE // Auto sleep after 2 min ignition off
 extern char FirmVer[];
 
 #ifdef AUTO_SLEEP_ENABLE
 #warning "AUTO SLEEP ENABLED, disbale for production"
 #endif
-
+ 
 // #define AUTO_PROFILESWITCH_DISABLE
 #ifdef AUTO_PROFILESWITCH_DISABLE
 #warning                                                                       \
     "AUTO PROFILE SWITCH is disabled, device will be always in airtel profile, switch operator manually if needed"
 #endif
 
-#define FIRMWAREVERSION "1.5.9"
+#define FIRMWAREVERSION "01.05.09"
 #define DevModel "02"
 #define SDKFirm "01/V1.0"
 #define PROTOVER "AIS140"
@@ -101,9 +99,9 @@ extern char FirmVer[];
 #define LOW_BAT_THRS_PER 85
 
 // #define SIMMAKE_APM
- //#define SIMMAKE_IDEMIA_3P
+ #define SIMMAKE_IDEMIA_3P
 // #define SIMMAKE_SENS
-#define SIMMAKE_GND
+// #define SIMMAKE_GND
 // #define SIMMAKE_TACHNOJACKS
 // #define SIMMAKE_COLORPLAST
 
@@ -231,7 +229,7 @@ extern char FirmVer[];
 // #define NIC_TRIPURA
 // #define NIC_VAHAN
 // #define NIC_HIMACHEL
-  #define NIC_UP
+#define NIC_RAJASTHAN
 
 #define NO_PARAM
 #define DBM_IN_CSQ
@@ -306,12 +304,12 @@ extern char FirmVer[];
 #define DEFAULT_IP3 "13.234.160.106"
 #define DEFAULT_PORT3 "8224"
 
-#elif defined(NIC_UP)
+#elif defined(NIC_RAJASTHAN)
 #define PRF_AUTOSWITCH
-#define PROTO_TAG "UP1"
-#define DEFAULT_IP1 "vltspvt.up.gov.in"
+#define PROTO_TAG "RJ1"
+#define DEFAULT_IP1 "vltspvt.rajasthan.gov.in"
 #define DEFAULT_PORT1 "9031"
-#define DEFAULT_IP2 "vltsemg.up.gov.in"
+#define DEFAULT_IP2 "vltsemg.rajasthan.gov.in"
 #define DEFAULT_PORT2 "9032"
 #define DEFAULT_IP3 "13.234.160.106"
 #define DEFAULT_PORT3 "8224"
@@ -323,10 +321,9 @@ extern char FirmVer[];
 #define DEFAULT_PORT1 "8080"
 #define DEFAULT_IP2 "NA"
 #define DEFAULT_PORT2 "0"
-#define DEFAULT_IP3 "tracking.vlvprotect.com"
-#define DEFAULT_PORT3 "8080"
-#define DEFAULT_IP4 "13.234.160.106"
-#define DEFAULT_PORT4 "8224"
+#define DEFAULT_IP3 "13.234.160.106"
+#define DEFAULT_PORT3 "8224"
+
 
 #define SOS_FULL_EA
 
@@ -350,7 +347,7 @@ extern char FirmVer[];
 #define DEFAULT_INV_STM 120 // 2 mins
 
 #define DEFAULT_MOB0 "9600696008"
-#define DEFAULT_MOB1 "9655543732"
+#define DEFAULT_MOB1 "8489607555"
 
 #define DEFAULT_VEHREG "UNKNOWN"
 
@@ -385,7 +382,7 @@ extern char FirmVer[];
 
 #else
 #define PROTO_TAG "OD1"
-//#define HISTORY_DISABLED
+// #define HISTORY_DISABLED
 #define NO_TAMPER
 #define DEFAULT_IP1 "pvtdevices.odishatransport.gov.in"
 #define DEFAULT_PORT1 "8205"
@@ -393,8 +390,8 @@ extern char FirmVer[];
 #define DEFAULT_PORT2 "9202"
 #define DEFAULT_IP3 "13.234.160.106"
 #define DEFAULT_PORT3 "8224"
-#define DEFAULT_IP4 "13.234.160.106"
-#define DEFAULT_PORT4 "8224"
+#define DEFAULT_IP4 "NA"
+#define DEFAULT_PORT4 "0"
 
 #define DEFAULT_INV_DATA 300
 #define DEFAULT_INV_IGN 60
@@ -450,7 +447,6 @@ extern char FirmVer[];
 
 #error NO VALID PROTOCOL SELECTED !!!
 #endif
-
 
 #ifndef DEFAULT_IP4
 #define DEFAULT_IP4 "NA"
@@ -585,7 +581,8 @@ typedef struct {
   uint16_t HaltTime;
 
 } IntervalTypeDef;
-#define DataInterval MotionInterval  /* alias so shared code compiles under PROTO_CDAC */
+#define DataInterval                                                           \
+  MotionInterval /* alias so shared code compiles under PROTO_CDAC */
 #define SOSInterval EnergencyInterval
 #define StandbyInterval SleepInterval
 #define IgnitionInterval HaltInterval
@@ -623,7 +620,10 @@ typedef struct {
   uint64_t SOSSmsConfigSignature;
   uint8_t EnableHTTPS;
   uint8_t DisableGPSFaultReset;
+  uint8_t DisableSOSTamper;
 } VTSTypedef;
+
+#define DEFAULT_DISABLE_SOS_TAMPER 1
 
 #ifdef PROTO_MAHARASHTRA1
 #define SOS_SMS_FEATURE_ENABLED 1
@@ -778,6 +778,6 @@ extern uint8_t ZigTestMode;
 extern uint8_t IsOverSpeed, PrevTamp;
 extern volatile TickTypeDef IntervalTick;
 
-const char* GetProfileName(uint8_t profile);
+const char *GetProfileName(uint8_t profile);
 
 #endif // _VTS_H

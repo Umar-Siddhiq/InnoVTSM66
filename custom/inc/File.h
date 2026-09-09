@@ -42,6 +42,7 @@
  * State.bin or UFSConfig.bin. Completely safe to add to existing devices.
  * ----------------------------------------------------------------------- */
 #define     DIAG_FILE_PATH          "Diag.bin\0"
+#define     LAST_GPS_FILE_PATH      "LastGPS.bin\0"
 
 
 void LoadConfig(void);

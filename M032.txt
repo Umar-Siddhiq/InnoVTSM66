@@ -1,0 +1,4259 @@
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 125
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 126 / 250
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 91 05 71 06 
+MCU: 89 00 72 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 91 05 71 06 
+MCU: 89 00 72 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1425 (34.3V) BattADC: 1649
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 126
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 127 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.3,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 127
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 128 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7C 05 3D 06 
+MCU: 8B 00 84 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 7C 05 3D 06 
+MCU: 8B 00 84 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1404 (33.8V) BattADC: 1597
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+SYSTIC: Sensor Interval: 170, Current Tick: 128
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 129 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 129
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 130 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 73 05 40 06 
+MCU: 86 00 8B 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 73 05 40 06 
+MCU: 86 00 8B 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1395 (33.6V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 130
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 131 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.6,0.0
+
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 131
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 132 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 78 05 40 06 
+MCU: 84 00 7A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 78 05 40 06 
+MCU: 84 00 7A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1400 (33.7V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 132
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 133 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+SYSTIC: Sensor Interval: 170, Current Tick: 133
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 134 / 250
+
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 89 05 40 06 
+MCU: 8C 00 8C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 89 05 40 06 
+MCU: 8C 00 8C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1417 (34.1V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 134
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 135 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 135
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 136 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.1,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 95 05 69 06 
+MCU: 8B 00 8D 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 95 05 69 06 
+MCU: 8B 00 8D 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1429 (34.4V) BattADC: 1641
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 136
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 137 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 137
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 138 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 9C 05 6E 06 
+MCU: 81 00 7F 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 9C 05 6E 06 
+MCU: 81 00 7F 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1436 (34.5V) BattADC: 1646
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 138
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 139 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 139
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 140 / 250
+
+SERVER: NR blocked: time not set
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.6,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 71 05 39 06 
+MCU: 8C 00 8E 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 71 05 39 06 
+MCU: 8C 00 8E 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1393 (33.5V) BattADC: 1593
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 140
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 141 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 141
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 142 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 95 05 6C 06 
+MCU: 82 00 7D 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 95 05 6C 06 
+MCU: 82 00 7D 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1429 (34.4V) BattADC: 1644
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 142
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 143 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 143
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 144 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 144
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 145 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 97 05 63 06 
+MCU: 8B 00 8E 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 97 05 63 06 
+MCU: 8B 00 8E 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1431 (34.4V) BattADC: 1635
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.5,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 145
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 146 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 146
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 147 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7A 05 3A 06 
+MCU: 83 00 78 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 7A 05 3A 06 
+MCU: 83 00 78 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1402 (33.7V) BattADC: 1594
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 147
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 148 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 148
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 149 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8B 05 40 06 
+MCU: 8A 00 88 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8B 05 40 06 
+MCU: 8A 00 88 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1419 (34.1V) BattADC: 1600
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 149
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 150 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.2,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 150
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 151 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 151
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 152 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 91 05 75 06 
+MCU: 8A 00 87 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 91 05 75 06 
+MCU: 8A 00 87 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1425 (34.3V) BattADC: 1653
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 152
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 153 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 153
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 154 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8C 05 40 06 
+MCU: 8B 00 8A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8C 05 40 06 
+MCU: 8B 00 8A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1420 (34.2V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 154
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 155 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.2,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 155
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 156 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 89 05 40 06 
+MCU: 8B 00 8C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 89 05 40 06 
+MCU: 8B 00 8C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1417 (34.1V) BattADC: 1600
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 156
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 157 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 18
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 157
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 158 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8A 05 40 06 
+MCU: 81 00 68 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8A 05 40 06 
+MCU: 81 00 68 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1418 (34.1V) BattADC: 1600
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 158
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 159 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.2,0.0
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 159
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 160 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8A 05 40 06 
+MCU: 8B 00 82 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8A 05 40 06 
+MCU: 8B 00 82 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1418 (34.1V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 160
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 161 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 161
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 162 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7A 05 40 06 
+MCU: 8A 00 85 0E 00 00 00 00 
+MCU: 7E 
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 18
+MCU: Rx[17]:
+MCU: 26 02 01 01 7A 05 40 06 
+MCU: 8A 00 85 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1402 (33.7V) BattADC: 1600
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 162
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 163 / 250
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 163
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 164 / 250
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.8,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 80 05 40 06 
+MCU: 8A 00 89 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 80 05 40 06 
+MCU: 8A 00 89 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1408 (33.9V) BattADC: 1600
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 164
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 165 / 250
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 165
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 166 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 9B 05 65 06 
+MCU: 8B 00 88 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 9B 05 65 06 
+MCU: 8B 00 88 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1435 (34.5V) BattADC: 1637
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 166
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 167 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 167
+SENSOR: Querying CLS sensor
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 168 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 9A 05 63 06 
+MCU: 8B 00 88 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 9A 05 63 06 
+MCU: 8B 00 88 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1434 (34.5V) BattADC: 1635
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.5,0.0
+
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 168
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 169 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 169
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 170 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 76 05 3E 06 
+MCU: 8A 00 85 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 76 05 3E 06 
+MCU: 8A 00 85 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1398 (33.6V) BattADC: 1598
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 0
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 171 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 1
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 172 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 9B 05 68 06 
+MCU: 8A 00 85 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 9B 05 68 06 
+MCU: 8A 00 85 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1435 (34.5V) BattADC: 1640
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 2
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 173 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.6,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 3
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 174 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 92 05 71 06 
+MCU: 8A 00 88 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 92 05 71 06 
+MCU: 8A 00 88 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1426 (34.3V) BattADC: 1649
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 4
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 175 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 5
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 176 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 83 05 40 06 
+MCU: 8B 00 86 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 83 05 40 06 
+MCU: 8B 00 86 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1411 (33.9V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 6
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 177 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.0,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 7
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 178 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 72 05 40 06 
+MCU: 80 00 74 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 72 05 40 06 
+MCU: 80 00 74 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1394 (33.5V) BattADC: 1600
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 8
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 179 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 9
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 180 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8F 05 6F 06 
+MCU: 89 00 79 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8F 05 6F 06 
+MCU: 89 00 79 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1423 (34.2V) BattADC: 1647
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+SYSTIC: Sensor Interval: 170, Current Tick: 10
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 181 / 250
+
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.3,0.0
+
+SYSTIC: Sensor Interval: 170, Current Tick: 11
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 182 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 83 05 5F 06 
+MCU: 89 00 65 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 83 05 5F 06 
+MCU: 89 00 65 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1411 (33.9V) BattADC: 1631
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 12
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 183 / 250
+
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.68 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 13
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 184 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7D 05 40 06 
+MCU: 87 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 7D 05 40 06 
+MCU: 87 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1405 (33.8V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 14
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 185 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 18
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 15
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 186 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.8,0.0
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 16
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 187 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8E 05 6A 06 
+MCU: 86 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8E 05 6A 06 
+MCU: 86 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1422 (34.2V) BattADC: 1642
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 17
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 188 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 18
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 189 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 85 05 40 06 
+MCU: 86 00 37 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 85 05 40 06 
+MCU: 86 00 37 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1413 (34.0V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 19
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 190 / 250
+
+SERVER: NR blocked: time not set
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 18
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.0,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 20
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 191 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 96 05 6A 06 
+MCU: 85 00 29 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 96 05 6A 06 
+MCU: 85 00 29 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1430 (34.4V) BattADC: 1642
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 21
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 192 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=18
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 22
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 193 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 98 05 69 06 
+MCU: 84 00 22 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 98 05 69 06 
+MCU: 84 00 22 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1432 (34.4V) BattADC: 1641
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 23
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 194 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 24
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 195 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8C 05 40 06 
+MCU: 7E 00 0B 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8C 05 40 06 
+MCU: 7E 00 0B 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1420 (34.2V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.2,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 25
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 196 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 26
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 197 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7D 05 40 06 
+MCU: 83 00 1A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 7D 05 40 06 
+MCU: 83 00 1A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1405 (33.8V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 27
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 198 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 28
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 199 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 6D 05 3C 06 
+MCU: 84 00 17 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 6D 05 3C 06 
+MCU: 84 00 17 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1389 (33.4V) BattADC: 1596
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 29
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 200 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.5,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 30
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 201 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 31
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 202 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 72 05 40 06 
+MCU: 84 00 07 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 72 05 40 06 
+MCU: 84 00 07 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1394 (33.5V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+SYSTIC: Sensor Interval: 170, Current Tick: 32
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 203 / 250
+
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 33
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 204 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8F 05 6C 06 
+MCU: 84 00 19 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8F 05 6C 06 
+MCU: 84 00 19 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1423 (34.2V) BattADC: 1644
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+SYSTIC: Sensor Interval: 170, Current Tick: 34
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 205 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.3,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 35
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 206 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 84 05 40 06 
+MCU: 84 00 16 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 84 05 40 06 
+MCU: 84 00 16 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1412 (34.0V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 36
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 207 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 37
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 208 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 94 05 70 06 
+MCU: 7B 00 0A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 94 05 70 06 
+MCU: 7B 00 0A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1428 (34.3V) BattADC: 1648
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 38
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 209 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.4,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 39
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 210 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 73 05 40 06 
+MCU: 83 00 14 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 73 05 40 06 
+MCU: 83 00 14 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1395 (33.6V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 40
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 211 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 41
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 212 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 9B 05 69 06 
+MCU: 84 00 17 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 9B 05 69 06 
+MCU: 84 00 17 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1435 (34.5V) BattADC: 1641
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 42
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 213 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 43
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 214 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.6,0.0
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7F 05 40 06 
+MCU: 83 00 15 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 7F 05 40 06 
+MCU: 83 00 15 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1407 (33.8V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 44
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 215 / 250
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 45
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 216 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 90 05 69 06 
+MCU: 84 00 17 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 90 05 69 06 
+MCU: 84 00 17 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1424 (34.2V) BattADC: 1641
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 46
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 217 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 47
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 218 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7E 05 40 06 
+MCU: 82 00 15 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 7E 05 40 06 
+MCU: 82 00 15 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1406 (33.8V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.9,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+SYSTIC: Sensor Interval: 170, Current Tick: 48
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 219 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+SYSTIC: Sensor Interval: 170, Current Tick: 49
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 220 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 76 05 40 06 
+MCU: 7A 00 03 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 76 05 40 06 
+MCU: 7A 00 03 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1398 (33.6V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 50
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 221 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 51
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 222 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 71 05 40 06 
+MCU: 83 00 10 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 71 05 40 06 
+MCU: 83 00 10 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1393 (33.5V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 52
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 223 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.6,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 53
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 224 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 6E 05 40 06 
+MCU: 83 00 12 0E 00 00 00 00 
+MCU: 7E 
+SYSTIC: Sensor Interval: 170, Current Tick: 54
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 225 / 250
+
+MCU: Rx[17]:
+MCU: 26 02 01 01 6E 05 40 06 
+MCU: 83 00 12 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1390 (33.4V) BattADC: 1600
+HARDWARE: BattRaw: 2.67 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 55
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 226 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 56
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 227 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 73 05 40 06 
+MCU: 84 00 15 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 73 05 40 06 
+MCU: 84 00 15 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1395 (33.6V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.6,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 57
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 228 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 58
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 229 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8D 05 40 06 
+MCU: 83 00 14 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8D 05 40 06 
+MCU: 83 00 14 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1421 (34.2V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 59
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 230 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+SERVER: NR blocked: time not set
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 60
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 231 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 80 05 40 06 
+MCU: 83 00 13 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 80 05 40 06 
+MCU: 83 00 13 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1408 (33.9V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 61
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 232 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.9,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+SYSTIC: Sensor Interval: 170, Current Tick: 62
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 233 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 97 05 6A 06 
+MCU: 83 00 19 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 97 05 6A 06 
+MCU: 83 00 19 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1431 (34.4V) BattADC: 1642
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 63
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 234 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 64
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 235 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7D 05 40 06 
+MCU: 86 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 7D 05 40 06 
+MCU: 86 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1405 (33.8V) BattADC: 1600
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 65
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 236 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.8,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 66
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 237 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 98 05 68 06 
+MCU: 85 00 3C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 98 05 68 06 
+MCU: 85 00 3C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1432 (34.4V) BattADC: 1640
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 67
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 238 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+SYSTIC: Sensor Interval: 170, Current Tick: 68
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 239 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 90 05 5E 06 
+MCU: 7E 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 90 05 5E 06 
+MCU: 7E 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1424 (34.2V) BattADC: 1630
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 69
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 240 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 70
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 241 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.3,0.0
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=17
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8C 05 40 06 
+MCU: 89 00 74 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8C 05 40 06 
+MCU: 89 00 74 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1420 (34.2V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 71
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 242 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=17
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 17
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 72
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 243 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=17
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 96 05 66 06 
+MCU: 89 00 7B 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 96 05 66 06 
+MCU: 89 00 7B 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1430 (34.4V) BattADC: 1638
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=17
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 73
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 244 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=17
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 74
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 245 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 A0 05 6A 06 
+MCU: 83 00 6B 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 A0 05 6A 06 
+MCU: 83 00 6B 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1440 (34.6V) BattADC: 1642
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.7,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=17
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 75
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 246 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=17
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 17
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,1,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 76
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 247 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 9B 05 66 06 
+MCU: 89 00 7A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 9B 05 66 06 
+MCU: 89 00 7A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1435 (34.5V) BattADC: 1638
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=17
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 77
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 248 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=17
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 78
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 249 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=17
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8E 05 40 06 
+MCU: 7E 00 69 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8E 05 40 06 
+MCU: 7E 00 69 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1422 (34.2V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 79
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 250 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.2,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPS: GPS Not Fixed
+
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 80
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 0 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 20
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 72 05 37 06 
+MCU: 89 00 6A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 72 05 37 06 
+MCU: 89 00 6A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1394 (33.5V) BattADC: 1591
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 81
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 1 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+GPS: GPS Not Fixed
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 82
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 2 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8B 05 40 06 
+MCU: 87 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8B 05 40 06 
+MCU: 87 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1419 (34.1V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 83
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 3 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.2,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 84
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 4 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 85
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 5 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7D 05 40 06 
+MCU: 83 00 66 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 7D 05 40 06 
+MCU: 83 00 66 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1405 (33.8V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 20
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 86
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 6 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 87
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 7 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 9D 05 5D 06 
+MCU: 89 00 7D 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 9D 05 5D 06 
+MCU: 89 00 7D 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1437 (34.6V) BattADC: 1629
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 88
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 8 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.6,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 89
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 9 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8D 05 40 06 
+MCU: 88 00 6C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8D 05 40 06 
+MCU: 88 00 6C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1421 (34.2V) BattADC: 1600
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 90
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 10 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 20
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 91
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 11 / 250
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 83 05 40 06 
+MCU: 88 00 66 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 83 05 40 06 
+MCU: 88 00 66 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1411 (33.9V) BattADC: 1600
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 92
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 12 / 250
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 93
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 13 / 250
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.0,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 A3 05 65 06 
+MCU: 88 00 6D 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 A3 05 65 06 
+MCU: 88 00 6D 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1443 (34.7V) BattADC: 1637
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 94
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 14 / 250
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 95
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 15 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 20
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 80 05 40 06 
+MCU: 88 00 6F 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 80 05 40 06 
+MCU: 88 00 6F 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1408 (33.9V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 96
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 16 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 97
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 17 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7D 05 40 06 
+MCU: 82 00 40 0E 00 00 00 00 
+MCU: 7E 
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Rx[17]:
+MCU: 26 02 01 01 7D 05 40 06 
+MCU: 82 00 40 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1405 (33.8V) BattADC: 1600
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.8,0.0
+
+SYSTIC: Sensor Interval: 170, Current Tick: 98
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 18 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 99
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 19 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 100
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 20 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8C 05 40 06 
+MCU: 7F 00 73 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8C 05 40 06 
+MCU: 7F 00 73 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1420 (34.2V) BattADC: 1600
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.62 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 101
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 21 / 250
+
+HARDWARE: BattRaw: 2.62 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.62 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.62 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.62 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.62 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 102
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 22 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8B 05 40 06 
+MCU: 8A 00 79 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8B 05 40 06 
+MCU: 8A 00 79 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1419 (34.1V) BattADC: 1600
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.2,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 103
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 23 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 104
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 24 / 250
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7F 05 3C 06 
+MCU: 83 00 76 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 7F 05 3C 06 
+MCU: 83 00 76 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1407 (33.8V) BattADC: 1596
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 19
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 105
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 25 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 106
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 26 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 89 05 40 06 
+MCU: 89 00 75 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 89 05 40 06 
+MCU: 89 00 75 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1417 (34.1V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=19
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.1,0.0
+
+SYSTIC: Sensor Interval: 170, Current Tick: 107
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 27 / 250
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 108
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 28 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 9E 05 6A 06 
+MCU: 7F 00 67 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 9E 05 6A 06 
+MCU: 7F 00 67 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1438 (34.6V) BattADC: 1642
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 109
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 29 / 250
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SERVER: NR blocked: time not set
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 20
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 110
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 30 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 9C 05 40 06 
+MCU: 89 00 79 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 9C 05 40 06 
+MCU: 89 00 79 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1436 (34.5V) BattADC: 1600
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.66 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 111
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 31 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.6,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 112
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 32 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8F 05 40 06 
+MCU: 89 00 7A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8F 05 40 06 
+MCU: 89 00 7A 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1423 (34.2V) BattADC: 1600
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 113
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 33 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 20
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 114
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 34 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 7D 05 3D 06 
+MCU: 89 00 78 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 7D 05 3D 06 
+MCU: 89 00 78 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1405 (33.8V) BattADC: 1597
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 115
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 35 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,33.8,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 116
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 36 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 99 05 40 06 
+MCU: 89 00 77 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 99 05 40 06 
+MCU: 89 00 77 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1433 (34.5V) BattADC: 1600
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 117
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 37 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 118
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 38 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 20
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 8C 05 40 06 
+MCU: 89 00 7C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 8C 05 40 06 
+MCU: 89 00 7C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1420 (34.2V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 119
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 39 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 120
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 40 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.2,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 84 05 40 06 
+MCU: 89 00 7C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 84 05 40 06 
+MCU: 89 00 7C 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1412 (34.0V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 121
+SYSTIC: Normal Tick: 2 / 10
+Health Tick: 41 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 122
+SYSTIC: Normal Tick: 3 / 10
+Health Tick: 42 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 A2 05 6C 06 
+MCU: 81 00 6B 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 A2 05 6C 06 
+MCU: 81 00 6B 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1442 (34.7V) BattADC: 1644
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 123
+SYSTIC: Normal Tick: 4 / 10
+Health Tick: 43 / 250
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 20
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+SYSTIC: Sensor Interval: 170, Current Tick: 124
+SYSTIC: Normal Tick: 5 / 10
+Health Tick: 44 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 87 05 40 06 
+MCU: 88 00 75 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 87 05 40 06 
+MCU: 88 00 75 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1415 (34.0V) BattADC: 1600
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.1,0.0
+
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 125
+SYSTIC: Normal Tick: 6 / 10
+Health Tick: 45 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $GPD,861329082912008,0,0,0.00,0.00,0.000000,0.000000,0.00,0.00,0.00
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+SYSTIC: Sensor Interval: 170, Current Tick: 126
+SYSTIC: Normal Tick: 7 / 10
+Health Tick: 46 / 250
+
+HARDWARE: BattRaw: 2.65 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 78 05 3C 06 
+MCU: 7E 00 63 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 78 05 3C 06 
+MCU: 7E 00 63 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1400 (33.7V) BattADC: 1596
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 127
+SYSTIC: Normal Tick: 8 / 10
+Health Tick: 47 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: $INF,861329082912008,FQ_OG1_1.5.9,0,,,,,,,,,78.46.190.117:50011,78.46.190.117:50011,13.234.160.106:8224,NA:0
+
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+GPRS: 2000-00-00 00:00:00, ts:0 csq: 20
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 128
+SYSTIC: Normal Tick: 9 / 10
+Health Tick: 48 / 250
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+MCU: Sending data: len=3, isWait=1, waitFlag=2, timeout=300
+MCU: RAW UART RX[17]:
+MCU: 26 02 01 01 94 05 40 06 
+MCU: 88 00 78 0E 00 00 00 00 
+MCU: 7E 
+MCU: Rx[17]:
+MCU: 26 02 01 01 94 05 40 06 
+MCU: 88 00 78 0E 00 00 00 00 
+MCU: 7E 
+MCU: Function: GETPH
+MCU: Mains ADC: 1428 (34.3V) BattADC: 1600
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 129
+SYSTIC: Normal Tick: 0 / 10
+Health Tick: 49 / 250
+
+SERVER: NR blocked: time not set
+HARDWARE: BattRaw: 2.64 Rpt: 0.00 Conn: 1
+GPS: GPS Not Fixed
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+MCU: Sending data: len=505, isWait=0, waitFlag=1, timeout=100
+HARDWARE: $PER,861329082912008,1,0,000000,000000,1,1,0,1,0,0,1,34.4,0.0
+
+MCU: RAW UART RX[3]:
+MCU: 26 01 7E 
+MCU: Rx[3]:
+MCU: 26 01 7E 
+MCU: Function: SUCCESS
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+STATE: CURRENT: SIM_NOT_DETECTED(0) profile=0(NONE) CSQ=20
+GPRS: No valid time source available (Network year: 2004, GPS Year: 0)
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1
+SYSTIC: Sensor Interval: 170, Current Tick: 130
+SYSTIC: Normal Tick: 1 / 10
+Health Tick: 50 / 250
+
+HARDWARE: BattRaw: 2.63 Rpt: 0.00 Conn: 1

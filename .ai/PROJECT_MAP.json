@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-08-20T07:36:33+00:00",
+  "generated_at": "2026-09-09T07:34:20+00:00",
   "root_name": "InnoVTSM66",
   "git": {
     "branch": "OG-FIRMWARE",
-    "head": "4e319dc",
+    "head": "e3249fb",
     "remote": "https://github.com/Umar-Siddhiq/InnoVTSM66.git"
   },
   "counts": {
-    "files": 720,
-    "tests": 0
+    "files": 725,
+    "tests": 2
   },
   "languages": [
     {
@@ -18,6 +18,10 @@
     {
       "name": "C/C++ Header",
       "files": 196
+    },
+    {
+      "name": "Python",
+      "files": 1
     }
   ],
   "top_directories": [
@@ -43,7 +47,7 @@
     },
     {
       "path": ".",
-      "files": 26
+      "files": 29
     },
     {
       "path": "include",
@@ -60,6 +64,10 @@
     {
       "path": "libs",
       "files": 3
+    },
+    {
+      "path": "tests",
+      "files": 2
     }
   ],
   "manifests": [],
@@ -68,19 +76,37 @@
     "custom/main.c"
   ],
   "ci": [],
-  "test_candidates": [],
+  "test_candidates": [
+    "tests/OG_DELIVERY_BENCH.md",
+    "tests/og_delivery_regression.py"
+  ],
   "dirty_paths": [
-    "16MB_FLASH_AND_FIRMWARE_FIXES_HISTORY.md",
-    "Server Log.txt",
-    "custom/TCP.c",
+    "M032.txt",
+    "ai/CRITICAL_INVARIANTS.md",
+    "custom/File.c",
+    "custom/MCU.c",
+    "custom/SMS.c",
+    "custom/SMSLib.c",
+    "custom/SOS.c",
+    "custom/Server.c",
     "custom/config/custom_feature_def.h",
+    "custom/config/custom_proto_cfg.h",
+    "custom/inc/MCU.h",
+    "custom/inc/SMS.h",
+    "custom/inc/SMSlib.h",
+    "custom/inc/Server.h",
     "custom/inc/VTS.h",
-    "ustom/Server.c"
+    "custom/main.c",
+    "tests/"
   ],
   "high_churn": [
     {
       "path": "custom/inc/VTS.h",
-      "changes": 7
+      "changes": 9
+    },
+    {
+      "path": "custom/Server.c",
+      "changes": 6
     },
     {
       "path": "custom/FTP.c",
@@ -89,6 +115,10 @@
     {
       "path": "custom/SMS.c",
       "changes": 6
+    },
+    {
+      "path": "custom/config/custom_feature_def.h",
+      "changes": 5
     },
     {
       "path": "custom/File.c",
@@ -100,10 +130,6 @@
     },
     {
       "path": "custom/GPS.c",
-      "changes": 5
-    },
-    {
-      "path": "custom/Server.c",
       "changes": 5
     },
     {
@@ -139,6 +165,10 @@
       "changes": 4
     },
     {
+      "path": "custom/TCP.c",
+      "changes": 3
+    },
+    {
       "path": "LOGS.txt",
       "changes": 3
     },
@@ -148,14 +178,6 @@
     },
     {
       "path": "custom/MCU.c",
-      "changes": 3
-    },
-    {
-      "path": "custom/Utilities.c",
-      "changes": 3
-    },
-    {
-      "path": "custom/config/custom_feature_def.h",
       "changes": 3
     }
   ],
@@ -218,7 +240,7 @@
       "path": "custom/Server.c",
       "extension": ".c",
       "language": "C",
-      "size": 179327
+      "size": 182806
     },
     {
       "path": "reference/src/Server.c",
@@ -260,7 +282,7 @@
       "path": "custom/SMS.c",
       "extension": ".c",
       "language": "C",
-      "size": 113609
+      "size": 115312
     },
     {
       "path": "QuectelM031-main/Library/CMSIS/Include/core_cm4.h",
@@ -313,6 +335,12 @@
       "size": 2285
     },
     {
+      "path": "AGENTS.md",
+      "extension": ".md",
+      "language": null,
+      "size": 1138
+    },
+    {
       "path": "ALERTS.txt",
       "extension": ".txt",
       "language": null,
@@ -343,6 +371,12 @@
       "size": 26689
     },
     {
+      "path": "CLAUDE.md",
+      "extension": ".md",
+      "language": null,
+      "size": 1138
+    },
+    {
       "path": "FIRMWARE_DOCUMENTATION.md",
       "extension": ".md",
       "language": null,
@@ -359,6 +393,12 @@
       "extension": ".txt",
       "language": null,
       "size": 1677
+    },
+    {
+      "path": "M032.txt",
+      "extension": ".txt",
+      "language": null,
+      "size": 138782
     },
     {
       "path": "MS-DOS.lnk",
@@ -3100,7 +3140,7 @@
       "path": "custom/File.c",
       "extension": ".c",
       "language": "C",
-      "size": 34866
+      "size": 35071
     },
     {
       "path": "custom/File.c.bak_unified",
@@ -3160,7 +3200,7 @@
       "path": "custom/MCU.c",
       "extension": ".c",
       "language": "C",
-      "size": 18206
+      "size": 18195
     },
     {
       "path": "custom/MOTA.c",
@@ -3184,19 +3224,19 @@
       "path": "custom/SMS.c",
       "extension": ".c",
       "language": "C",
-      "size": 113609
+      "size": 115312
     },
     {
       "path": "custom/SMSLib.c",
       "extension": ".c",
       "language": "C",
-      "size": 22370
+      "size": 22394
     },
     {
       "path": "custom/SOS.c",
       "extension": ".c",
       "language": "C",
-      "size": 8163
+      "size": 8524
     },
     {
       "path": "custom/SOS.c.bak_unified",
@@ -3220,7 +3260,7 @@
       "path": "custom/Server.c",
       "extension": ".c",
       "language": "C",
-      "size": 179327
+      "size": 182806
     },
     {
       "path": "custom/Server.c.bak_unified",
@@ -3460,7 +3500,7 @@
       "path": "custom/inc/MCU.h",
       "extension": ".h",
       "language": "C/C++ Header",
-      "size": 5045
+      "size": 5092
     },
     {
       "path": "custom/inc/MOTA.h",
@@ -3484,7 +3524,7 @@
       "path": "custom/inc/SMS.h",
       "extension": ".h",
       "language": "C/C++ Header",
-      "size": 2129
+      "size": 2231
     },
     {
       "path": "custom/inc/SMSlib.h",
@@ -3508,7 +3548,7 @@
       "path": "custom/inc/Server.h",
       "extension": ".h",
       "language": "C/C++ Header",
-      "size": 5998
+      "size": 6044
     },
     {
       "path": "custom/inc/Server.h.bak_unified",
@@ -3544,7 +3584,7 @@
       "path": "custom/inc/VTS.h",
       "extension": ".h",
       "language": "C/C++ Header",
-      "size": 21379
+      "size": 21420
     },
     {
       "path": "custom/inc/VTS.h.bak_unified",
@@ -3556,7 +3596,7 @@
       "path": "custom/main.c",
       "extension": ".c",
       "language": "C",
-      "size": 16853
+      "size": 16852
     },
     {
       "path": "custom/main.c.bak_unified",
@@ -4595,6 +4635,18 @@
       "extension": "",
       "language": null,
       "size": 186
+    },
+    {
+      "path": "tests/OG_DELIVERY_BENCH.md",
+      "extension": ".md",
+      "language": null,
+      "size": 2332
+    },
+    {
+      "path": "tests/og_delivery_regression.py",
+      "extension": ".py",
+      "language": "Python",
+      "size": 6876
     },
     {
       "path": "walkthrough.md",

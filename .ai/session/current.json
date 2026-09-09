@@ -1,0 +1,42 @@
+{
+  "active": false,
+  "baseline_dirty_hashes": {
+    ".ai/CRITICAL_INVARIANTS.md": "3b3673523b3a89ed9dc39e81b9079dcd33e7bb54f28e153f1c303b161ecae1cd",
+    ".ai/MEMORY_INDEX.md": "892c20a6e0c125e1a686cc0bd3679d7c462014412bcf130d866ed97f90ea025b",
+    ".ai/PROJECT_MAP.json": "1cc3484c1451a6dc907ad06a3eddfe26e48beb564c4f054af328ed890fa87369",
+    ".ai/PROJECT_MAP.md": "14df79f340e5bdea2ac486baec6cfea8e9d139a10f35b653a43b454a5b6b36b4",
+    ".ai/memory/events.jsonl": "e456f9c68a6372665b03733cd3bf879ebfb9957fd2dc2c91d316c1f3f482978b",
+    ".ai/session/current.json": "47b03dc73dd8305451f951e703c8872a98eb72a42dc78097d0a9b5fd8b8ebc6a",
+    "M032.txt": "7ede83c8d706f51809332f0716115d8e689682ef023ad635be76a7e22cf7b19f",
+    "custom/File.c": "7361c4d7b2e8bd7bf702342d64cb14a5ade954011a105d5584474560e7b2586e",
+    "custom/MCU.c": "be46f32ea1a852919d188adefc4d4b017e0d83fc60059cb3be4f4ec99848a860",
+    "custom/SMS.c": "9123a2b78ed9f1f023c67fdb4d798baf659968f345fac889f5f58896777587c4",
+    "custom/SMSLib.c": "804ad8acba42877874258e5406d614543252e2d8efaa0b9f8949a95828019623",
+    "custom/SOS.c": "b854fabfd81c6fc61c89315adffaf13000e77b3e7057b034b9a3790564a14f94",
+    "custom/Server.c": "da483329ccea62a2f37525af2ccd2e38e328e5ca5999eb6c55c7adc4f78c6951",
+    "custom/Systic.c": "ae2843e29a623b60d83b976966543c303d2a9a97ec8354d02e01350ae4fef6bb",
+    "custom/config/custom_feature_def.h": "b48dc230b7ea2390b2cd767ab6ecd60e490d48c3cb3568c6573b21bb1d18e2ef",
+    "custom/config/custom_proto_cfg.h": "ef3376f2992678e40d99241cfa57a894f4c879599229e6b26302e6e2e310acb4",
+    "custom/inc/MCU.h": "9aac7eafbd205e59e408d6b66577e14d8280371f59f60de051911ab21da3aabf",
+    "custom/inc/SMS.h": "aa7597f57cf9974b0d2710e05eb49e7d24e26eedbca01cd3eb03b2bca7d516d3",
+    "custom/inc/SMSlib.h": "39da28be2bf3c938baf1d25c4f0c1e1fb1e686b24247e38d0b7b9315e94f0965",
+    "custom/inc/Server.h": "7a1f7b7b242e232e1245687201e7858de4c608c04a4d9427c7f8304b506a81a8",
+    "custom/inc/VTS.h": "17647cfedec9feb1c76501deb8b2d370db41bfaef732c9be62074ae8ea880cbf",
+    "custom/main.c": "ee2cc2cd905bdf728dcd6fb5446eb6d09cf449600b01a5a66b46d45616f956a3",
+    "tests/OG_DELIVERY_BENCH.md": "0d32cdd7120db5acb6164e61cdefefc59f1330e79e9c51bcec21c8ebbb10a5fc",
+    "tests/og_delivery_regression.py": "0eac20131140d1d198a2cbf217612624a29b18b0632342c51f0077f882aa52a2"
+  },
+  "changed_paths": [
+    ".ai/MEMORY_INDEX.md",
+    ".ai/memory/events.jsonl",
+    ".ai/session/current.json",
+    "custom/GPS.c",
+    "custom/config/custom_feature_def.h",
+    "custom/inc/GPS.h"
+  ],
+  "finished_at": "2026-09-09T10:40:34+00:00",
+  "head": "e3249fb",
+  "session_id": "a5e772b11bf741b0",
+  "started_at": "2026-09-09T10:33:46+00:00",
+  "version": 1
+}

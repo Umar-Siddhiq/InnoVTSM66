@@ -49,5 +49,5 @@ extern uint8_t IsSMSInit;
 void Hdlr_RecvNewSMS(u32 nIndex, bool bAutoReply);
 bool SMS_Initialize(void);
 void ResetSMSContext(void);
-void SMS_SendTextMessage(char* phoneNumber, const char* message, bool isUCS2);
+bool SMS_SendTextMessage(char* phoneNumber, const char* message, bool isUCS2);
 #endif

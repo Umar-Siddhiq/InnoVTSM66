@@ -144,6 +144,7 @@ int MCOMM_FetchPerihperal(void);
 uint8_t MCOMM_SendData(uint8_t* data, int len, uint8_t isWait, uint8_t waitFlag, uint16_t timeout);
 int MCOMM_FetchVER(void);
 int MCOMM_SendSleep(uint16_t sleeptime);
+float mcu_mainsadc_to_voltage(int adc_value);
 extern int IsMCU;
 
 #endif // _MCU_H_

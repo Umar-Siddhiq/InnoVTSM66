@@ -185,6 +185,7 @@ void InsertFloatValue(double value, uint16_t position, uint16_t length, const ch
 
 
 void InitSockets(void);
+void ReinitSingleSocket(uint8_t socketIndex);
 void UpdateURL(char* value);
 void UpdateSecondaryURL(char* value);
 
