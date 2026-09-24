@@ -156,7 +156,7 @@ $PVT,<VendorID>,<FirmVer>,<PktType>,<PktTypeNum>,L,<IMEI>,<VehicleRegNo>,<GPSFix
 | 13 | Longitude | DDDMM.MMMM | 10 | `07312.5678` | `AppendFixString` len=10 |
 | 14 | LngDir | `E`/`W` | 1 | `E` | `GPS.LngDir` |
 | 15 | Speed | km/h | `%05.1f` | `060.5` | `GPS.Speed` |
-| 16 | Heading | degrees | `%06.2f` | `180.00` | `GPS.Heading` |
+| 16 | Heading | degrees | Integer (`%u`) | `126` | Course over ground in degrees (0–360) |
 | 17 | Satellites | count | `%02d` | `08` | `GPS.NoOfSatalite` |
 | 18 | Altitude | metres | `%03.1f` | `123.4` | `GPS.Altitude` |
 | 19 | PDOP | DOP | `%04.1f` | `01.2` | `GPS.PDOP` |
@@ -179,9 +179,9 @@ $PVT,<VendorID>,<FirmVer>,<PktType>,<PktTypeNum>,L,<IMEI>,<VehicleRegNo>,<GPSFix
 | 47 | FrameNo | Count | `%06d` | `000042` | `FrameNumber` (auto-inc) |
 | 48 | AN1 | Analog 1 | float | `0.00` | Hardcoded `0.00` |
 | 49 | AN2 | Analog 2 | float | `0.00` | Hardcoded `0.00` |
-| 50 | DeltaDist | Distance m | `%05.1f` | `00123.4` | `DeltaDis` since last packet |
+| 50 | DeltaDist | Distance m | `%.2f` | `0.00` | `DeltaDis` formatted to 2 decimals |
 | 51 | OTAResp | OTA response | `(...)` or `()` | `(SCK1\|SET\|002:192.168.1.1:1)` | See §10 |
-| 52 | TrailerID | RFID tag | `TAG<id>` or `()` | `TAG1234ABCD` | From sensor data |
+| 52 | TrailerID | RFID tag (optional) | `TAG<id>` | `TAG8520XYZ123` | Only present when active RFID tag read |
 
 ### DINs Field Detail
 ```
@@ -201,20 +201,17 @@ Bit1 Bit0
 
 ### Raw Example — Normal Packet (no alerts, no OTA pending)
 ```
-$PVT,QUICKTEL,1.5.8,NR,1,L,123456789012345,MH12AB1234,1,11082026,143000,1845.1234,N,07312.5678,E,060.5,180.00,08,123.4,01.2,00.9,AIRTEL,1,1,12.0,4.1,0,C,18,404,20,00D6,CFBD,15,00D6,CFBD,14,00D5,CFBC,12,00D4,CFBB,10,00D3,CFBA,1010,00,000042,0.00,0.00,00123.4,(),()
-*XX\r\n
+$PVT,QUICKTEL,1.5.8,NR,1,L,123456789012345,MH12AB1234,1,11082026,143000,1845.1234,N,07312.5678,E,060.5,180,08,123.4,01.2,00.9,AIRTEL,1,1,12.0,4.1,0,C,18,404,20,00D6,CFBD,15,00D6,CFBD,14,00D5,CFBC,12,00D4,CFBB,10,00D3,CFBA,1010,00,000042,0.00,0.00,0.00,()*XX\r\n
 ```
 
 ### Raw Example — Ignition ON Alert
 ```
-$PVT,QUICKTEL,1.5.8,IN,7,L,123456789012345,MH12AB1234,1,11082026,143005,1845.1234,N,07312.5678,E,000.0,180.00,08,123.4,01.2,00.9,AIRTEL,1,1,12.0,4.1,0,C,18,404,20,00D6,CFBD,15,00D6,CFBD,14,00D5,CFBC,12,00D4,CFBB,10,00D3,CFBA,1010,00,000043,0.00,0.00,00000.0,(),()
-*XX\r\n
+$PVT,QUICKTEL,1.5.8,IN,7,L,123456789012345,MH12AB1234,1,11082026,143005,1845.1234,N,07312.5678,E,000.0,180,08,123.4,01.2,00.9,AIRTEL,1,1,12.0,4.1,0,C,18,404,20,00D6,CFBD,15,00D6,CFBD,14,00D5,CFBC,12,00D4,CFBB,10,00D3,CFBA,1010,00,000043,0.00,0.00,0.00,()*XX\r\n
 ```
 
 ### Raw Example — OTA Response Embedded
 ```
-$PVT,QUICKTEL,1.5.8,OA,12,L,123456789012345,MH12AB1234,1,11082026,143010,...,00000.0,(SCK1|SET|002:192.168.1.100:1),()
-*XX\r\n
+$PVT,QUICKTEL,1.5.8,OA,12,L,123456789012345,MH12AB1234,1,11082026,143010,...,0.00,0.00,0.00,(SCK1|SET|002:192.168.1.100:1)*XX\r\n
 ```
 
 ---

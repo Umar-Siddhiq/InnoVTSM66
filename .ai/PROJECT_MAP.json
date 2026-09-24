@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-09-09T07:34:20+00:00",
+  "generated_at": "2026-09-24T03:22:00+00:00",
   "root_name": "InnoVTSM66",
   "git": {
     "branch": "OG-FIRMWARE",
-    "head": "e3249fb",
+    "head": "3ef4e64",
     "remote": "https://github.com/Umar-Siddhiq/InnoVTSM66.git"
   },
   "counts": {
-    "files": 725,
-    "tests": 2
+    "files": 730,
+    "tests": 6
   },
   "languages": [
     {
@@ -21,7 +21,7 @@
     },
     {
       "name": "Python",
-      "files": 1
+      "files": 5
     }
   ],
   "top_directories": [
@@ -47,7 +47,7 @@
     },
     {
       "path": ".",
-      "files": 29
+      "files": 30
     },
     {
       "path": "include",
@@ -58,16 +58,16 @@
       "files": 7
     },
     {
+      "path": "tests",
+      "files": 6
+    },
+    {
       "path": ".vscode",
       "files": 3
     },
     {
       "path": "libs",
       "files": 3
-    },
-    {
-      "path": "tests",
-      "files": 2
     }
   ],
   "manifests": [],
@@ -78,34 +78,53 @@
   "ci": [],
   "test_candidates": [
     "tests/OG_DELIVERY_BENCH.md",
-    "tests/og_delivery_regression.py"
+    "tests/og_delivery_regression.py",
+    "tests/og_prf_signal_regression.py",
+    "tests/og_pvt_format_regression.py",
+    "tests/og_tamper_test_regression.py",
+    "tests/og_wirecut_disable_regression.py"
   ],
   "dirty_paths": [
-    "M032.txt",
-    "ai/CRITICAL_INVARIANTS.md",
+    "AMD3_PROTOCOL_IMPLEMENTATION.md",
+    "QuectelM031-main.zip",
+    "ai/MEMORY_INDEX.md",
     "custom/File.c",
-    "custom/MCU.c",
     "custom/SMS.c",
-    "custom/SMSLib.c",
     "custom/SOS.c",
     "custom/Server.c",
-    "custom/config/custom_feature_def.h",
-    "custom/config/custom_proto_cfg.h",
-    "custom/inc/MCU.h",
+    "custom/Systic.c",
     "custom/inc/SMS.h",
-    "custom/inc/SMSlib.h",
     "custom/inc/Server.h",
     "custom/inc/VTS.h",
-    "custom/main.c",
-    "tests/"
+    "tests/og_delivery_regression.py",
+    "tests/og_prf_signal_regression.py",
+    "tests/og_pvt_format_regression.py",
+    "tests/og_tamper_test_regression.py",
+    "tests/og_wirecut_disable_regression.py"
   ],
   "high_churn": [
     {
       "path": "custom/inc/VTS.h",
-      "changes": 9
+      "changes": 10
+    },
+    {
+      "path": "custom/SMS.c",
+      "changes": 7
     },
     {
       "path": "custom/Server.c",
+      "changes": 7
+    },
+    {
+      "path": "custom/File.c",
+      "changes": 6
+    },
+    {
+      "path": "custom/GPS.c",
+      "changes": 6
+    },
+    {
+      "path": "custom/config/custom_feature_def.h",
       "changes": 6
     },
     {
@@ -113,15 +132,23 @@
       "changes": 6
     },
     {
-      "path": "custom/SMS.c",
-      "changes": 6
-    },
-    {
-      "path": "custom/config/custom_feature_def.h",
+      "path": "custom/SOS.c",
       "changes": 5
     },
     {
-      "path": "custom/File.c",
+      "path": "custom/Systic.c",
+      "changes": 5
+    },
+    {
+      "path": "custom/inc/File.h",
+      "changes": 5
+    },
+    {
+      "path": "custom/inc/Server.h",
+      "changes": 5
+    },
+    {
+      "path": "custom/main.c",
       "changes": 5
     },
     {
@@ -129,12 +156,24 @@
       "changes": 5
     },
     {
-      "path": "custom/GPS.c",
+      "path": "FIRMWARE_DOCUMENTATION.md",
       "changes": 5
     },
     {
-      "path": "FIRMWARE_DOCUMENTATION.md",
-      "changes": 5
+      "path": "custom/MCU.c",
+      "changes": 4
+    },
+    {
+      "path": "custom/config/custom_proto_cfg.h",
+      "changes": 4
+    },
+    {
+      "path": "custom/inc/GPS.h",
+      "changes": 4
+    },
+    {
+      "path": "custom/inc/SMS.h",
+      "changes": 4
     },
     {
       "path": "custom/Hardware.c",
@@ -143,42 +182,6 @@
     {
       "path": "custom/PktSave.c",
       "changes": 4
-    },
-    {
-      "path": "custom/SOS.c",
-      "changes": 4
-    },
-    {
-      "path": "custom/Systic.c",
-      "changes": 4
-    },
-    {
-      "path": "custom/inc/File.h",
-      "changes": 4
-    },
-    {
-      "path": "custom/inc/Server.h",
-      "changes": 4
-    },
-    {
-      "path": "custom/main.c",
-      "changes": 4
-    },
-    {
-      "path": "custom/TCP.c",
-      "changes": 3
-    },
-    {
-      "path": "LOGS.txt",
-      "changes": 3
-    },
-    {
-      "path": "custom/Alert.c",
-      "changes": 3
-    },
-    {
-      "path": "custom/MCU.c",
-      "changes": 3
     }
   ],
   "largest_source_files": [
@@ -240,7 +243,7 @@
       "path": "custom/Server.c",
       "extension": ".c",
       "language": "C",
-      "size": 182806
+      "size": 183867
     },
     {
       "path": "reference/src/Server.c",
@@ -282,7 +285,7 @@
       "path": "custom/SMS.c",
       "extension": ".c",
       "language": "C",
-      "size": 115312
+      "size": 118958
     },
     {
       "path": "QuectelM031-main/Library/CMSIS/Include/core_cm4.h",
@@ -350,7 +353,7 @@
       "path": "AMD3_PROTOCOL_IMPLEMENTATION.md",
       "extension": ".md",
       "language": null,
-      "size": 30604
+      "size": 30644
     },
     {
       "path": "APMQuectelSCH.pdf",
@@ -417,6 +420,12 @@
       "extension": ".pdf",
       "language": null,
       "size": 2390867
+    },
+    {
+      "path": "QuectelM031-main.zip",
+      "extension": ".zip",
+      "language": null,
+      "size": 9046841
     },
     {
       "path": "QuectelM031-main/.gitignore",
@@ -3140,7 +3149,7 @@
       "path": "custom/File.c",
       "extension": ".c",
       "language": "C",
-      "size": 35071
+      "size": 35055
     },
     {
       "path": "custom/File.c.bak_unified",
@@ -3158,7 +3167,7 @@
       "path": "custom/GPS.c",
       "extension": ".c",
       "language": "C",
-      "size": 40842
+      "size": 50447
     },
     {
       "path": "custom/Geofence.c",
@@ -3224,7 +3233,7 @@
       "path": "custom/SMS.c",
       "extension": ".c",
       "language": "C",
-      "size": 115312
+      "size": 118958
     },
     {
       "path": "custom/SMSLib.c",
@@ -3236,7 +3245,7 @@
       "path": "custom/SOS.c",
       "extension": ".c",
       "language": "C",
-      "size": 8524
+      "size": 7989
     },
     {
       "path": "custom/SOS.c.bak_unified",
@@ -3260,7 +3269,7 @@
       "path": "custom/Server.c",
       "extension": ".c",
       "language": "C",
-      "size": 182806
+      "size": 183867
     },
     {
       "path": "custom/Server.c.bak_unified",
@@ -3278,7 +3287,7 @@
       "path": "custom/Systic.c",
       "extension": ".c",
       "language": "C",
-      "size": 18727
+      "size": 19235
     },
     {
       "path": "custom/TCP.c",
@@ -3302,7 +3311,7 @@
       "path": "custom/config/custom_feature_def.h",
       "extension": ".h",
       "language": "C/C++ Header",
-      "size": 4617
+      "size": 5265
     },
     {
       "path": "custom/config/custom_feature_def.h.bak_unified",
@@ -3434,7 +3443,7 @@
       "path": "custom/inc/File.h",
       "extension": ".h",
       "language": "C/C++ Header",
-      "size": 3689
+      "size": 3741
     },
     {
       "path": "custom/inc/File.h.bak_unified",
@@ -3452,7 +3461,7 @@
       "path": "custom/inc/GPS.h",
       "extension": ".h",
       "language": "C/C++ Header",
-      "size": 2797
+      "size": 3541
     },
     {
       "path": "custom/inc/Geofence.h",
@@ -3524,7 +3533,7 @@
       "path": "custom/inc/SMS.h",
       "extension": ".h",
       "language": "C/C++ Header",
-      "size": 2231
+      "size": 2272
     },
     {
       "path": "custom/inc/SMSlib.h",
@@ -3548,7 +3557,7 @@
       "path": "custom/inc/Server.h",
       "extension": ".h",
       "language": "C/C++ Header",
-      "size": 6044
+      "size": 6098
     },
     {
       "path": "custom/inc/Server.h.bak_unified",
@@ -3584,7 +3593,7 @@
       "path": "custom/inc/VTS.h",
       "extension": ".h",
       "language": "C/C++ Header",
-      "size": 21420
+      "size": 21379
     },
     {
       "path": "custom/inc/VTS.h.bak_unified",
@@ -4646,7 +4655,31 @@
       "path": "tests/og_delivery_regression.py",
       "extension": ".py",
       "language": "Python",
-      "size": 6876
+      "size": 6995
+    },
+    {
+      "path": "tests/og_prf_signal_regression.py",
+      "extension": ".py",
+      "language": "Python",
+      "size": 1866
+    },
+    {
+      "path": "tests/og_pvt_format_regression.py",
+      "extension": ".py",
+      "language": "Python",
+      "size": 7598
+    },
+    {
+      "path": "tests/og_tamper_test_regression.py",
+      "extension": ".py",
+      "language": "Python",
+      "size": 3512
+    },
+    {
+      "path": "tests/og_wirecut_disable_regression.py",
+      "extension": ".py",
+      "language": "Python",
+      "size": 4531
     },
     {
       "path": "walkthrough.md",

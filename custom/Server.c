@@ -1382,7 +1382,7 @@ void InitBuffer(uint8_t alt)
 		!PVTAppendChar(',') || !PVTAppendChar(GPS.LatDir ? GPS.LatDir : 'N') || !PVTAppendChar(',') ||
 		!PVTAppendVariable(sLongitude, 20, 20, 0, "0.000000") || !PVTAppendChar(',') ||
 		!PVTAppendChar(GPS.LngDir ? GPS.LngDir : 'E') || !PVTAppendChar(',') ||
-		!PVTAppendFloat(GPS.Speed, "%05.1f") || !PVTAppendChar(',') || !PVTAppendFloat(GPS.Heading, "%06.2f") ||
+		!PVTAppendFloat(GPS.Speed, "%05.1f") || !PVTAppendChar(',') || !PVTAppendUInt((uint32_t)(GPS.Heading + 0.5), "%u") ||
 		!PVTAppendChar(',') || !PVTAppendUInt(GPS.NoOfSatalite, "%02d") || !PVTAppendChar(',') ||
 		!PVTAppendFloat(GPS.Altitude, "%03.1f") || !PVTAppendChar(',') || !PVTAppendFloat(GPS.PDOP, "%04.1f") ||
 		!PVTAppendChar(',') || !PVTAppendFloat(GPS.HDOP, "%04.1f") || !PVTAppendChar(',') ||
@@ -1392,7 +1392,7 @@ void InitBuffer(uint8_t alt)
 		!PVTAppendFloat(PeriPheralVal.BattVolt, "%03.1f") || !PVTAppendChar(',') ||
 		!PVTAppendChar((VAlert[SOS_ON_ALERT].Enable || VAlert[SOS_OFF_ALERT].Enable) ? '1' : '0') || !PVTAppendChar(',') ||
 		!PVTAppendChar(PeriPheralVal.IsCoverOpen ? 'O' : 'C') || !PVTAppendChar(',') ||
-		!PVTAppendUInt(GSM.SignalStrength, "%2d") || !PVTAppendChar(',') || !PVTAppendUInt(GSM.MCC, "%02d") ||
+		!PVTAppendUInt(GetReportedSignalStrength(), "%2d") || !PVTAppendChar(',') || !PVTAppendUInt(GSM.MCC, "%02d") ||
 		!PVTAppendChar(',') || !PVTAppendUInt(GSM.MNC, "%02d") || !PVTAppendChar(',') ||
 		!PVTAppendVariable(GSM.LAC, sizeof(GSM.LAC), 5, 4, "00D6") || !PVTAppendChar(',') ||
 		!PVTAppendVariable(GSM.CellID, sizeof(GSM.CellID), 5, 4, "CFBD") || !PVTAppendChar(','))
@@ -1414,7 +1414,7 @@ void InitBuffer(uint8_t alt)
 	if (!PVTAppendChar(PeriPheralVal.OP1 + '0') || !PVTAppendChar(PeriPheralVal.OP2 + '0') || !PVTAppendChar(',') ||
 		!PVTAppendUInt(FrameNumber, "%06d") || !PVTAppendChar(',') || !PVTAppendBounded("0.00,0.00,", sizeof("0.00,0.00,"))) goto packet_overflow;
 	dd = (float)DeltaDis;
-	if (!PVTAppendFloat(dd, "%05.1f") || !PVTAppendChar(',')) goto packet_overflow;
+	if (!PVTAppendFloat(dd, "%.2f") || !PVTAppendChar(',')) goto packet_overflow;
 
 	/* OTA response - AMD3 sect10 */
 	if (LastOTAResponse.Pending && alt == 12)
@@ -1430,24 +1430,17 @@ void InitBuffer(uint8_t alt)
 	{
 		if (!PVTAppendBounded("()", 3)) goto packet_overflow;
 	}
-	if (!PVTAppendChar(',')) goto packet_overflow;
 
-	/* TrailerID: first active RFID sensor, else () */
+	/* TrailerID: append first active RFID sensor tag if present, else terminate with no second () */
+	for (i = 0; i < MAX_SENSORS; i++)
 	{
-		uint8_t rfid_found = 0;
-		for (i = 0; i < MAX_SENSORS; i++)
+		if (SensorData[i].SensorType == SENSOR_TYPE_RFID && SensorData[i].IsActive)
 		{
-			if (SensorData[i].SensorType == SENSOR_TYPE_RFID && SensorData[i].IsActive)
-			{
 			Ql_snprintf(ss, sizeof(ss), "TAG%.*s", 12,
 				(const char*)SensorData[i].SensorData);
-			if (!PVTAppendBounded(ss, sizeof(ss))) goto packet_overflow;
-				rfid_found = 1;
-				break;
-			}
+			if (!PVTAppendChar(',') || !PVTAppendBounded(ss, sizeof(ss))) goto packet_overflow;
+			break;
 		}
-		if (!rfid_found)
-			if (!PVTAppendBounded("()", 3)) goto packet_overflow;
 	}
 
 	cs = GetXORChecksum(dataBuffer + 1, Ql_strlen(dataBuffer) - 1);
@@ -1930,7 +1923,7 @@ uint16_t MakeCriticalString(uint8_t IsURE)
 							continueCondition = 1;
 						else if(i == OVER_SPEED_ALERT && IsOverSpeed)
 							continueCondition = 1;
-						else if(SOS.IsSOS || SOS.IsSOSTamper)
+						else if(SOS.IsSOS || (!VTSData.DisableSOSTamper && SOS.IsSOSTamper))
 							continueCondition = 1;
 
 						if(!continueCondition)
@@ -2552,6 +2545,10 @@ void MakeParamChangeString(char* Sender, char* param, uint8_t IsServer)
 void SMSAlert(uint8_t AlertNum)
 {
 	uint8_t tm=125;
+#if !SOS_WIRECUT_SMS_ENABLED
+	if(AlertNum == 16)
+		return;
+#endif
 	if(GSM.GSMState < GPRS_INIT)
 		return;
 	Ql_memset(SimData,0x00,MSGSIZE);
@@ -4358,6 +4355,37 @@ void MakeSMSFallbackPacket(void)
 
 
 
+#ifdef PROTO_OG
+/* A manufacturing test is independent of physical tamper state and its
+ * persisted disable setting. Keep it pending until a PVT endpoint accepts it. */
+static uint8_t SOSTamperTestPending = 0;
+
+void QueueSOSTamperTest(void)
+{
+	SOSTamperTestPending = 1;
+}
+
+static void HandleSOSTamperTest(void)
+{
+	uint8_t sent = 0;
+	if (!SOSTamperTestPending) return;
+	if (ServerSocket[0].SocketState != SOCKET_CONNECTED &&
+		ServerSocket[2].SocketState != SOCKET_CONNECTED
+		#ifdef EXTENDED_IPS
+		&& ServerSocket[3].SocketState != SOCKET_CONNECTED
+		#endif
+	) return;
+
+	InitBuffer(16);
+	sent |= TCPSocket_SendString(&ServerSocket[0], dataBuffer);
+	sent |= TCPSocket_SendString(&ServerSocket[2], dataBuffer);
+	#ifdef EXTENDED_IPS
+	sent |= TCPSocket_SendString(&ServerSocket[3], dataBuffer);
+	#endif
+	if (sent) SOSTamperTestPending = 0;
+}
+#endif
+
 void CheckAlerts(void)
 {
 	if(VAlert[SOS_ON_ALERT].Enable)
@@ -4973,9 +5001,9 @@ uint8_t GetBatchData(void)
 	 * be processed until the POST returns, and SOS may time out first.
 	 * Deferring batch until after the emergency clears costs at most one
 	 * normal-interval delay and guarantees the EPB gets through. */
-	if(SOS.IsSOS || SOS.IsSOSTamper || VAlert[SOS_OFF_ALERT].Enable) {
+	if(SOS.IsSOS || (!VTSData.DisableSOSTamper && SOS.IsSOSTamper) || VAlert[SOS_OFF_ALERT].Enable) {
 		LOGData(TAG_SERVER, "GetBatchData: skipping batch — emergency state active (SOS=%d Tamp=%d SOSOff=%d)",
-			SOS.IsSOS, SOS.IsSOSTamper, VAlert[SOS_OFF_ALERT].Enable);
+			SOS.IsSOS, (!VTSData.DisableSOSTamper && SOS.IsSOSTamper), VAlert[SOS_OFF_ALERT].Enable);
 		return 0;
 	}
 
@@ -5418,6 +5446,7 @@ static void handleLoginRequests(void) {
 
 static void handlePackets(void) {
     #ifdef PROTO_OG
+	HandleSOSTamperTest();
     /* Route by Channel, never by the displayed address. Pending replies use
      * OA/12 only and must never block alerts, history or periodic packets. */
     static uint16_t otaAckWait = 0;
@@ -5803,7 +5832,7 @@ static void handleCriticalPackets(void) {
 		/* SOS_OFF_ALERT must also bypass the queue — after timeout ResetSOS() clears
 		 * IsSOS, so the EPB11 packet would fall into the normal queue path and sit
 		 * behind NRM packets until evicted to flash.  Include it in emergency bypass. */
-		isEmergencyState = SOS.IsSOS || SOS.IsSOSTamper || VAlert[SOS_OFF_ALERT].Enable;
+		isEmergencyState = SOS.IsSOS || (!VTSData.DisableSOSTamper && SOS.IsSOSTamper) || VAlert[SOS_OFF_ALERT].Enable;
 		if(isEmergencyState) {
 			criticalTimeout = VTSData.IntervalData.EnergencyInterval;
 		}
@@ -5917,7 +5946,7 @@ static void handleRepeatingCriticalPackets(void) {
 	}
 
 	VehicleState.PacketState = CRITICAL;
-	critInterval = (SOS.IsSOS || SOS.IsSOSTamper) ?
+	critInterval = (SOS.IsSOS || (!VTSData.DisableSOSTamper && SOS.IsSOSTamper)) ?
 		VTSData.IntervalData.EnergencyInterval :
 		VTSData.IntervalData.CurrentInterval;
 
@@ -6031,12 +6060,12 @@ static void handleRegularPackets(void) {
 	uint16_t resp = 0;
 	uint8_t hasContinuousCritical;
 
-	hasContinuousCritical = SOS.IsSOS || SOS.IsSOSTamper ||
+	hasContinuousCritical = SOS.IsSOS || (!VTSData.DisableSOSTamper && SOS.IsSOSTamper) ||
 		(VAlert[TILT_ALERT].Enable && VAlert[TILT_ALERT].AlertSent) ||
 		VAlert[SOS_OFF_ALERT].Enable;
 
 	LOGData(TAG_SERVER, "NRM guard: OVS=%d IsSOS=%d IsTamp=%d TiltEnSnt=%d%d SOSOff=%d",
-		IsOverSpeed, SOS.IsSOS, SOS.IsSOSTamper,
+		IsOverSpeed, SOS.IsSOS, (!VTSData.DisableSOSTamper && SOS.IsSOSTamper),
 		VAlert[TILT_ALERT].Enable, VAlert[TILT_ALERT].AlertSent,
 		VAlert[SOS_OFF_ALERT].Enable);
 

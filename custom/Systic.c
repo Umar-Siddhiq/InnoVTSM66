@@ -204,7 +204,7 @@ void UpdateTick(void)
 //	else
 //		IntervalTick.CriticalTick++;
     #else
-    uint8_t inContinuousCritical = SOS.IsSOS || SOS.IsSOSTamper || PeriPheralVal.IsTilt || IsOverSpeed;
+    uint8_t inContinuousCritical = SOS.IsSOS || (!VTSData.DisableSOSTamper && SOS.IsSOSTamper) || PeriPheralVal.IsTilt || IsOverSpeed;
     if(inContinuousCritical && (IntervalTick.CriticalTick >= VTSData.IntervalData.EnergencyInterval-CONNTECTION_PRETIME))
         HTTPConnectFlag=1;
     else
@@ -384,15 +384,24 @@ void UpdateTick(void)
     /* SOS tamper timeout — clears SOS_TMP_ALERT if button/input is stuck. */
     if(SOS.IsSOSTamper)
     {
-        SOS.SOSTamperTimeLapsed++;
-        if(SOS.SOSTamperTimeLapsed >= SOS.SOSTimeOut)
+        if(VTSData.DisableSOSTamper)
         {
-            SOS.SOSTamperTimeLapsed = 0;
             SOS.IsSOSTamper = 0;
-            SOS.SOSPushCount = 0;
-            SOS.RequireRelease = 1;
+            SOS.SOSTamperTimeLapsed = 0;
             RemoveAlert(SOS_TMP_ALERT);
-            LOGData(TAG_SOS, "SOS Tamper Timeout OFF");
+        }
+        else
+        {
+            SOS.SOSTamperTimeLapsed++;
+            if(SOS.SOSTamperTimeLapsed >= SOS.SOSTimeOut)
+            {
+                SOS.SOSTamperTimeLapsed = 0;
+                SOS.IsSOSTamper = 0;
+                SOS.SOSPushCount = 0;
+                SOS.RequireRelease = 1;
+                RemoveAlert(SOS_TMP_ALERT);
+                LOGData(TAG_SOS, "SOS Tamper Timeout OFF");
+            }
         }
     }
 

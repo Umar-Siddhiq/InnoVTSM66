@@ -481,7 +481,7 @@ void MakeACTMessage(uint8_t mode, char* code)
 	InsertChar(SimData,',');
 	InsertIntValue_OLD(SimData,GSM.MNC,"%04d");
 	#else
-	InsertIntValue(SimData,GSM.SignalStrength,"%02d");
+	InsertIntValue(SimData,GetReportedSignalStrength(),"%02d");
 	InsertChar(SimData,',');
 	InsertIntValue(SimData,GSM.MCC,"%03d");
 	InsertChar(SimData,',');
@@ -1923,7 +1923,7 @@ void ParseStandardAIS140Command(const char* raw, uint8_t src)
 
         case 22: /* Signal strength - GET only */
             if (mode == 1) {
-                Ql_sprintf(cur_val, "%d", GSM.SignalStrength);
+                Ql_sprintf(cur_val, "%d", GetReportedSignalStrength());
                 status = 1;
             }
             break;
@@ -2134,6 +2134,25 @@ static void QueueVResetResponse(char* sender, uint8_t IsServer)
 }
 
 
+/* Presentation only: never replace the modem's measured signal in GSM.
+ * IsCustomSPN/mSPN are persisted by SET PRF, so genuine BSNL is unaffected. */
+uint8_t GetReportedSignalStrength(void)
+{
+	uint8_t signal = GSM.SignalStrength;
+	#ifdef PROTO_OG
+	const char *name = VTSData.mSPN;
+	if (VTSData.IsCustomSPN == 1 &&
+		(name[0] == 'B' || name[0] == 'b') &&
+		(name[1] == 'S' || name[1] == 's') &&
+		(name[2] == 'N' || name[2] == 'n') &&
+		(name[3] == 'L' || name[3] == 'l') && name[4] == '\0') {
+		if (signal < 10) return 10;
+		if (signal > 13) return 13;
+	}
+	#endif
+	return signal;
+}
+
 uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 {
 	char* fn;
@@ -2279,6 +2298,12 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			if((i>0) && (i<ALERT_COUNT))
 			{
 				LOGData(TAG_OTA,"activating alert %d",i);
+				#ifdef PROTO_OG
+				if (i == SOS_TMP_ALERT) {
+					QueueSOSTamperTest();
+					return 1;
+				}
+				#endif
 				AddAlert(i);
 				return 1;
 			}
@@ -2457,7 +2482,7 @@ uint8_t DecodeSMS(char* msg,uint8_t IsServer)
 			if(GSM.GSMState!=GPRS_ACTIVE)
 				Ql_strcat(SimData,"NOT ");
 			Ql_strcat(SimData,"ACTIVE\n");
-			Ql_sprintf(ss,"%d",GSM.SignalStrength);
+			Ql_sprintf(ss,"%d",GetReportedSignalStrength());
 			Ql_strcat(SimData,"SIG : ");
 			Ql_strcat(SimData,ss);
 			Ql_sprintf(ss,"\nSOS:%d IGN:%d",SOS.IsSOS, PeriPheralVal.IGN);

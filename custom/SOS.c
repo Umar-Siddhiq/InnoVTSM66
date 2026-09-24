@@ -130,33 +130,23 @@ void ProcessSOS(void)
 	 * permanently, so the tamper threshold is crossed exactly like a stuck button. */
 	if(pinValue == SOS_ACTIVE_LEVEL)
 	{
-		/* Count always increments while button is held — moved outside the
-		 * RequireRelease gate.  Previously, SOS ON set RequireRelease=1 and
-		 * reset count=0, so the tamper check (count > SOS_TAMPER_COUNT) could
-		 * never fire because counting stopped at 0.  Counting unconditionally
-		 * lets a prolonged hold accumulate past the tamper threshold even after
-		 * SOS has already fired.  With NC circuit, also counts when wire is cut. */
-		SOS.SOSPushCount++;
+		if(SOS.SOSPushCount < 250)
+			SOS.SOSPushCount++;
 
-		/* Tamper: button held longer than SOS_TAMPER_COUNT ticks (~2.1s) or wire cut.
-		 * If SOS ON was activated during count, clear SOS ON so removal only sends Alert 16. */
-		if(SOS.SOSPushCount > SOS_TAMPER_COUNT && !SOS.IsSOSTamper)
+		/* Tamper / Wirecut: Disabled when DisableSOSTamper is set.
+		 * Prevents false alerts, SMS, continuous critical loops, and stuck latch when wire is cut. */
+		if(!VTSData.DisableSOSTamper && SOS.SOSPushCount > SOS_TAMPER_COUNT && !SOS.IsSOSTamper)
 		{
 			SOS.SOSPushCount=0;
 			LOGData(TAG_SOS,"********************SOS TAMPERED / WIRECUT!! (Code 02) ***********************");
 			SOS.IsSOSTamper=1;
 			SOS.RequireRelease=1; // Latch until button returns to idle level to prevent false triggers
-			if(!VTSData.DisableSOSTamper)
-			{
-				VAlert[SOS_TMP_ALERT].Enable=1;
-				AddAlert(SOS_TMP_ALERT);
-				IsPacketReady.IsCriticalPacket=1;
-				SMSAlert(16);
-			}
-			else
-			{
-				LOGData(TAG_SOS, "SOS Tamper Alert to server is DISABLED");
-			}
+			VAlert[SOS_TMP_ALERT].Enable=1;
+			AddAlert(SOS_TMP_ALERT);
+			IsPacketReady.IsCriticalPacket=1;
+			#if SOS_WIRECUT_SMS_ENABLED
+			SMSAlert(16);
+			#endif
 			return;
 		}
 	}
@@ -196,7 +186,10 @@ void ProcessSOS(void)
 			SOS.IsSOSTamper=0;
 			LOGData(TAG_SOS, "SOS Tamper Alert OFF (Wire Reconnected)");
 			RemoveAlert(SOS_TMP_ALERT);
-			IsPacketReady.IsCriticalPacket = 1;
+			if(!VTSData.DisableSOSTamper)
+			{
+				IsPacketReady.IsCriticalPacket = 1;
+			}
 		}
 	}
 }
@@ -233,26 +226,19 @@ void ProcessSOS(void)
 	 * → SOSPushCount crosses SOS_TAMPER_COUNT → tamper fires without hardware change. */
 	if(pinValue == SOS_ACTIVE_LEVEL)
 	{
-		/* Same fix as ProcessSOSCDAC: count unconditionally so that a prolonged
-		 * hold reaches SOS_TAMPER_COUNT even after SOS has already fired and
-		 * set RequireRelease=1.  With NC circuit also counts when wire is cut. */
-		SOS.SOSPushCount++;
+		if(SOS.SOSPushCount < 250)
+			SOS.SOSPushCount++;
 
-		if(SOS.SOSPushCount > SOS_TAMPER_COUNT && !SOS.IsSOSTamper)
+		/* Tamper / Wirecut: Disabled when DisableSOSTamper is set.
+		 * Prevents false alerts, continuous critical loops, and stuck latch when wire is cut. */
+		if(!VTSData.DisableSOSTamper && SOS.SOSPushCount > SOS_TAMPER_COUNT && !SOS.IsSOSTamper)
 		{
 			SOS.SOSPushCount=0;
 			LOGData(TAG_SOS,"********************\nSOS Temper Alert ON********************\n");
 			SOS.IsSOSTamper=1;
 			SOS.RequireRelease=1; // Latch until button returns to idle level to prevent false triggers
-			if(!VTSData.DisableSOSTamper)
-			{
-				AddAlert(SOS_TMP_ALERT);
-				IsPacketReady.IsCriticalPacket=1;
-			}
-			else
-			{
-				LOGData(TAG_SOS, "SOS Tamper Alert to server is DISABLED");
-			}
+			AddAlert(SOS_TMP_ALERT);
+			IsPacketReady.IsCriticalPacket=1;
 			return;
 		}
 	}
@@ -298,7 +284,10 @@ void ProcessSOS(void)
 			SOS.IsSOSTamper=0;
 			LOGData(TAG_SOS,"********************\nSOS Temper Alert OFF********************\n");
 			RemoveAlert(SOS_TMP_ALERT);
-			IsPacketReady.IsCriticalPacket = 1;
+			if(!VTSData.DisableSOSTamper)
+			{
+				IsPacketReady.IsCriticalPacket = 1;
+			}
 		}
 	}
 }

@@ -5,6 +5,7 @@
 #include "SMSlib.h"
 #define MSGSIZE			400
 extern char SMSSender[];
+uint8_t GetReportedSignalStrength(void);
 extern uint16_t IsSMS;
 extern char SMSData[];
 extern char SimData[];

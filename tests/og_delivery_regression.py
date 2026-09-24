@@ -99,6 +99,8 @@ void valid_checksum(const char *packet) {
     assert(cs==GetXORChecksum(packet+1,star-packet-1));
 }
 '''
+program += "\nstatic uint8_t SOSTamperTestPending = 0;\n"
+program += function("static void HandleSOSTamperTest(void)")
 program += history + "\n" + normal + "\n" + function("static void handlePackets(void)")
 program += r'''
 int main(void) {

@@ -67,6 +67,9 @@ void SMSAlert(uint8_t AlertNum);
 extern char Server1RxData[];
 extern char Server2RxData[];
 extern char dataBuffer[DATA_MAX_BUFF];
+#ifdef PROTO_OG
+void QueueSOSTamperTest(void);
+#endif
 
 typedef struct
 {

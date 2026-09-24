@@ -702,10 +702,8 @@ void LoadConfig(void)
         return;
     }
 
-    if (VTSData.DisableSOSTamper != 0 && VTSData.DisableSOSTamper != 1)
-    {
-        VTSData.DisableSOSTamper = DEFAULT_DISABLE_SOS_TAMPER;
-    }
+    /* Enforce SOS wirecut/tamper alert disabled across overall code */
+    VTSData.DisableSOSTamper = DEFAULT_DISABLE_SOS_TAMPER;
 
     InitGeoState();
     InitSockets();
